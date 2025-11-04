@@ -46,11 +46,11 @@ const Navigation = () => {
                 {link.name}
               </Link>
             ))}
-            <Link to="/admin">
+            {/* <Link to="/admin">
               <Button variant="outline" size="sm">
                 Admin
               </Button>
-            </Link>
+            </Link> */}
           </div>
 
           {/* Mobile Menu Button */}
@@ -81,7 +81,7 @@ const Navigation = () => {
                 {link.name}
               </Link>
             ))}
-            <Link
+            {/* <Link
               to="/admin"
               onClick={() => setIsOpen(false)}
               className="block px-3 py-2"
@@ -89,7 +89,7 @@ const Navigation = () => {
               <Button variant="outline" size="sm" className="w-full">
                 Admin
               </Button>
-            </Link>
+            </Link> */}
           </div>
         )}
       </div>
