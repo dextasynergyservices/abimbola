@@ -11,7 +11,7 @@ const Footer = () => {
             <div className="flex items-center space-x-2">
               <BookOpen className="h-6 w-6 text-primary" />
               <span className="text-lg font-display font-bold gradient-text">
-                Eden's Nest
+                Abimola Lawuyi
               </span>
             </div>
             <p className="text-sm text-muted-foreground">
@@ -108,7 +108,7 @@ const Footer = () => {
                 <Instagram className="h-5 w-5" />
               </a>
               <a
-                href="mailto:hello@edensnest.com"
+                href="mailto:hello@abimolalawuyi.com"
                 className="text-muted-foreground hover:text-primary transition-colors"
                 aria-label="Email"
               >
@@ -120,7 +120,7 @@ const Footer = () => {
 
         <div className="mt-8 pt-8 border-t border-border text-center">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Eden's Nest. All rights reserved.
+            © {new Date().getFullYear()} Abimola Lawuyi. All rights reserved.
           </p>
         </div>
       </div>

@@ -11,7 +11,7 @@ const About = () => {
       <section className="bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 section-padding">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-display font-bold mb-6">
-            About Eden's Nest
+            About Abimola Lawuyi
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl">
             Where thoughtful words and curated stories come together
@@ -22,7 +22,7 @@ const About = () => {
       <section className="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-16">
         <div className="prose prose-lg max-w-none space-y-6">
           <p className="text-lg text-muted-foreground leading-relaxed">
-            Eden's Nest was founded on a simple belief: that words have the power to transform lives. Whether through the reflective insights of a thoughtful blog post or the immersive journey of a carefully chosen book, we believe in the magic of storytelling and the wisdom found in the written word.
+            Abimola Lawuyi was founded on a simple belief: that words have the power to transform lives. Whether through the reflective insights of a thoughtful blog post or the immersive journey of a carefully chosen book, we believe in the magic of storytelling and the wisdom found in the written word.
           </p>
 
           <h2 className="text-3xl font-display font-bold mt-12 mb-6">Our Mission</h2>
@@ -66,11 +66,11 @@ const About = () => {
           <h2 className="text-3xl font-display font-bold mt-12 mb-6">Our Story</h2>
           
           <p className="text-muted-foreground leading-relaxed">
-            Eden's Nest began as a small passion project in 2020, born from a love of literature and a desire to create a space where readers could discover both insightful articles and beautiful books. What started as a personal blog has grown into a full-fledged platform serving thousands of readers worldwide.
+            Abimola Lawuyi began as a small passion project in 2020, born from a love of literature and a desire to create a space where readers could discover both insightful articles and beautiful books. What started as a personal blog has grown into a full-fledged platform serving thousands of readers worldwide.
           </p>
 
           <p className="text-muted-foreground leading-relaxed">
-            Today, we continue to honor our founding principles: to provide quality content, to celebrate the written word, and to foster a community of curious, thoughtful readers. Whether you're here for our blog, browsing our bookstore, or both, we're grateful to have you as part of the Eden's Nest community.
+            Today, we continue to honor our founding principles: to provide quality content, to celebrate the written word, and to foster a community of curious, thoughtful readers. Whether you're here for our blog, browsing our bookstore, or both, we're grateful to have you as part of the Abimola Lawuyi community.
           </p>
         </div>
       </section>

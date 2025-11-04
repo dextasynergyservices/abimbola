@@ -68,7 +68,7 @@ const Index = () => {
         
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-display font-bold text-primary-foreground mb-6 animate-fade-in">
-            Welcome to Eden's Nest
+            Welcome to Abimola Lawuyi
           </h1>
           <p className="text-xl md:text-2xl text-primary-foreground/90 mb-8 animate-fade-in">
             Your garden of knowledge — where stories bloom and wisdom grows

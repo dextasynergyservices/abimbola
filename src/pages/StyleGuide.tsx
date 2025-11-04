@@ -14,7 +14,7 @@ const StyleGuide = () => {
           Style Guide
         </h1>
         <p className="text-xl text-muted-foreground mb-12">
-          Design system and component library for Eden's Nest
+          Design system and component library for Abimola Lawuyi
         </p>
 
         {/* Colors */}

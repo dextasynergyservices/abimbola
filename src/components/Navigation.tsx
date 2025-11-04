@@ -26,7 +26,7 @@ const Navigation = () => {
           <Link to="/" className="flex items-center space-x-2">
             <BookOpen className="h-8 w-8 text-primary" />
             <span className="text-xl font-display font-bold gradient-text">
-              Eden's Nest
+              Abimola Lawuyi
             </span>
           </Link>
 
