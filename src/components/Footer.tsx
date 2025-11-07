@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { BookOpen, Facebook, Twitter, Instagram, Mail } from "lucide-react";
+import logo from "@/assets/AW - LOGO.png"
+
 
 const Footer = () => {
   return (
@@ -8,12 +10,13 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About */}
           <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <BookOpen className="h-6 w-6 text-primary" />
-              <span className="text-lg font-display font-bold gradient-text">
-                Abimola Lawuyi
-              </span>
-            </div>
+            <Link to="/" className="flex items-center">
+            <img 
+              src={logo} 
+              alt="Your Site Name" 
+              className="h-20 w-auto" 
+            />
+          </Link>
             <p className="text-sm text-muted-foreground">
               Your garden of knowledge. Discover thoughtful articles and curated
               books that nurture the mind and soul.

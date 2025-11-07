@@ -4,12 +4,13 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { ArrowRight, Calendar } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import heroImage from "@/assets/hero-image.jpg";
+import heroImage from "@/assets/HERO Background.png";
+import mobileHeroImage from "@/assets/HERO Background 2.png"
 import blogFeatured1 from "@/assets/blog-featured-1.jpg";
 import blogFeatured2 from "@/assets/blog-featured-2.jpg";
-import book1 from "@/assets/book-1.jpg";
-import book2 from "@/assets/book-2.jpg";
-import book3 from "@/assets/book-3.jpg";
+import book1 from "@/assets/ABIMBOLA PIX (2).png";
+import book2 from "@/assets/For BOOKS (2).png";
+import book3 from "@/assets/For BOOKS (1).png";
 
 const Index = () => {
   const featuredPosts = [
@@ -32,23 +33,23 @@ const Index = () => {
   const featuredBooks = [
     {
       id: 1,
-      title: "Geometric Thoughts",
-      author: "Sarah Mitchell",
-      price: "$24.99",
+      title: "Dear MOthers",
+      author: "Abimola Lawuyi",
+      price: "₦15,000",
       image: book1,
     },
     {
       id: 2,
-      title: "Botanical Wisdom",
-      author: "James Chen",
-      price: "$29.99",
+      title: "50 life lessons",
+      author: "Abimola Lawuyi",
+      price: "₦20,000",
       image: book2,
     },
     {
       id: 3,
-      title: "Tranquil Moments",
-      author: "Emily Rose",
-      price: "$19.99",
+      title: "Loving your children fully",
+      author: "Abimola Lawuyi",
+      price: "₦19,000",
       image: book3,
     },
   ];
@@ -58,36 +59,51 @@ const Index = () => {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${heroImage})` }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-accent/80" />
-        </div>
-        
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-7xl font-display font-bold text-primary-foreground mb-6 animate-fade-in">
-            Welcome to Abimola Lawuyi
-          </h1>
-          <p className="text-xl md:text-2xl text-primary-foreground/90 mb-8 animate-fade-in">
-            Your garden of knowledge — where stories bloom and wisdom grows
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
-            <Link to="/books">
-              <Button size="lg" variant="secondary" className="text-lg">
-                Explore Books
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link to="/blog">
-              <Button size="lg" variant="outline" className="text-lg bg-background/20 hover:bg-background/30 text-primary-foreground border-primary-foreground/30">
-                Read the Blog
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+{/* Hero Section */}
+<section className="relative h-[100vh] flex items-center justify-center overflow-hidden">
+  {/* Mobile background with left shift */}
+  <div 
+    className="absolute inset-0 md:hidden bg-cover bg-center"
+    style={{ 
+      backgroundImage: `url(${mobileHeroImage})`,
+      backgroundPosition: '65% center'
+    }}
+  />
+  
+  {/* Desktop background */}
+  <div 
+    className="absolute inset-0 hidden md:block bg-cover bg-center"
+    style={{ 
+      backgroundImage: `url(${heroImage})` 
+    }}
+  />
+  
+  {/* Overlay */}
+  <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-accent/80 opacity-50" />
+  
+  {/* Content */}
+  <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+    <h1 className="text-4xl md:text-5xl lg:text-7xl font-display font-bold text-primary-foreground mb-6 animate-fade-in">
+      Welcome to Abimbola Lawuyi
+    </h1>
+    <p className="text-lg md:text-xl lg:text-2xl text-primary-foreground/90 mb-8 animate-fade-in">
+      Your garden of knowledge — where stories bloom and wisdom grows
+    </p>
+    <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
+      <Link to="/books">
+        <Button size="lg" variant="secondary" className="text-lg">
+          Explore Books
+          <ArrowRight className="ml-2 h-5 w-5" />
+        </Button>
+      </Link>
+      <Link to="/blog">
+        <Button size="lg" variant="outline" className="text-lg bg-background/20 hover:bg-background/30 text-primary-foreground border-primary-foreground/30">
+          Read the Blog
+        </Button>
+      </Link>
+    </div>
+  </div>
+</section>
 
       {/* Featured Content Section */}
       <section className="section-padding max-w-7xl mx-auto w-full">

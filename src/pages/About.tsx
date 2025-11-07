@@ -1,7 +1,7 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
-import { BookOpen, Heart, Users } from "lucide-react";
+import { BookOpen, Heart, Users, Music, PenTool } from "lucide-react";
 
 const About = () => {
   return (
@@ -11,10 +11,10 @@ const About = () => {
       <section className="bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 section-padding">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-display font-bold mb-6">
-            About Abimola Lawuyi
+            About Abimbola Lawuyi
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl">
-            Where thoughtful words and curated stories come together
+            Sharing wisdom through stories, poetry, and life experiences
           </p>
         </div>
       </section>
@@ -22,32 +22,30 @@ const About = () => {
       <section className="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-16">
         <div className="prose prose-lg max-w-none space-y-6">
           <p className="text-lg text-muted-foreground leading-relaxed">
-            Abimola Lawuyi was founded on a simple belief: that words have the power to transform lives. Whether through the reflective insights of a thoughtful blog post or the immersive journey of a carefully chosen book, we believe in the magic of storytelling and the wisdom found in the written word.
+            Abimbola Lawuyi believes every life experience carries a lesson, and she is passionate about helping others discover theirs. With warmth and wisdom, she shares powerful insights on personal growth, relationships, and purposeful living, encouraging reflection, healing, and transformation.
           </p>
 
-          <h2 className="text-3xl font-display font-bold mt-12 mb-6">Our Mission</h2>
-          
           <p className="text-muted-foreground leading-relaxed">
-            We curate content and books that nourish the mind and soul. Our blog explores themes of mindfulness, personal growth, and the literary life, while our bookstore offers a carefully selected collection of titles that inspire, challenge, and delight.
+            A natural storyteller, Abimbola weaves real-life experiences with timeless truths through her writing, poetry, and songs, guiding readers toward greater self-awareness and fulfillment.
           </p>
 
           <div className="grid md:grid-cols-3 gap-6 my-12">
             <Card>
               <CardContent className="pt-6 text-center">
                 <BookOpen className="h-12 w-12 text-primary mx-auto mb-4" />
-                <h3 className="font-display font-semibold mb-2">Quality Content</h3>
+                <h3 className="font-display font-semibold mb-2">Published Author</h3>
                 <p className="text-sm text-muted-foreground">
-                  Thoughtfully written articles and carefully selected books
+                  Co-author of 40 Pearls of Wisdom and upcoming personal books
                 </p>
               </CardContent>
             </Card>
             
             <Card>
               <CardContent className="pt-6 text-center">
-                <Heart className="h-12 w-12 text-secondary mx-auto mb-4" />
-                <h3 className="font-display font-semibold mb-2">Passion for Reading</h3>
+                <PenTool className="h-12 w-12 text-secondary mx-auto mb-4" />
+                <h3 className="font-display font-semibold mb-2">Creative Writer</h3>
                 <p className="text-sm text-muted-foreground">
-                  We believe in the transformative power of reading
+                  Weaving stories, poetry, and songs from life experiences
                 </p>
               </CardContent>
             </Card>
@@ -55,23 +53,51 @@ const About = () => {
             <Card>
               <CardContent className="pt-6 text-center">
                 <Users className="h-12 w-12 text-accent mx-auto mb-4" />
-                <h3 className="font-display font-semibold mb-2">Community</h3>
+                <h3 className="font-display font-semibold mb-2">Mentor & Guide</h3>
                 <p className="text-sm text-muted-foreground">
-                  Building a community of thoughtful readers and writers
+                  Passionate about helping others discover life's lessons
                 </p>
               </CardContent>
             </Card>
           </div>
 
-          <h2 className="text-3xl font-display font-bold mt-12 mb-6">Our Story</h2>
+          <h2 className="text-3xl font-display font-bold mt-12 mb-6">Writing Journey</h2>
           
           <p className="text-muted-foreground leading-relaxed">
-            Abimola Lawuyi began as a small passion project in 2020, born from a love of literature and a desire to create a space where readers could discover both insightful articles and beautiful books. What started as a personal blog has grown into a full-fledged platform serving thousands of readers worldwide.
+            She is the co-author of <strong>40 Pearls of Wisdom</strong> and is currently working on two deeply personal books: <strong>Fifty Life Lessons @ 50</strong> and <strong>Dear Single</strong>.
+          </p>
+
+          <h2 className="text-3xl font-display font-bold mt-12 mb-6">Beyond Writing</h2>
+          
+          <p className="text-muted-foreground leading-relaxed">
+            When she's not writing or composing, Abimbola mentors others, contributes to school leadership and enjoys unwinding with music and movies.
           </p>
 
           <p className="text-muted-foreground leading-relaxed">
-            Today, we continue to honor our founding principles: to provide quality content, to celebrate the written word, and to foster a community of curious, thoughtful readers. Whether you're here for our blog, browsing our bookstore, or both, we're grateful to have you as part of the Abimola Lawuyi community.
+            She lives in Port Harcourt, Nigeria, with her family.
           </p>
+
+          <div className="grid md:grid-cols-2 gap-6 my-12">
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <Music className="h-12 w-12 text-primary mx-auto mb-4" />
+                <h3 className="font-display font-semibold mb-2">Creative Pursuits</h3>
+                <p className="text-sm text-muted-foreground">
+                  Composes songs and poetry that inspire and transform
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <Heart className="h-12 w-12 text-secondary mx-auto mb-4" />
+                <h3 className="font-display font-semibold mb-2">Community Impact</h3>
+                <p className="text-sm text-muted-foreground">
+                  Mentoring and educational leadership in her community
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 

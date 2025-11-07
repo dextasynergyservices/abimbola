@@ -5,64 +5,67 @@ import { Search, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import book1 from "@/assets/book-1.jpg";
-import book2 from "@/assets/book-2.jpg";
-import book3 from "@/assets/book-3.jpg";
+import book1 from "@/assets/For BOOKS (1).png";
+import book2 from "@/assets/For BOOKS (2).png";
+import book3 from "@/assets/ABIMBOLA PIX (2).png";
+import book4 from "@/assets/For BOOKS (3).png";
+import book5 from "@/assets/book-2.jpg";
+import book6 from "@/assets/book-3.jpg";
 
 const Books = () => {
   const books = [
     {
       id: 1,
-      title: "Geometric Thoughts",
-      author: "Sarah Mitchell",
-      price: "$24.99",
+      title: "The hardest part of loving your children",
+      author: "Abimola Lawuyi",
+      price: "₦15,000",
       rating: 4.5,
       image: book1,
       category: "Philosophy",
     },
     {
       id: 2,
-      title: "Botanical Wisdom",
-      author: "James Chen",
-      price: "$29.99",
+      title: "50 life lessons",
+      author: "Abimola Lawuyi",
+      price: "₦20,000",
       rating: 5.0,
       image: book2,
       category: "Nature",
     },
     {
       id: 3,
-      title: "Tranquil Moments",
-      author: "Emily Rose",
-      price: "$19.99",
+      title: "Dear Mothers",
+      author: "Abimola Lawuyi",
+      price: "₦19,000",
       rating: 4.8,
       image: book3,
       category: "Mindfulness",
     },
     {
       id: 4,
-      title: "Geometric Thoughts",
-      author: "Sarah Mitchell",
-      price: "$24.99",
+      title: "Loving your children",
+      author: "Abimola Lawuyi",
+      price: "₦24,990",
       rating: 4.5,
-      image: book1,
+      image: book4,
       category: "Philosophy",
     },
     {
       id: 5,
       title: "Botanical Wisdom",
-      author: "James Chen",
-      price: "$29.99",
+      author: "Abimola Lawuyi",
+      price: "₦29,000",
       rating: 5.0,
-      image: book2,
+      image: book5,
       category: "Nature",
     },
     {
       id: 6,
       title: "Tranquil Moments",
-      author: "Emily Rose",
-      price: "$19.99",
+      author: "Abimola Lawuyi",
+      price: "₦19,000",
       rating: 4.8,
-      image: book3,
+      image: book6,
       category: "Mindfulness",
     },
   ];

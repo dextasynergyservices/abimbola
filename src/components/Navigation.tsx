@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import logo from "@/assets/AW - LOGO.png"
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,7 +13,7 @@ const Navigation = () => {
     { name: "Home", path: "/" },
     { name: "Blog", path: "/blog" },
     { name: "Books", path: "/books" },
-    { name: "About Us", path: "/about" },
+    { name: "About Me", path: "/about" },
     { name: "Contact", path: "/contact" },
   ];
 
@@ -23,11 +24,12 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <BookOpen className="h-8 w-8 text-primary" />
-            <span className="text-xl font-display font-bold gradient-text">
-              Abimola Lawuyi
-            </span>
+          <Link to="/" className="flex items-center">
+            <img 
+              src={logo} 
+              alt="Your Site Name" 
+              className="h-20 w-auto" 
+            />
           </Link>
 
           {/* Desktop Navigation */}

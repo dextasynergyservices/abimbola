@@ -4,9 +4,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Star, ShoppingCart } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import book1 from "@/assets/book-1.jpg";
-import book2 from "@/assets/book-2.jpg";
-import book3 from "@/assets/book-3.jpg";
+import book1 from "@/assets/For BOOKS (1).png";
+import book2 from "@/assets/For BOOKS (2).png";
+import book3 from "@/assets/ABIMBOLA PIX (2).png";
+import book4 from "@/assets/For BOOKS (3).png";
+import book5 from "@/assets/book-2.jpg";
+import book6 from "@/assets/book-3.jpg";
 
 const BookDetail = () => {
   const relatedBooks = [
