@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Mail } from "lucide-react";
-
-const logo = "https://res.cloudinary.com/dxoorukfj/image/upload/v1782312802/Abimbola_LOGO_3_ms0jyd.png";
+const logo = "https://res.cloudinary.com/dxoorukfj/image/upload/v1782315132/Abimbola_LOGO_white_pwezaa.png";
 
 const Footer = () => {
   return (
