@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Mail } from "lucide-react";
-import logo from "@/assets/AW - LOGO.png";
+
+const logo = "https://res.cloudinary.com/dxoorukfj/image/upload/v1782312802/Abimbola_LOGO_3_ms0jyd.png";
 
 const Footer = () => {
   return (
@@ -13,7 +14,7 @@ const Footer = () => {
               <img
                 src={logo}
                 alt="Abimbola Lawuyi"
-                className="h-14 w-auto brightness-0 invert"
+                className="h-14 w-auto"
               />
             </Link>
             <p className="text-neutral-400 text-sm leading-relaxed max-w-xs">

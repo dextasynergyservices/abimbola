@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Feather, Heart, Users } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import heroPortrait from "@/assets/ABIMBOLA PIX (1).png";
@@ -152,7 +152,7 @@ const Index = () => {
           <div className="hero-features-inner">
 
             <div className="hero-feature-item">
-              <span className="hero-feature-icon">✏️</span>
+              <span className="hero-feature-icon text-[#d4930a]"><Feather className="w-5 h-5" /></span>
               <div>
                 <p className="hero-feature-title">Honest Stories</p>
                 <p className="hero-feature-sub">from real life</p>
@@ -162,7 +162,7 @@ const Index = () => {
             <div className="hero-feature-divider" />
 
             <div className="hero-feature-item">
-              <span className="hero-feature-icon">❤️</span>
+              <span className="hero-feature-icon text-[#d4930a]"><Heart className="w-5 h-5" /></span>
               <div>
                 <p className="hero-feature-title">Deep Reflections</p>
                 <p className="hero-feature-sub">on love &amp; life</p>
@@ -172,7 +172,7 @@ const Index = () => {
             <div className="hero-feature-divider" />
 
             <div className="hero-feature-item">
-              <span className="hero-feature-icon">👥</span>
+              <span className="hero-feature-icon text-[#d4930a]"><Users className="w-5 h-5" /></span>
               <div>
                 <p className="hero-feature-title">A Community</p>
                 <p className="hero-feature-sub">that gets it</p>

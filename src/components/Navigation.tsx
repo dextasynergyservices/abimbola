@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/AW - LOGO.png";
+
+const logo = "https://res.cloudinary.com/dxoorukfj/image/upload/v1782312802/Abimbola_LOGO_3_ms0jyd.png";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,13 +52,13 @@ const Navigation = () => {
       )}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20 md:h-32">
+        <div className="flex justify-between items-center h-20 md:h-24">
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <img
               src={logo}
               alt="Abimbola Lawuyi"
-              className="h-14 md:h-28 w-auto"
+              className="h-14 md:h-20 w-auto"
             />
           </Link>
 
