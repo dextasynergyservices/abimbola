@@ -1,64 +1,112 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, BookOpen } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/AW - LOGO.png"
+import logo from "@/assets/AW - LOGO.png";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
 
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Blog", path: "/blog" },
     { name: "Books", path: "/books" },
-    { name: "About Me", path: "/about" },
-    { name: "Contact", path: "/contact" },
+    { name: "Community", path: "#community" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
 
+  const handleNavClick = (path: string) => {
+    setIsOpen(false);
+    if (path.startsWith("#") && location.pathname === "/") {
+      const el = document.querySelector(path);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
+
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <nav
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
+        scrolled || isOpen
+          ? "bg-white/95 backdrop-blur-md shadow-[0_1px_0_rgba(0,0,0,0.06)]"
+          : "bg-transparent"
+      )}
+    >
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20 md:h-32">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <img 
-              src={logo} 
-              alt="Your Site Name" 
-              className="h-20 w-auto" 
+            <img
+              src={logo}
+              alt="Abimbola Lawuyi"
+              className="h-14 md:h-28 w-auto"
             />
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  isActive(link.path)
-                    ? "text-primary"
-                    : "text-muted-foreground"
-                )}
-              >
-                {link.name}
-              </Link>
-            ))}
-            {/* <Link to="/admin">
-              <Button variant="outline" size="sm">
-                Admin
-              </Button>
-            </Link> */}
+          <div className="hidden md:flex items-center gap-10">
+            {navLinks.map((link) =>
+              link.path.startsWith("#") ? (
+                <button
+                  key={link.path}
+                  onClick={() => handleNavClick(link.path)}
+                  className={cn(
+                    "text-[13px] font-medium tracking-wide uppercase link-underline transition-colors duration-300",
+                    scrolled ? "text-neutral-600 hover:text-black" : "text-neutral-500 hover:text-black"
+                  )}
+                >
+                  {link.name}
+                </button>
+              ) : (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={cn(
+                    "text-[13px] font-medium tracking-wide uppercase link-underline transition-colors duration-300",
+                    isActive(link.path)
+                      ? "text-black"
+                      : scrolled
+                        ? "text-neutral-600 hover:text-black"
+                        : "text-neutral-500 hover:text-black"
+                  )}
+                >
+                  {link.name}
+                </Link>
+              )
+            )}
+
+            {/* CTA Button */}
+            <Link
+              to="#newsletter"
+              onClick={() => handleNavClick("#newsletter")}
+              className="ml-2 px-5 py-2.5 bg-black text-white text-[13px] font-medium tracking-wide uppercase rounded-full hover:bg-neutral-800 transition-colors duration-300"
+            >
+              Get the Letters
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-md text-foreground hover:bg-muted"
+            className="md:hidden p-2 text-black"
             aria-label="Toggle menu"
           >
             {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -66,34 +114,49 @@ const Navigation = () => {
         </div>
 
         {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="md:hidden py-4 space-y-2 animate-fade-in">
-            {navLinks.map((link) => (
+        <div
+          className={cn(
+            "md:hidden overflow-hidden transition-all duration-500 ease-in-out",
+            isOpen ? "max-h-[400px] opacity-100 pb-8" : "max-h-0 opacity-0"
+          )}
+        >
+          <div className="flex flex-col gap-1 pt-2">
+            {navLinks.map((link) =>
+              link.path.startsWith("#") ? (
+                <button
+                  key={link.path}
+                  onClick={() => handleNavClick(link.path)}
+                  className="text-left px-4 py-3 text-[15px] font-medium text-neutral-600 hover:text-black hover:bg-neutral-50 rounded-lg transition-colors"
+                >
+                  {link.name}
+                </button>
+              ) : (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  onClick={() => setIsOpen(false)}
+                  className={cn(
+                    "px-4 py-3 text-[15px] font-medium rounded-lg transition-colors",
+                    isActive(link.path)
+                      ? "text-black bg-neutral-50"
+                      : "text-neutral-600 hover:text-black hover:bg-neutral-50"
+                  )}
+                >
+                  {link.name}
+                </Link>
+              )
+            )}
+            <div className="px-4 pt-3">
               <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setIsOpen(false)}
-                className={cn(
-                  "block px-3 py-2 rounded-md text-base font-medium transition-colors",
-                  isActive(link.path)
-                    ? "bg-primary text-primary-foreground"
-                    : "text-foreground hover:bg-muted"
-                )}
+                to="#newsletter"
+                onClick={() => handleNavClick("#newsletter")}
+                className="block text-center px-5 py-3 bg-black text-white text-[14px] font-medium rounded-full hover:bg-neutral-800 transition-colors"
               >
-                {link.name}
+                Get the Letters
               </Link>
-            ))}
-            {/* <Link
-              to="/admin"
-              onClick={() => setIsOpen(false)}
-              className="block px-3 py-2"
-            >
-              <Button variant="outline" size="sm" className="w-full">
-                Admin
-              </Button>
-            </Link> */}
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );

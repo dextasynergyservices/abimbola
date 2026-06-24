@@ -9,11 +9,8 @@ import book1 from "@/assets/For BOOKS (1).png";
 import book2 from "@/assets/For BOOKS (2).png";
 import book3 from "@/assets/ABIMBOLA PIX (2).png";
 import book4 from "@/assets/For BOOKS (3).png";
-import book5 from "@/assets/book-2.jpg";
-import book6 from "@/assets/book-3.jpg";
 
-const Books = () => {
-  const books = [
+export const books = [
     {
       id: 1,
       title: "The hardest part of loving your children",
@@ -50,26 +47,9 @@ const Books = () => {
       image: book4,
       category: "Philosophy",
     },
-    {
-      id: 5,
-      title: "Botanical Wisdom",
-      author: "Abimola Lawuyi",
-      price: "₦29,000",
-      rating: 5.0,
-      image: book5,
-      category: "Nature",
-    },
-    {
-      id: 6,
-      title: "Tranquil Moments",
-      author: "Abimola Lawuyi",
-      price: "₦19,000",
-      rating: 4.8,
-      image: book6,
-      category: "Mindfulness",
-    },
   ];
 
+const Books = () => {
   const categories = ["All", "Philosophy", "Nature", "Mindfulness", "Fiction", "Self-Help"];
 
   return (
@@ -159,7 +139,7 @@ const Books = () => {
                   </Button>
                 </Link>
                 <Button size="sm" className="flex-1">
-                  Add to Cart
+                  Buy
                 </Button>
               </CardFooter>
             </Card>

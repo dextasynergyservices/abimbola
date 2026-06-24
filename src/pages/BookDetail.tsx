@@ -1,58 +1,55 @@
-import { Link } from "react-router-dom";
+import { Link, useParams, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Star, ShoppingCart } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import book1 from "@/assets/For BOOKS (1).png";
-import book2 from "@/assets/For BOOKS (2).png";
-import book3 from "@/assets/ABIMBOLA PIX (2).png";
-import book4 from "@/assets/For BOOKS (3).png";
-import book5 from "@/assets/book-2.jpg";
-import book6 from "@/assets/book-3.jpg";
+import { books } from "./Books";
 
 const BookDetail = () => {
-  const relatedBooks = [
-    { id: 2, title: "Botanical Wisdom", price: "$29.99", image: book2 },
-    { id: 3, title: "Tranquil Moments", price: "$19.99", image: book3 },
-  ];
+  const { id } = useParams<{ id: string }>();
+  
+  // Find the specific book based on the URL ID
+  const book = books.find((b) => b.id === Number(id));
+
+  // If book not found, redirect to the books page
+  if (!book) {
+    return <Navigate to="/books" />;
+  }
+
+  // Related books (just picking the first two that are not the current book)
+  const relatedBooks = books.filter((b) => b.id !== book.id).slice(0, 2);
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navigation />
       
-      {/* Back Button */}
-      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-8">
-        <Link to="/books">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Books
-          </Button>
-        </Link>
-      </div>
+
 
       {/* Book Detail */}
       <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid md:grid-cols-2 gap-12">
           {/* Book Image */}
-          <div className="aspect-[2/3] rounded-lg overflow-hidden shadow-xl">
-            <img
-              src={book1}
-              alt="Geometric Thoughts"
-              className="w-full h-full object-cover"
-            />
+          <div className="flex justify-center md:justify-start lg:sticky lg:top-32 h-fit">
+            <div className="w-full max-w-[480px]">
+              <img
+                src={book.image}
+                alt={book.title}
+                className="w-full h-auto object-contain rounded-xl drop-shadow-2xl hover:scale-[1.03] transition-transform duration-500"
+              />
+            </div>
           </div>
 
           {/* Book Info */}
           <div className="space-y-6">
             <div>
               <span className="text-sm bg-accent/10 text-accent px-3 py-1 rounded">
-                Philosophy
+                {book.category}
               </span>
               <h1 className="text-4xl md:text-5xl font-display font-bold mt-4 mb-2">
-                Geometric Thoughts
+                {book.title}
               </h1>
-              <p className="text-xl text-muted-foreground">by Sarah Mitchell</p>
+              <p className="text-xl text-muted-foreground">by {book.author}</p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -60,22 +57,19 @@ const BookDetail = () => {
                 <Star
                   key={i}
                   className={`h-5 w-5 ${
-                    i < 4 ? "fill-secondary text-secondary" : "text-muted"
+                    i < Math.floor(book.rating) ? "fill-secondary text-secondary" : "text-muted"
                   }`}
                 />
               ))}
-              <span className="text-muted-foreground">(4.5 out of 5)</span>
+              <span className="text-muted-foreground">({book.rating} out of 5)</span>
             </div>
 
-            <div className="text-4xl font-bold text-primary">$24.99</div>
+            <div className="text-4xl font-bold text-primary">{book.price}</div>
 
             <div className="flex gap-4">
               <Button size="lg" className="flex-1">
                 <ShoppingCart className="mr-2 h-5 w-5" />
-                Add to Cart
-              </Button>
-              <Button size="lg" variant="secondary">
-                Buy Now
+                Buy
               </Button>
             </div>
 
@@ -84,10 +78,7 @@ const BookDetail = () => {
                 About This Book
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                "Geometric Thoughts" is a profound exploration of how mathematical patterns and philosophical concepts intersect to create a deeper understanding of our world. Through elegant prose and thought-provoking insights, Sarah Mitchell guides readers on a journey through abstract concepts made tangible.
-              </p>
-              <p className="text-muted-foreground leading-relaxed mb-4">
-                This book challenges conventional thinking and invites readers to see the beauty in structure, the logic in creativity, and the harmony in apparent chaos. Perfect for anyone interested in the intersection of mathematics, philosophy, and creative thinking.
+                This is a placeholder description. Once you're ready, you can add a dedicated summary for "{book.title}" in the books data file.
               </p>
             </div>
 
@@ -98,23 +89,11 @@ const BookDetail = () => {
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Publisher:</dt>
-                  <dd className="font-medium">Abimola Lawuyi Publishing</dd>
+                  <dd className="font-medium">Abimbola Lawuyi Publishing</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Publication Date:</dt>
-                  <dd className="font-medium">October 2025</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Pages:</dt>
-                  <dd className="font-medium">342</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Language:</dt>
-                  <dd className="font-medium">English</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">ISBN:</dt>
-                  <dd className="font-medium">978-1-234567-89-0</dd>
+                  <dd className="font-medium">2026</dd>
                 </div>
               </dl>
             </div>
@@ -131,7 +110,7 @@ const BookDetail = () => {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <p className="font-semibold">John Doe</p>
+                    <p className="font-semibold">Reviewer {review}</p>
                     <p className="text-sm text-muted-foreground">
                       Verified Purchase
                     </p>
@@ -146,7 +125,7 @@ const BookDetail = () => {
                   </div>
                 </div>
                 <p className="text-muted-foreground">
-                  "This book completely changed how I think about abstract concepts. Mitchell's writing is clear, engaging, and profound. Highly recommended for anyone interested in philosophy and mathematics."
+                  "This book completely changed my perspective. Highly recommended."
                 </p>
               </CardContent>
             </Card>
@@ -158,18 +137,18 @@ const BookDetail = () => {
       <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-24">
         <h2 className="text-3xl font-display font-bold mb-8">You May Also Like</h2>
         <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {relatedBooks.map((book) => (
-            <Card key={book.id} className="card-lift overflow-hidden">
+          {relatedBooks.map((relBook) => (
+            <Card key={relBook.id} className="card-lift overflow-hidden">
               <div className="aspect-[2/3] overflow-hidden">
                 <img
-                  src={book.image}
-                  alt={book.title}
+                  src={relBook.image}
+                  alt={relBook.title}
                   className="w-full h-full object-cover"
                 />
               </div>
               <CardContent className="pt-4">
-                <h3 className="font-display font-semibold mb-1">{book.title}</h3>
-                <p className="text-lg font-bold text-primary">{book.price}</p>
+                <h3 className="font-display font-semibold mb-1">{relBook.title}</h3>
+                <p className="text-lg font-bold text-primary">{relBook.price}</p>
               </CardContent>
             </Card>
           ))}

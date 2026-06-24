@@ -2,63 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
-    --background: 0 0% 99%;
-    --foreground: 180 15% 15%;
+    /* Core palette: White / Black / Gold */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
 
     --card: 0 0% 100%;
-    --card-foreground: 180 15% 15%;
+    --card-foreground: 0 0% 0%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 180 15% 15%;
+    --popover-foreground: 0 0% 0%;
 
-    /* Teal as primary */
-    --primary: 180 100% 25%;
+    /* Black as primary brand */
+    --primary: 0 0% 0%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 180 60% 45%;
-    --primary-glow: 180 80% 35%;
 
-    /* Coral as secondary */
-    --secondary: 16 100% 66%;
-    --secondary-foreground: 0 0% 100%;
-    --secondary-light: 16 100% 76%;
+    /* Gold accent */
+    --secondary: 43 93% 53%;
+    --secondary-foreground: 0 0% 0%;
 
-    /* Amethyst as accent */
-    --accent: 270 50% 60%;
-    --accent-foreground: 0 0% 100%;
-    --accent-light: 270 50% 75%;
+    /* Light gold */
+    --accent: 39 100% 76%;
+    --accent-foreground: 0 0% 0%;
 
-    --muted: 180 10% 95%;
-    --muted-foreground: 180 10% 45%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 180 15% 90%;
-    --input: 180 15% 90%;
-    --ring: 180 100% 25%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 43 93% 53%;
 
     --radius: 0.5rem;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(180 100% 25%), hsl(270 50% 60%));
-    --gradient-hero: linear-gradient(135deg, hsl(180 100% 25% / 0.95), hsl(270 50% 60% / 0.9));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(180 10% 98%));
+    /* Gold values for direct use */
+    --gold: 43 93% 53%;
+    --gold-light: 39 100% 76%;
+    --gold-dark: 43 93% 40%;
 
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(180 100% 25% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(180 100% 25% / 0.1), 0 2px 4px -1px hsl(180 100% 25% / 0.06);
-    --shadow-lg: 0 10px 15px -3px hsl(180 100% 25% / 0.1), 0 4px 6px -2px hsl(180 100% 25% / 0.05);
-    --shadow-xl: 0 20px 25px -5px hsl(180 100% 25% / 0.1), 0 10px 10px -5px hsl(180 100% 25% / 0.04);
-    --shadow-card: 0 4px 12px hsl(180 100% 25% / 0.08);
-    --shadow-card-hover: 0 12px 24px hsl(180 100% 25% / 0.15);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.08);
 
-    /* Animations */
     --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -71,52 +59,6 @@ All colors MUST be HSL.
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
-
-  .dark {
-    --background: 180 20% 8%;
-    --foreground: 180 10% 95%;
-
-    --card: 180 20% 10%;
-    --card-foreground: 180 10% 95%;
-
-    --popover: 180 20% 10%;
-    --popover-foreground: 180 10% 95%;
-
-    --primary: 180 80% 45%;
-    --primary-foreground: 0 0% 100%;
-    --primary-light: 180 60% 55%;
-    --primary-glow: 180 80% 35%;
-
-    --secondary: 16 90% 60%;
-    --secondary-foreground: 0 0% 100%;
-    --secondary-light: 16 90% 70%;
-
-    --accent: 270 50% 65%;
-    --accent-foreground: 0 0% 100%;
-    --accent-light: 270 50% 75%;
-
-    --muted: 180 20% 20%;
-    --muted-foreground: 180 10% 65%;
-
-    --destructive: 0 62.8% 50%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 180 20% 20%;
-    --input: 180 20% 20%;
-    --ring: 180 80% 45%;
-
-    --gradient-primary: linear-gradient(135deg, hsl(180 80% 35%), hsl(270 50% 55%));
-    --gradient-hero: linear-gradient(135deg, hsl(180 80% 35% / 0.95), hsl(270 50% 55% / 0.9));
-    
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
 }
 
 @layer base {
@@ -124,25 +66,491 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html,
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 16px;
+    overflow-x: hidden;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display;
+  @media (min-width: 768px) {
+    html, body {
+      font-size: 19px;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Cormorant Garamond', serif;
   }
 }
 
+/* ─── Scroll-triggered reveal animations ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-60px);
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.reveal-scale.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Stagger children */
+.stagger-children>.reveal:nth-child(1) {
+  transition-delay: 0s;
+}
+
+.stagger-children>.reveal:nth-child(2) {
+  transition-delay: 0.12s;
+}
+
+.stagger-children>.reveal:nth-child(3) {
+  transition-delay: 0.24s;
+}
+
+.stagger-children>.reveal:nth-child(4) {
+  transition-delay: 0.36s;
+}
+
+.stagger-children>.reveal:nth-child(5) {
+  transition-delay: 0.48s;
+}
+
+.stagger-children>.reveal:nth-child(6) {
+  transition-delay: 0.6s;
+}
+
+/* ─── Hero text animations ─── */
+@keyframes textRevealUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInSoft {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lineExpand {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.hero-headline-mask {
+  overflow: hidden;
+}
+
+.hero-headline-text {
+  animation: textRevealUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.3s;
+  opacity: 0;
+}
+
+.hero-eyebrow {
+  animation: fadeInSoft 0.8s ease forwards;
+  animation-delay: 0.1s;
+  opacity: 0;
+}
+
+.hero-subheadline {
+  animation: slideInFromBottom 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.7s;
+  opacity: 0;
+}
+
+.hero-cta {
+  animation: slideInFromBottom 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 1s;
+  opacity: 0;
+}
+
+.hero-line {
+  animation: lineExpand 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.15s;
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+/* ─── Marquee / Scrolling Strip ─── */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee 30s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* ─── Smooth underline effect ─── */
+.link-underline {
+  position: relative;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: currentColor;
+  transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.link-underline:hover::after {
+  width: 100%;
+}
+
+/* ─── Section label with line (tobore-style) ─── */
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #f6b219;
+}
+
+.section-label::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 2px;
+  background-color: #f6b219;
+}
+
+/* ─── Utilities ─── */
 @layer utilities {
   .card-lift {
-    @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_12px_24px_hsl(180_100%_25%_/_0.15)];
+    @apply transition-all duration-300 hover:-translate-y-1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .card-lift:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent;
+    background: linear-gradient(135deg, #f6b219, #ffd183);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .section-padding {
-    @apply px-4 py-16 md:px-8 md:py-24 lg:px-16;
+    @apply px-6 py-20 md:px-8 md:py-28 lg:px-16;
+  }
+}
+
+/* ─── Custom scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fafafa;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4d4d4;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a3a3a3;
+}
+
+/* ─── Selection color ─── */
+::selection {
+  background-color: #ffd183;
+  color: #000000;
+}
+
+/* ─────────────────────────────────────────
+   HERO SECTION — custom styles
+   ───────────────────────────────────────── */
+
+/* Section: fills viewport on desktop */
+.hero-section {
+  min-height: 100svh;
+}
+
+/* ── Full background image ── */
+.hero-bg-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://res.cloudinary.com/dxoorukfj/image/upload/v1782301942/mobile-bg_yzdcxu.png');
+  background-size: cover;
+  background-position: right top;
+  /* Keeps the woman and books visible on right */
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+/* ── Gradient overlay for mobile readability ── */
+.hero-mobile-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right,
+      rgba(253, 248, 240, 0.95) 0%,
+      rgba(253, 248, 240, 0.8) 50%,
+      rgba(253, 248, 240, 0.2) 100%);
+  z-index: 1;
+}
+
+/* ── Content Grid ── */
+.hero-content-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  align-items: center;
+  min-height: calc(100vh - 5rem);
+}
+
+/* ── Portrait column: relative context for circle ── */
+.hero-portrait-col {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 3rem;
+  overflow: hidden;
+}
+
+/* ── Gold circle container (background removed as requested) ── */
+.hero-gold-circle {
+  position: relative;
+  width: min(340px, 85vw);
+  height: min(340px, 85vw);
+  border-radius: 50%;
+  background: transparent;
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+/* Portrait fills circle — show from top */
+.hero-portrait-img {
+  position: absolute;
+  bottom: -5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 115%;
+  height: auto;
+  object-fit: contain;
+  object-position: center bottom;
+  border-radius: 2.5rem;
+  display: block;
+}
+
+/* ── Love word underline ── */
+.hero-love-underline {
+  transform-origin: left;
+  animation: lineExpand 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 1s;
+  transform: scaleX(0);
+}
+
+/* ── Features bar ── */
+.hero-features-bar {
+  position: relative;
+  z-index: 20;
+  width: 100%;
+  padding: 0 1.5rem 2rem;
+  margin-top: 1.5rem;
+}
+
+.hero-features-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+}
+
+.hero-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.5rem;
+}
+
+.hero-feature-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  filter: sepia(1) saturate(3) hue-rotate(5deg) brightness(0.9);
+}
+
+.hero-feature-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111;
+  line-height: 1.2;
+}
+
+.hero-feature-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  color: #888;
+  line-height: 1.3;
+}
+
+.hero-feature-divider {
+  height: 1px;
+  background: #f0f0f0;
+  margin: 0 1.5rem;
+}
+
+/* ── Desktop overrides (>= 1024px) ── */
+@media (min-width: 1024px) {
+  .hero-content-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .hero-bg-image {
+    background-image: url('https://res.cloudinary.com/dxoorukfj/image/upload/v1782301518/ChatGPT_Image_Jun_24_2026_12_43_57_PM_lnebly.png');
+  }
+
+  .hero-mobile-overlay {
+    background: linear-gradient(to right,
+        rgba(253, 248, 240, 0.95) 0%,
+        rgba(253, 248, 240, 0.6) 40%,
+        transparent 60%);
+  }
+
+  .hero-portrait-col {
+    overflow: visible;
+    padding-top: 0;
+    justify-content: flex-end;
+  }
+
+  .hero-gold-circle {
+    width: min(500px, 42vw);
+    height: min(500px, 42vw);
+  }
+
+  .hero-portrait-img {
+    width: 140%;
+  }
+
+  /* Features bar: horizontal pill on desktop */
+  .hero-features-bar {
+    padding: 0 3rem 2.5rem;
+    margin-top: -1rem;
+  }
+
+  .hero-features-inner {
+    flex-direction: row;
+    align-items: center;
+    max-width: 860px;
+    border-radius: 1.5rem;
+  }
+
+  .hero-feature-item {
+    flex: 1;
+    padding: 1.4rem 2rem;
+  }
+
+  .hero-feature-divider {
+    width: 1px;
+    height: 44px;
+    margin: 0;
+    background: #ebebeb;
   }
 }
