@@ -182,17 +182,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════
-          HERO IMAGE QUOTE (DARK FOOTER STRIP)
-          ═══════════════════════════════════════════ */}
-      <div className="w-full bg-neutral-900 py-6 border-t border-neutral-800">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-neutral-300 text-sm md:text-base font-medium tracking-wide">
-            <span className="text-white italic">"Singleness is not a waiting room for life — it is life."</span>
-            <span className="text-gold ml-2">— From Dear Single, by Abimbola</span>
-          </p>
-        </div>
-      </div>
 
 
       {/* ═══════════════════════════════════════════
