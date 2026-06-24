@@ -69,8 +69,7 @@ const Index = () => {
             <div className="flex flex-col justify-center pt-10 pb-6 lg:py-20">
 
               {/* Eyebrow */}
-              <div className="hero-eyebrow flex items-center gap-3 mb-5">
-                <span className="block w-8 h-[2px] bg-[#c9963f]" />
+              <div className="hero-eyebrow mb-5">
                 <span className="text-[#c9963f] text-[0.68rem] font-semibold tracking-[0.22em] uppercase">
                   A Lady with a Pen and a Purpose
                 </span>
@@ -182,6 +181,18 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════
+          HERO IMAGE QUOTE (DARK FOOTER STRIP)
+          ═══════════════════════════════════════════ */}
+      <div className="w-full bg-neutral-900 py-6 border-t border-neutral-800">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <p className="text-neutral-300 text-sm md:text-base font-medium tracking-wide">
+            <span className="text-white italic">"Singleness is not a waiting room for life — it is life."</span>
+            <span className="text-gold ml-2">— From Dear Single, by Abimbola</span>
+          </p>
+        </div>
+      </div>
 
 
       {/* ═══════════════════════════════════════════
@@ -345,7 +356,7 @@ const Index = () => {
                   choose wisely.
                 </p>
                 <p className="font-display text-neutral-400 text-sm italic mb-4">
-                  "Singleness is not a waiting room for life — it is life."
+                  "Singleness is not a waiting room for life — it is life. It is a season filled with purpose, growth, and self-discovery."
                 </p>
                 <div className="flex items-baseline gap-3 mb-5">
                   <span className="text-black font-semibold">₦5,000</span>

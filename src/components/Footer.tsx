@@ -13,7 +13,7 @@ const Footer = () => {
               <img
                 src={logo}
                 alt="Abimbola Lawuyi"
-                className="h-14 w-auto"
+                className="h-20 w-auto"
               />
             </Link>
             <p className="text-neutral-400 text-sm leading-relaxed max-w-xs">
