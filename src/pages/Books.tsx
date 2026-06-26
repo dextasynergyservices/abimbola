@@ -11,43 +11,43 @@ import book3 from "@/assets/ABIMBOLA PIX (2).png";
 import book4 from "@/assets/For BOOKS (3).png";
 
 export const books = [
-    {
-      id: 1,
-      title: "The hardest part of loving your children",
-      author: "Abimola Lawuyi",
-      price: "₦15,000",
-      rating: 4.5,
-      image: book1,
-      category: "Philosophy",
-    },
-    {
-      id: 2,
-      title: "50 life lessons",
-      author: "Abimola Lawuyi",
-      price: "₦20,000",
-      rating: 5.0,
-      image: book2,
-      category: "Nature",
-    },
-    {
-      id: 3,
-      title: "Dear Mothers",
-      author: "Abimola Lawuyi",
-      price: "₦19,000",
-      rating: 4.8,
-      image: book3,
-      category: "Mindfulness",
-    },
-    {
-      id: 4,
-      title: "Loving your children",
-      author: "Abimola Lawuyi",
-      price: "₦24,990",
-      rating: 4.5,
-      image: book4,
-      category: "Philosophy",
-    },
-  ];
+  {
+    id: 1,
+    title: "The hardest part of loving your children",
+    author: "Abimola Lawuyi",
+    price: "₦15,000",
+    rating: 4.5,
+    image: book1,
+    category: "Philosophy",
+  },
+  {
+    id: 2,
+    title: "50 life lessons",
+    author: "Abimola Lawuyi",
+    price: "Free",
+    rating: 5.0,
+    image: book2,
+    category: "Nature",
+  },
+  {
+    id: 3,
+    title: "Dear Single",
+    author: "Abimola Lawuyi",
+    price: "Coming Soon",
+    rating: 4.8,
+    image: 'https://res.cloudinary.com/dxoorukfj/image/upload/v1782469054/DS_NEW_niyokf.png',
+    category: "Mindfulness",
+  },
+  {
+    id: 4,
+    title: "Dear Mothers",
+    author: "Abimola Lawuyi",
+    price: "₦19,000",
+    rating: 4.8,
+    image: book3,
+    category: "Mindfulness",
+  },
+];
 
 const Books = () => {
   const categories = ["All", "Philosophy", "Nature", "Mindfulness", "Fiction", "Self-Help"];
@@ -55,7 +55,7 @@ const Books = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navigation />
-      
+
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-secondary/10 via-primary/10 to-accent/10 section-padding">
         <div className="max-w-7xl mx-auto">
@@ -119,28 +119,37 @@ const Books = () => {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-4 w-4 ${
-                        i < Math.floor(book.rating)
+                      className={`h-4 w-4 ${i < Math.floor(book.rating)
                           ? "fill-secondary text-secondary"
                           : "text-muted"
-                      }`}
+                        }`}
                     />
                   ))}
                   <span className="text-sm text-muted-foreground ml-1">
                     ({book.rating})
                   </span>
                 </div>
-                <p className="text-xl font-bold text-primary">{book.price}</p>
+                {book.price === "Coming Soon" ? (
+                  <div className="mt-1">
+                    <span className="inline-flex items-center text-xs font-semibold bg-primary/10 text-primary px-2.5 py-1 rounded-full uppercase tracking-wider">
+                      Coming Soon
+                    </span>
+                  </div>
+                ) : (
+                  <p className="text-xl font-bold text-primary">{book.price}</p>
+                )}
               </CardContent>
               <CardFooter className="gap-2">
-                <Link to={`/books/${book.id}`} className="flex-1">
+                <Link to={`/books/${book.id}`} className={book.price === "Coming Soon" ? "w-full" : "flex-1"}>
                   <Button variant="outline" size="sm" className="w-full">
                     Details
                   </Button>
                 </Link>
-                <Button size="sm" className="flex-1">
-                  Buy
-                </Button>
+                {book.price !== "Coming Soon" && (
+                  <Button size="sm" className="flex-1">
+                    {book.price === "Free" ? "Download" : "Buy"}
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           ))}

@@ -64,14 +64,22 @@ const BookDetail = () => {
               <span className="text-muted-foreground">({book.rating} out of 5)</span>
             </div>
 
-            <div className="text-4xl font-bold text-primary">{book.price}</div>
+            {book.price === "Coming Soon" ? (
+              <div className="inline-flex items-center text-sm font-semibold bg-primary/10 text-primary px-4 py-1.5 rounded-full uppercase tracking-wider">
+                Coming Soon
+              </div>
+            ) : (
+              <div className="text-4xl font-bold text-primary">{book.price}</div>
+            )}
 
-            <div className="flex gap-4">
-              <Button size="lg" className="flex-1">
-                <ShoppingCart className="mr-2 h-5 w-5" />
-                Buy
-              </Button>
-            </div>
+            {book.price !== "Coming Soon" && (
+              <div className="flex gap-4">
+                <Button size="lg" className="flex-1">
+                  <ShoppingCart className="mr-2 h-5 w-5" />
+                  {book.price === "Free" ? "Download" : "Buy"}
+                </Button>
+              </div>
+            )}
 
             <div className="pt-6 border-t border-border">
               <h2 className="text-2xl font-display font-bold mb-4">

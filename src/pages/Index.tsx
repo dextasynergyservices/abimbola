@@ -5,8 +5,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import heroPortrait from "@/assets/ABIMBOLA PIX (1).png";
 import aboutImage from "@/assets/about IMAGE.png";
-import bookDearSingle from "@/assets/For BOOKS (3).png";
-import bookHardestPart from "@/assets/For BOOKS (1).png";
+import bookHardestPart from "@/assets/For BOOKS (3).png";
 import book50Lessons from "@/assets/For BOOKS (2).png";
 
 /* ─── Scroll reveal hook ─── */
@@ -324,13 +323,13 @@ const Index = () => {
             {/* Book 1 — Dear Single (Featured) */}
             <div className="reveal bg-white rounded-2xl overflow-hidden border border-neutral-100 card-lift relative">
               <div className="absolute top-4 right-4 z-10">
-                <span className="px-3 py-1 bg-gold text-black text-[11px] font-semibold tracking-wider uppercase rounded-full">
-                  New Book
+                <span className="px-3 py-1 bg-neutral-900 text-white text-[11px] font-semibold tracking-wider uppercase rounded-full">
+                  Coming Soon
                 </span>
               </div>
               <div className="aspect-[3/4] overflow-hidden bg-neutral-100">
                 <img
-                  src={bookDearSingle}
+                  src='https://res.cloudinary.com/dxoorukfj/image/upload/v1782469054/DS_NEW_niyokf.png'
                   alt="Dear Single by Abimbola Lawuyi"
                   className="w-full h-full object-cover"
                 />
@@ -347,28 +346,17 @@ const Index = () => {
                 <p className="font-display text-neutral-400 text-sm italic mb-4">
                   "Singleness is not a waiting room for life — it is life. It is a season filled with purpose, growth, and self-discovery."
                 </p>
-                <div className="flex items-baseline gap-3 mb-5">
-                  <span className="text-black font-semibold">₦5,000</span>
-                  <span className="text-neutral-400 text-xs">Digital</span>
-                  <span className="text-neutral-300">·</span>
-                  <span className="text-black font-semibold">₦8,000</span>
-                  <span className="text-neutral-400 text-xs">Physical</span>
-                </div>
-                <Link
-                  to="/books"
-                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-neutral-800 transition-colors"
-                >
-                  Get Your Copy
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
+                <span className="inline-flex items-center gap-2 px-6 py-2.5 bg-neutral-100 text-neutral-500 text-sm font-medium rounded-full cursor-default">
+                  Coming Soon
+                </span>
               </div>
             </div>
 
             {/* Book 2 — The Hardest Part of Loving Your Child */}
             <div className="reveal bg-white rounded-2xl overflow-hidden border border-neutral-100 card-lift">
-              <div className="absolute top-4 right-4 z-10 hidden">
-                <span className="px-3 py-1 bg-neutral-100 text-neutral-600 text-[11px] font-semibold tracking-wider uppercase rounded-full">
-                  Parenting & Faith
+              <div className="absolute top-4 right-4 z-10">
+                <span className="px-3 py-1 bg-neutral-900 text-white text-[11px] font-semibold tracking-wider uppercase rounded-full">
+                  New Book
                 </span>
               </div>
               <div className="aspect-[3/4] overflow-hidden bg-neutral-100">
@@ -384,10 +372,14 @@ const Index = () => {
                   The Hardest Part of Loving Your Child
                 </h3>
                 <p className="text-neutral-400 text-xs italic mb-3">By Abimbola Lawuyi</p>
-                <p className="text-neutral-600 text-sm leading-relaxed mb-5">
+                <p className="text-neutral-600 text-sm leading-relaxed mb-4">
                   A heartfelt exploration of the complexities, sacrifices, and deep grace found
                   in loving a child through every season — even the difficult ones.
                 </p>
+                <div className="flex items-baseline gap-3 mb-5">
+                  <span className="text-black font-semibold">Free</span>
+                  <span className="text-neutral-400 text-xs">Digital Download</span>
+                </div>
                 <Link
                   to="/books"
                   className="inline-flex items-center gap-2 px-6 py-2.5 border border-black text-black text-sm font-medium rounded-full hover:bg-black hover:text-white transition-colors"
@@ -399,11 +391,6 @@ const Index = () => {
 
             {/* Book 3 — 50 Life Lessons */}
             <div className="reveal bg-white rounded-2xl overflow-hidden border border-neutral-100 card-lift relative">
-              <div className="absolute top-4 right-4 z-10">
-                <span className="px-3 py-1 bg-neutral-900 text-white text-[11px] font-semibold tracking-wider uppercase rounded-full">
-                  Coming Soon
-                </span>
-              </div>
               <div className="aspect-[3/4] overflow-hidden bg-neutral-100">
                 <img
                   src={book50Lessons}
@@ -420,9 +407,20 @@ const Index = () => {
                   of hard-won wisdom for the person who is approaching a new decade — or simply
                   ready to stop living on autopilot.
                 </p>
-                <span className="inline-flex items-center gap-2 px-6 py-2.5 bg-neutral-100 text-neutral-500 text-sm font-medium rounded-full cursor-default">
-                  Coming Soon
-                </span>
+                <div className="flex items-baseline gap-3 mb-5">
+                  <span className="text-black font-semibold">₦5,000</span>
+                  <span className="text-neutral-400 text-xs">Digital</span>
+                  <span className="text-neutral-300">·</span>
+                  <span className="text-black font-semibold">₦8,000</span>
+                  <span className="text-neutral-400 text-xs">Physical</span>
+                </div>
+                <Link
+                  to="/books"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-neutral-800 transition-colors"
+                >
+                  Get Your Copy
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
               </div>
             </div>
           </div>
