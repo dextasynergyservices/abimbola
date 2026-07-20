@@ -1,7 +1,7 @@
-/* App-level overrides — intentionally minimal */
+/* App-level overrides - intentionally minimal */
 #root {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  text-align: left;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	text-align: left;
 }
