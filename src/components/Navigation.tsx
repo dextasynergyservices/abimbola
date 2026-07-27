@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 const logo =
@@ -23,6 +23,7 @@ const Navigation = () => {
 	}, []);
 
 	// Close mobile menu on route change
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reset menu on route change
 	useEffect(() => {
 		setIsOpen(false);
 	}, [pathname]);

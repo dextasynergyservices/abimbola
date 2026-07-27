@@ -1,7 +1,7 @@
-import Navigation from "@/components/Navigation";
+import { BookOpen, Heart, Music, PenTool, Users } from "lucide-react";
 import Footer from "@/components/Footer";
+import Navigation from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
-import { BookOpen, Heart, Users, Music, PenTool } from "lucide-react";
 
 const About = () => {
 	return (

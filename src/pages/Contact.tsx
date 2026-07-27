@@ -1,11 +1,11 @@
-import Navigation from "@/components/Navigation";
+import { Mail, MapPin, Phone } from "lucide-react";
 import Footer from "@/components/Footer";
+import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 const Contact = () => {
 	return (

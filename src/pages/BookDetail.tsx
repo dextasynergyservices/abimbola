@@ -1,8 +1,8 @@
+import { ShoppingCart, Star } from "lucide-react";
+import Footer from "@/components/Footer";
+import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, ShoppingCart } from "lucide-react";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { books } from "@/data/books";
 
 const BookDetail = ({ bookId }: { bookId: string }) => {

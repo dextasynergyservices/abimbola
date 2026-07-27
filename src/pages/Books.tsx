@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { Search, Star } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import Footer from "@/components/Footer";
+import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Search, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { books } from "@/data/books";
 
 const Books = () => {

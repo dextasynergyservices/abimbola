@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { ArrowRight, Calendar, Search } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import Footer from "@/components/Footer";
+import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Calendar, ArrowRight, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
+
 const blogFeatured1 = "/assets/blog-featured-1.jpg";
 const blogFeatured2 = "/assets/blog-featured-2.jpg";
 

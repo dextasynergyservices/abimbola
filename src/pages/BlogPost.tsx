@@ -1,9 +1,10 @@
+import { ArrowLeft, ArrowRight, Calendar, User } from "lucide-react";
 import Link from "next/link";
+import Footer from "@/components/Footer";
+import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, User, ArrowLeft, ArrowRight } from "lucide-react";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
+
 const blogFeatured1 = "/assets/blog-featured-1.jpg";
 const blogFeatured2 = "/assets/blog-featured-2.jpg";
 

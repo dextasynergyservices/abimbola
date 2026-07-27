@@ -12,8 +12,11 @@
 		"format": "biome format .",
 		"format:fix": "biome format --write .",
 		"check": "biome check .",
+		"check:ci": "biome ci .",
 		"check:fix": "biome check --write .",
-		"start": "next start"
+		"ci": "bun run check:ci && bun run build",
+		"start": "next start",
+		"prepare": "husky"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^3.10.0",
@@ -80,6 +83,7 @@
 		"eslint-plugin-react-hooks": "^5.2.0",
 		"eslint-plugin-react-refresh": "^0.4.20",
 		"globals": "^15.15.0",
+		"husky": "^9.1.7",
 		"postcss": "^8.5.6",
 		"tailwindcss": "^3.4.17",
 		"typescript": "^5.8.3",
