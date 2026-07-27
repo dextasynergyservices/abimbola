@@ -1,5 +1,8 @@
+"use client";
+
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +12,7 @@ const logo =
 const Navigation = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [scrolled, setScrolled] = useState(false);
-	const location = useLocation();
+	const pathname = usePathname();
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -22,7 +25,7 @@ const Navigation = () => {
 	// Close mobile menu on route change
 	useEffect(() => {
 		setIsOpen(false);
-	}, []);
+	}, [pathname]);
 
 	const navLinks = [
 		{ name: "Home", path: "/" },
@@ -31,15 +34,17 @@ const Navigation = () => {
 		{ name: "Community", path: "#community" },
 	];
 
-	const isActive = (path: string) => location.pathname === path;
+	const isActive = (path: string) => pathname === path;
 
 	const handleNavClick = (path: string) => {
 		setIsOpen(false);
-		if (path.startsWith("#") && location.pathname === "/") {
+		if (path.startsWith("#") && pathname === "/") {
 			const el = document.querySelector(path);
 			if (el) {
 				el.scrollIntoView({ behavior: "smooth" });
 			}
+		} else if (path.startsWith("#")) {
+			window.location.href = `/${path}`;
 		}
 	};
 
@@ -55,7 +60,7 @@ const Navigation = () => {
 			<div className="max-w-7xl mx-auto px-6 lg:px-8">
 				<div className="flex justify-between items-center h-20 md:h-24">
 					{/* Logo */}
-					<Link to="/" className="flex items-center">
+					<Link href="/" className="flex items-center">
 						<img
 							src={logo}
 							alt="Abimbola Lawuyi"
@@ -83,7 +88,7 @@ const Navigation = () => {
 							) : (
 								<Link
 									key={link.path}
-									to={link.path}
+									href={link.path}
 									className={cn(
 										"text-[13px] font-medium tracking-wide uppercase link-underline transition-colors duration-300",
 										isActive(link.path)
@@ -100,7 +105,7 @@ const Navigation = () => {
 
 						{/* CTA Button */}
 						<Link
-							to="#newsletter"
+							href="/#newsletter"
 							onClick={() => handleNavClick("#newsletter")}
 							className="ml-2 px-5 py-2.5 bg-black text-white text-[13px] font-medium tracking-wide uppercase rounded-full hover:bg-neutral-800 transition-colors duration-300"
 						>
@@ -140,7 +145,7 @@ const Navigation = () => {
 							) : (
 								<Link
 									key={link.path}
-									to={link.path}
+									href={link.path}
 									onClick={() => setIsOpen(false)}
 									className={cn(
 										"px-4 py-3 text-[15px] font-medium rounded-lg transition-colors",
@@ -155,7 +160,7 @@ const Navigation = () => {
 						)}
 						<div className="px-4 pt-3">
 							<Link
-								to="#newsletter"
+								href="/#newsletter"
 								onClick={() => handleNavClick("#newsletter")}
 								className="block text-center px-5 py-3 bg-black text-white text-[14px] font-medium rounded-full hover:bg-neutral-800 transition-colors"
 							>

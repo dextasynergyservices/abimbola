@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom";
+"use client";
+
+import Link from "next/link";
 import { Facebook, Instagram, Mail } from "lucide-react";
 const logo =
 	"https://res.cloudinary.com/dxoorukfj/image/upload/v1782315132/Abimbola_LOGO_white_pwezaa.png";
@@ -10,7 +12,7 @@ const Footer = () => {
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-12">
 					{/* Brand */}
 					<div className="space-y-5">
-						<Link to="/" className="inline-block">
+						<Link href="/" className="inline-block">
 							<img src={logo} alt="Abimbola Lawuyi" className="h-20 w-auto" />
 						</Link>
 						<p className="text-neutral-400 text-sm leading-relaxed max-w-xs">
@@ -62,7 +64,7 @@ const Footer = () => {
 							].map((link) => (
 								<li key={link.name}>
 									<Link
-										to={link.path}
+										href={link.path.startsWith("#") ? `/${link.path}` : link.path}
 										className="text-sm text-neutral-300 hover:text-white transition-colors duration-300"
 									>
 										{link.name}
@@ -80,7 +82,7 @@ const Footer = () => {
 						<ul className="space-y-3">
 							<li>
 								<Link
-									to="#newsletter"
+									href="/#newsletter"
 									className="text-sm text-neutral-300 hover:text-white transition-colors duration-300"
 								>
 									Newsletter

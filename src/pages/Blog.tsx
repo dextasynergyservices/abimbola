@@ -1,13 +1,15 @@
+"use client";
+
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Calendar, ArrowRight, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import blogFeatured1 from "@/assets/blog-featured-1.jpg";
-import blogFeatured2 from "@/assets/blog-featured-2.jpg";
+const blogFeatured1 = "/assets/blog-featured-1.jpg";
+const blogFeatured2 = "/assets/blog-featured-2.jpg";
 
 const Blog = () => {
 	const [searchQuery, setSearchQuery] = useState("");
@@ -148,7 +150,7 @@ const Blog = () => {
 									</p>
 								</CardContent>
 								<CardFooter>
-									<Link to={`/blog/${post.id}`} className="w-full">
+									<Link href={`/blog/${post.id}`} className="w-full">
 										<Button variant="ghost" className="w-full">
 											Read More
 											<ArrowRight className="ml-2 h-4 w-4" />

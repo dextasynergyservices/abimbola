@@ -1,20 +1,17 @@
-import { useParams, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, ShoppingCart } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { books } from "./Books";
+import { books } from "@/data/books";
 
-const BookDetail = () => {
-	const { id } = useParams<{ id: string }>();
-
+const BookDetail = ({ bookId }: { bookId: string }) => {
 	// Find the specific book based on the URL ID
-	const book = books.find((b) => b.id === Number(id));
+	const book = books.find((b) => b.id === Number(bookId));
 
 	// If book not found, redirect to the books page
 	if (!book) {
-		return <Navigate to="/books" />;
+		return null;
 	}
 
 	// Related books (just picking the first two that are not the current book)

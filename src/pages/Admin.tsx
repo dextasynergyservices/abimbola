@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import {
 	FileText,
 	BookOpen,
-	Users,
+	Image,
 	Settings,
 	PlusCircle,
 	Edit,
@@ -28,11 +28,11 @@ const Admin = () => {
 		},
 		{
 			label: "Total Books",
-			value: "156",
+			value: "3",
 			icon: BookOpen,
 			color: "text-secondary",
 		},
-		{ label: "Users", value: "1,234", icon: Users, color: "text-accent" },
+		{ label: "Media Items", value: "18", icon: Image, color: "text-accent" },
 	];
 
 	const recentPosts = [
@@ -73,7 +73,7 @@ const Admin = () => {
 						Admin Dashboard
 					</h1>
 					<p className="text-muted-foreground">
-						Manage your blog posts, books, and users
+						Manage website content, books, media, and settings from one place
 					</p>
 				</div>
 			</section>
@@ -203,8 +203,8 @@ const Admin = () => {
 						<span>All Books</span>
 					</Button>
 					<Button variant="outline" className="h-24 flex flex-col gap-2">
-						<Users className="h-6 w-6" />
-						<span>Users</span>
+						<Image className="h-6 w-6" />
+						<span>Media</span>
 					</Button>
 					<Button variant="outline" className="h-24 flex flex-col gap-2">
 						<Settings className="h-6 w-6" />

@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { ArrowRight, Check, Feather, Heart, Users } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -11,8 +13,8 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import aboutImage from "@/assets/about IMAGE.png";
-import bookHardestPart from "@/assets/For BOOKS (3).png";
+const aboutImage = "/assets/about%20IMAGE.png";
+const bookHardestPart = "/assets/For%20BOOKS%20(3).png";
 
 /* ─── Scroll reveal hook ─── */
 function useReveal() {
@@ -123,7 +125,7 @@ const Index = () => {
 							{/* CTAs */}
 							<div className="hero-cta flex flex-col sm:flex-row gap-3 mb-10 lg:mb-0">
 								<Link
-									to="/books"
+									href="/books"
 									className="inline-flex items-center justify-center gap-2 px-7 py-[0.9rem] bg-black text-white text-sm font-semibold tracking-wide rounded-full hover:bg-neutral-800 transition-colors duration-300 shadow-[0_4px_18px_0_rgba(0,0,0,0.22)]"
 								>
 									Read Dear Single
@@ -300,7 +302,7 @@ const Index = () => {
 
 							<div className="reveal mt-10">
 								<Link
-									to="/books"
+									href="/books"
 									className="inline-flex items-center gap-2 text-black text-sm font-semibold tracking-wide uppercase link-underline"
 								>
 									Explore My Books
@@ -483,7 +485,7 @@ const Index = () => {
 										</span>
 									</div>
 									<Link
-										to="/books"
+										href="/books"
 										className="inline-flex items-center gap-2 px-6 py-2.5 border border-black text-black text-sm font-medium rounded-full hover:bg-black hover:text-white transition-colors"
 									>
 										Get Your Copy

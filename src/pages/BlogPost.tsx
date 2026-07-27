@@ -1,11 +1,11 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, User, ArrowLeft, ArrowRight } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import blogFeatured1 from "@/assets/blog-featured-1.jpg";
-import blogFeatured2 from "@/assets/blog-featured-2.jpg";
+const blogFeatured1 = "/assets/blog-featured-1.jpg";
+const blogFeatured2 = "/assets/blog-featured-2.jpg";
 
 const BlogPost = () => {
 	const relatedPosts = [
@@ -27,7 +27,7 @@ const BlogPost = () => {
 
 			{/* Back Button */}
 			<div className="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-8">
-				<Link to="/blog">
+				<Link href="/blog">
 					<Button variant="ghost" size="sm">
 						<ArrowLeft className="mr-2 h-4 w-4" />
 						Back to Blog
@@ -172,7 +172,7 @@ const BlogPost = () => {
 										<h3 className="font-display font-semibold mb-2">
 											{post.title}
 										</h3>
-										<Link to={`/blog/${post.id}`}>
+										<Link href={`/blog/${post.id}`}>
 											<Button variant="link" className="p-0">
 												Read More
 												<ArrowRight className="ml-2 h-4 w-4" />

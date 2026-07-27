@@ -1,5 +1,8 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import heroPortrait from "@/assets/ABIMBOLA PIX (1).png";
+
+const heroPortrait = "/assets/ABIMBOLA%20PIX%20(1).png";
 
 // The heaviest images that need to load before we reveal the site
 const IMAGES_TO_PRELOAD = [
