@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { ArrowRight, Check, Feather, Heart, Users } from "lucide-react";
-import Navigation from "@/components/Navigation";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import Footer from "@/components/Footer";
+import Navigation from "@/components/Navigation";
 import {
 	Dialog,
 	DialogContent,
@@ -13,6 +13,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+
 const aboutImage = "/assets/about%20IMAGE.png";
 const bookHardestPart = "/assets/For%20BOOKS%20(3).png";
 
@@ -37,7 +38,9 @@ function useReveal() {
 			const targets = el.querySelectorAll(
 				".reveal, .reveal-left, .reveal-right, .reveal-scale",
 			);
-			targets.forEach((t) => { observer.observe(t); });
+			targets.forEach((t) => {
+				observer.observe(t);
+			});
 		}
 
 		return () => observer.disconnect();

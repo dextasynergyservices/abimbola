@@ -1,22 +1,22 @@
 import {
+	BookOpen,
+	Edit,
+	FileText,
+	Image,
+	PlusCircle,
+	Settings,
+	Trash2,
+} from "lucide-react";
+import Footer from "@/components/Footer";
+import Navigation from "@/components/Navigation";
+import { Button } from "@/components/ui/button";
+import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-	FileText,
-	BookOpen,
-	Image,
-	Settings,
-	PlusCircle,
-	Edit,
-	Trash2,
-} from "lucide-react";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 
 const Admin = () => {
 	const stats = [

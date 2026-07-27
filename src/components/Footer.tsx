@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { Facebook, Instagram, Mail } from "lucide-react";
+import Link from "next/link";
+
 const logo =
 	"https://res.cloudinary.com/dxoorukfj/image/upload/v1782315132/Abimbola_LOGO_white_pwezaa.png";
 
@@ -64,7 +65,9 @@ const Footer = () => {
 							].map((link) => (
 								<li key={link.name}>
 									<Link
-										href={link.path.startsWith("#") ? `/${link.path}` : link.path}
+										href={
+											link.path.startsWith("#") ? `/${link.path}` : link.path
+										}
 										className="text-sm text-neutral-300 hover:text-white transition-colors duration-300"
 									>
 										{link.name}

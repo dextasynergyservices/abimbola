@@ -1,6 +1,6 @@
-import BookDetail from "@/pages/BookDetail";
-import { books } from "@/data/books";
 import { notFound } from "next/navigation";
+import { books } from "@/data/books";
+import BookDetail from "@/pages/BookDetail";
 
 export default async function BookDetailPage({
 	params,
