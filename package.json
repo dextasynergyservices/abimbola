@@ -18,6 +18,7 @@
 		"ci": "bun run check:ci && bun run build",
 		"start": "next start",
 		"prepare": "husky",
+		"postinstall": "prisma generate",
 		"db:generate": "prisma generate",
 		"db:push": "prisma db push",
 		"db:migrate": "prisma migrate dev",
