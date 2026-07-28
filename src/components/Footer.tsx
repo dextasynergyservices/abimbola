@@ -168,7 +168,7 @@ const Footer = () => {
 					</div>
 				</div>
 
-				{/* Bottom bar */}
+				{/* Bottom barrr */}
 				<div className="mt-14 pt-8 border-t border-neutral-800 flex flex-col md:flex-row justify-between items-center gap-4">
 					<p className="text-xs text-neutral-500">
 						© {new Date().getFullYear()} Abimbola Lawuyi. All rights reserved.
