@@ -16,7 +16,11 @@
 		"check:fix": "biome check --write .",
 		"ci": "bun run check:ci && bun run build",
 		"start": "next start",
-		"prepare": "husky"
+		"prepare": "husky",
+		"db:generate": "prisma generate",
+		"db:push": "prisma db push",
+		"db:migrate": "prisma migrate dev",
+		"db:seed": "bun prisma/seed.ts"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^3.10.0",
@@ -68,6 +72,12 @@
 		"sonner": "^1.7.4",
 		"tailwind-merge": "^2.6.0",
 		"tailwindcss-animate": "^1.0.7",
+		"@prisma/adapter-pg": "^7.9.0",
+		"@prisma/client": "^7.9.0",
+		"bcryptjs": "^2.4.3",
+		"dotenv": "^16.4.7",
+		"next-auth": "5.0.0-beta.25",
+		"pg": "^8.13.3",
 		"vaul": "^0.9.9",
 		"zod": "^3.25.76"
 	},
@@ -75,7 +85,9 @@
 		"@biomejs/biome": "^2.5.4",
 		"@eslint/js": "^9.32.0",
 		"@tailwindcss/typography": "^0.5.16",
+		"@types/bcryptjs": "^2.4.6",
 		"@types/node": "^22.16.5",
+		"@types/pg": "^8.11.11",
 		"@types/react": "^18.3.23",
 		"@types/react-dom": "^18.3.7",
 		"autoprefixer": "^10.4.21",
@@ -85,8 +97,12 @@
 		"globals": "^15.15.0",
 		"husky": "^9.1.7",
 		"postcss": "^8.5.6",
+		"prisma": "^7.9.0",
 		"tailwindcss": "^3.4.17",
 		"typescript": "^5.8.3",
 		"typescript-eslint": "^8.38.0"
+	},
+	"prisma": {
+		"seed": "bun prisma/seed.ts"
 	}
 }

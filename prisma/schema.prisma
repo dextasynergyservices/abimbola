@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum BookPriceType {
+  HARD_COPY
+  SOFT_COPY
+  FREE
+  COMING_SOON
+}
+
+enum MessageStatus {
+  UNREAD
+  READ
+  ARCHIVED
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  passwordHash String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  posts        Post[]     @relation("PostAuthor")
+  media        Media[]    @relation("MediaUploader")
+  auditLogs    AuditLog[] @relation("UserAuditLogs")
+}
+
+model Page {
+  id             String        @id @default(cuid())
+  title          String
+  slug           String        @unique
+  status         ContentStatus @default(DRAFT)
+  seoTitle       String?
+  seoDescription String?
+  seoImageId     String?
+  publishedAt    DateTime?
+  deletedAt      DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  sections       PageSection[]
+}
+
+model PageSection {
+  id        String        @id @default(cuid())
+  pageId    String
+  type      String
+  title     String?
+  content   Json
+  settings  Json?
+  sortOrder Int           @default(0)
+  status    ContentStatus @default(DRAFT)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  page      Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  id              String        @id @default(cuid())
+  title           String
+  slug            String        @unique
+  excerpt         String?
+  body            String
+  featuredImageId String?
+  status          ContentStatus @default(DRAFT)
+  seoTitle        String?
+  seoDescription  String?
+  authorId        String
+  categoryId      String?
+  publishedAt     DateTime?
+  deletedAt       DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  author          User          @relation("PostAuthor", fields: [authorId], references: [id])
+  category        BlogCategory? @relation(fields: [categoryId], references: [id])
+}
+
+model BlogCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  posts     Post[]
+}
+
+model BookCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  books     Book[]
+}
+
+model Book {
+  id              String        @id @default(cuid())
+  title           String
+  slug            String        @unique
+  author          String        @default("Abimbola Lawuyi")
+  description     String?
+  rating          Float?        @default(5.0)
+  publisher       String?
+  publicationDate String?
+  coverImageId    String?
+  categoryId      String?
+  status          ContentStatus @default(DRAFT)
+  deletedAt       DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  category        BookCategory? @relation(fields: [categoryId], references: [id])
+  prices          BookPrice[]
+}
+
+model BookPrice {
+  id        String        @id @default(cuid())
+  bookId    String
+  type      BookPriceType
+  amount    Float?
+  currency  String?       @default("NGN")
+  available Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  book      Book          @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([bookId, type])
+}
+
+model ContactMessage {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  status    MessageStatus @default(UNREAD)
+  createdAt DateTime      @default(now())
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  firstName String
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model SiteSettings {
+  id            String   @id @default("singleton")
+  contactEmail  String?
+  contactPhone  String?
+  address       String?
+  instagramUrl  String?
+  facebookUrl   String?
+  whatsappUrl   String?
+  telegramUrl   String?
+  discordUrl    String?
+  tiktokUrl     String?
+  youtubeUrl    String?
+  updatedAt     DateTime @updatedAt
+}
+
+model Media {
+  id                 String   @id @default(cuid())
+  cloudinaryPublicId String   @unique
+  secureUrl          String
+  width              Int?
+  height             Int?
+  altText            String?
+  caption            String?
+  uploadedById       String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  uploadedBy         User     @relation("MediaUploader", fields: [uploadedById], references: [id])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  user       User     @relation("UserAuditLogs", fields: [userId], references: [id])
+}
