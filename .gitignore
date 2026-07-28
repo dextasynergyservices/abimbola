@@ -14,6 +14,7 @@ dist-ssr
 out
 build
 *.local
+.env
 
 # Editor directories and files
 .vscode/*
@@ -25,3 +26,7 @@ build
 *.njsproj
 *.sln
 *.sw?
+ADMIN.md
+
+# Claude Code local-only settings
+.claude/settings.local.json

@@ -1,8 +1,16 @@
 "use client";
 
-import { ArrowRight, Check, Feather, Heart, Users } from "lucide-react";
+import {
+	ArrowRight,
+	Check,
+	Feather,
+	Heart,
+	Loader2,
+	Users,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
 import {
@@ -53,16 +61,32 @@ const Index = () => {
 	const pageRef = useReveal();
 	const [formSubmitted, setFormSubmitted] = useState(false);
 	const [formData, setFormData] = useState({ firstName: "", email: "" });
+	const [submitting, setSubmitting] = useState(false);
 
-	const handleNewsletterSubmit = (e: React.FormEvent) => {
+	const handleNewsletterSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setFormSubmitted(true);
+		setSubmitting(true);
+		try {
+			const res = await fetch("/api/newsletter", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(formData),
+			});
+			const data = await res.json();
+			if (!res.ok) throw new Error(data.error || "Failed to subscribe");
+			setFormSubmitted(true);
+		} catch (err: unknown) {
+			toast.error(
+				(err as Error).message || "Failed to subscribe. Please try again.",
+			);
+		} finally {
+			setSubmitting(false);
+		}
 	};
 
 	return (
 		<div ref={pageRef} className="min-h-screen flex flex-col bg-white">
 			<Navigation />
-
 			{/* ═══════════════════════════════════════════
           HERO SECTION
           ═══════════════════════════════════════════ */}
@@ -732,17 +756,30 @@ const Index = () => {
 													placeholder="Your email address"
 													value={formData.email}
 													onChange={(e) =>
-														setFormData({ ...formData, email: e.target.value })
+														setFormData({
+															...formData,
+															email: e.target.value,
+														})
 													}
 													className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm text-black placeholder:text-neutral-400 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/30 transition-colors"
 												/>
 											</div>
 											<button
 												type="submit"
-												className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-black text-white text-sm font-semibold tracking-wide rounded-full hover:bg-neutral-800 transition-colors duration-300"
+												disabled={submitting}
+												className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-black text-white text-sm font-semibold tracking-wide rounded-full hover:bg-neutral-800 transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
 											>
-												Send me the letters
-												<ArrowRight className="h-4 w-4" />
+												{submitting ? (
+													<>
+														<Loader2 className="h-4 w-4 animate-spin" />
+														Sending...
+													</>
+												) : (
+													<>
+														Send me the letters
+														<ArrowRight className="h-4 w-4" />
+													</>
+												)}
 											</button>
 										</form>
 

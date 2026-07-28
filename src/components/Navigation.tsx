@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { CommunityModal } from "@/components/CommunityModal";
 import { cn } from "@/lib/utils";
 
 const logo =
@@ -12,6 +13,7 @@ const logo =
 const Navigation = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [scrolled, setScrolled] = useState(false);
+	const [communityOpen, setCommunityOpen] = useState(false);
 	const pathname = usePathname();
 
 	useEffect(() => {
@@ -37,8 +39,12 @@ const Navigation = () => {
 
 	const isActive = (path: string) => pathname === path;
 
-	const handleNavClick = (path: string) => {
+	const handleNavClick = (path: string, name?: string) => {
 		setIsOpen(false);
+		if (name === "Community") {
+			setCommunityOpen(true);
+			return;
+		}
 		if (path.startsWith("#") && pathname === "/") {
 			const el = document.querySelector(path);
 			if (el) {
@@ -76,7 +82,7 @@ const Navigation = () => {
 								<button
 									type="button"
 									key={link.path}
-									onClick={() => handleNavClick(link.path)}
+									onClick={() => handleNavClick(link.path, link.name)}
 									className={cn(
 										"text-[13px] font-medium tracking-wide uppercase link-underline transition-colors duration-300",
 										scrolled
@@ -138,7 +144,7 @@ const Navigation = () => {
 								<button
 									type="button"
 									key={link.path}
-									onClick={() => handleNavClick(link.path)}
+									onClick={() => handleNavClick(link.path, link.name)}
 									className="text-left px-4 py-3 text-[15px] font-medium text-neutral-600 hover:text-black hover:bg-neutral-50 rounded-lg transition-colors"
 								>
 									{link.name}
@@ -171,6 +177,8 @@ const Navigation = () => {
 					</div>
 				</div>
 			</div>
+
+			<CommunityModal open={communityOpen} onOpenChange={setCommunityOpen} />
 		</nav>
 	);
 };
