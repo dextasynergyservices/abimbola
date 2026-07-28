@@ -1,18 +1,6 @@
 {
-  "/admin/books/[id]/edit/page": "app/admin/books/[id]/edit/page.js",
-  "/admin/books/new/page": "app/admin/books/new/page.js",
-  "/admin/books/page": "app/admin/books/page.js",
+  "/admin/login/page": "app/admin/login/page.js",
   "/admin/page": "app/admin/page.js",
-  "/api/admin/book-categories/route": "app/api/admin/book-categories/route.js",
-  "/api/admin/books/[id]/route": "app/api/admin/books/[id]/route.js",
-  "/api/admin/books/route": "app/api/admin/books/route.js",
-  "/api/admin/media/[id]/route": "app/api/admin/media/[id]/route.js",
-  "/api/admin/media/route": "app/api/admin/media/route.js",
-  "/api/admin/stats/route": "app/api/admin/stats/route.js",
-  "/api/admin/upload/signature/route": "app/api/admin/upload/signature/route.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/api/settings/public/route": "app/api/settings/public/route.js",
-  "/books/[id]/page": "app/books/[id]/page.js",
-  "/books/page": "app/books/page.js",
   "/page": "app/page.js"
 }
