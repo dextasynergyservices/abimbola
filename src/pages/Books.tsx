@@ -143,7 +143,7 @@ export default function Books({
 											key={book.id}
 											className="border-slate-200 bg-white overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col h-full group"
 										>
-											<div className="relative aspect-3/4 overflow-hidden bg-slate-100">
+											<div className="relative aspect-[3/4] overflow-hidden bg-slate-100">
 												{imageUrl ? (
 													<Image
 														src={imageUrl}
@@ -213,7 +213,7 @@ export default function Books({
 										key={book.id}
 										className="border-slate-200 bg-white overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col h-full group"
 									>
-										<div className="relative aspect-3/4 overflow-hidden bg-slate-100">
+										<div className="relative aspect-[3/4] overflow-hidden bg-slate-100">
 											{book.image ? (
 												<Image
 													src={book.image}

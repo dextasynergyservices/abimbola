@@ -1,10 +1,17 @@
 "use client";
 
-import { ArrowLeft, Image as ImageIcon, Loader2, Save, X } from "lucide-react";
+import {
+	ArrowLeft,
+	Image as ImageIcon,
+	Loader2,
+	Save,
+	Upload,
+	X,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
 	BookPriceEditor,
@@ -12,10 +19,6 @@ import {
 	createDefaultPriceRows,
 	type PriceFormRow,
 } from "@/components/admin/BookPriceEditor";
-import {
-	type MediaItem,
-	MediaPickerModal,
-} from "@/components/admin/MediaPickerModal";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -28,6 +31,8 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import type { UploadedMedia } from "@/hooks/useCloudinaryUpload";
+import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
 
 interface BookCategory {
 	id: string;
@@ -55,10 +60,11 @@ export function BookForm({ bookId }: BookFormProps) {
 	const [status, setStatus] = useState<"DRAFT" | "PUBLISHED" | "ARCHIVED">(
 		"DRAFT",
 	);
-	const [coverImage, setCoverImage] = useState<MediaItem | null>(null);
-	const [isImagePickerOpen, setIsImagePickerOpen] = useState(false);
+	const [coverImage, setCoverImage] = useState<UploadedMedia | null>(null);
 	const [categories, setCategories] = useState<BookCategory[]>([]);
 	const [priceRows, setPriceRows] = useState(createDefaultPriceRows());
+	const fileInputRef = useRef<HTMLInputElement>(null);
+	const { uploading, upload } = useCloudinaryUpload();
 
 	const fetchCategories = useCallback(async () => {
 		try {
@@ -455,29 +461,59 @@ export function BookForm({ bookId }: BookFormProps) {
 								>
 									<X className="h-4 w-4" />
 								</button>
+								<label className="absolute bottom-2 left-2 cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-slate-950/70 hover:bg-slate-950/90 text-white text-xs font-medium px-3 py-1.5 transition-colors">
+									<Upload className="h-3.5 w-3.5" />
+									Change Image
+									<input
+										type="file"
+										accept="image/*"
+										disabled={uploading}
+										className="hidden"
+										onChange={async (e) => {
+											const media = await upload(e.target.files);
+											if (media) setCoverImage(media);
+											if (fileInputRef.current) fileInputRef.current.value = "";
+										}}
+									/>
+								</label>
 							</div>
 						) : (
-							<Button
-								type="button"
-								variant="outline"
-								onClick={() => setIsImagePickerOpen(true)}
-								className="w-full min-h-[44px] border-dashed border-slate-300 text-slate-600 hover:text-amber-700 hover:bg-amber-50/50"
+							<label
+								className={`flex flex-col items-center justify-center w-full min-h-[120px] rounded-lg border-2 border-dashed transition-colors cursor-pointer ${uploading ? "border-amber-400 bg-amber-50/50" : "border-slate-300 hover:border-amber-500 hover:bg-amber-50/30"}`}
 							>
-								<ImageIcon className="h-4 w-4 mr-2 text-amber-600" />
-								Select Cover Image
-							</Button>
+								{uploading ? (
+									<div className="flex flex-col items-center gap-2 text-amber-600">
+										<Loader2 className="h-6 w-6 animate-spin" />
+										<span className="text-sm font-medium">Uploading...</span>
+									</div>
+								) : (
+									<div className="flex flex-col items-center gap-2 text-slate-500">
+										<ImageIcon className="h-8 w-8 text-amber-500" />
+										<span className="text-sm font-medium">
+											Click to upload cover image
+										</span>
+										<span className="text-xs text-slate-400">
+											JPG, PNG, WebP supported
+										</span>
+									</div>
+								)}
+								<input
+									ref={fileInputRef}
+									type="file"
+									accept="image/*"
+									disabled={uploading}
+									className="hidden"
+									onChange={async (e) => {
+										const media = await upload(e.target.files);
+										if (media) setCoverImage(media);
+										if (fileInputRef.current) fileInputRef.current.value = "";
+									}}
+								/>
+							</label>
 						)}
 					</Card>
 				</div>
 			</div>
-
-			<MediaPickerModal
-				open={isImagePickerOpen}
-				onOpenChange={setIsImagePickerOpen}
-				onSelectImage={(media) => setCoverImage(media)}
-				selectedImageId={coverImage?.id}
-				title="Select Book Cover Image"
-			/>
 		</div>
 	);
 }

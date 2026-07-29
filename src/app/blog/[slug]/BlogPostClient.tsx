@@ -1,7 +1,6 @@
 "use client";
 
 import { ArrowLeft, Calendar, User } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -76,14 +75,16 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
 				</header>
 
 				{/* Featured Image */}
-				<div className="relative aspect-16/9 w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm">
-					<Image
+				<div className="w-full h-64 sm:h-80 md:h-[420px] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm relative">
+					<img
 						src={imageUrl}
 						alt={post.featuredImage?.altText || post.title}
-						fill
-						priority
-						sizes="(max-width: 1024px) 100vw, 896px"
-						className="object-cover"
+						onError={(e) => {
+							const target = e.currentTarget;
+							target.onerror = null;
+							target.src = "/assets/blog-featured-1.jpg";
+						}}
+						className="w-full h-full object-cover"
 					/>
 				</div>
 

@@ -365,18 +365,64 @@ async function main() {
 		}
 	}
 
-	// 3. Seed Posts Data
+	// 3. Seed Media records for Blog Posts and Books
+	const blogMediaData = [
+		{
+			cloudinaryPublicId: "static_blog_featured_1",
+			secureUrl: "/assets/blog-featured-1.jpg",
+			altText: "The Art of Mindful Reading",
+		},
+		{
+			cloudinaryPublicId: "static_blog_featured_2",
+			secureUrl: "/assets/blog-featured-2.jpg",
+			altText: "Whispers in the Garden",
+		},
+		{
+			cloudinaryPublicId: "static_blog_featured_3",
+			secureUrl: "/assets/hero-image.jpg",
+			altText: "Lessons in Resilience",
+		},
+		{
+			cloudinaryPublicId: "static_blog_featured_4",
+			secureUrl: "/assets/ABIMBOLA%20PIX%20%281%29.png",
+			altText: "Sanctuary of Quiet Reflection",
+		},
+		{
+			cloudinaryPublicId: "50_50_abimbola_tuaugi",
+			secureUrl: "/assets/about%20IMAGE.png",
+			altText: "50 Life Lessons for Modern Leaders",
+		},
+	];
+
+	const mediaMap = new Map<string, string>();
+	for (const mediaInfo of blogMediaData) {
+		const media = await prisma.media.upsert({
+			where: { cloudinaryPublicId: mediaInfo.cloudinaryPublicId },
+			update: { secureUrl: mediaInfo.secureUrl, altText: mediaInfo.altText },
+			create: {
+				cloudinaryPublicId: mediaInfo.cloudinaryPublicId,
+				secureUrl: mediaInfo.secureUrl,
+				altText: mediaInfo.altText,
+				uploadedById: admin.id,
+			},
+		});
+		mediaMap.set(mediaInfo.cloudinaryPublicId, media.id);
+	}
+	console.log("✓ Blog and featured images seeded into Media library");
+
+	// 4. Seed Posts Data with Featured Images
 	const postsData = [
 		{
 			title: "The Art of Mindful Reading in a Distracted World",
 			slug: "the-art-of-mindful-reading",
 			excerpt:
 				"Discover how to transform your reading habits into a contemplative practice that enriches your mind and soul.",
-			body: "Reading is more than decoding words; it is an active dialog between reader and author. In our fast-paced, notification-driven era, mindful reading creates a sanctuary of focus and quiet reflection...",
+			body: "Reading is more than decoding words; it is an active dialog between reader and author. In our fast-paced, notification-driven era, mindful reading creates a sanctuary of focus and quiet reflection...\n\nWhether reading fiction, poetry, or leadership guidebooks, immerse yourself fully into each page. Set aside designated time without screens, hold a physical book, and let your thoughts slow down to the rhythm of the written word.",
 			status: ContentStatus.PUBLISHED,
 			seoTitle: "The Art of Mindful Reading - Abimbola Lawuyi",
 			seoDescription:
 				"Transform reading into a reflective practice for deep focus.",
+			featuredMediaKey: "static_blog_featured_1",
 			publishedAt: new Date(),
 		},
 		{
@@ -384,11 +430,12 @@ async function main() {
 			slug: "whispers-in-the-garden",
 			excerpt:
 				"Reflections and prose exploring personal growth, patience, and embracing quiet moments between seasons.",
-			body: "Growth happens quietly, often unseen beneath the surface long before fruit appears. Just as gardens rest through winter, our lives require seasons of reflection before new breakthroughs emerge...",
+			body: "Growth happens quietly, often unseen beneath the surface long before fruit appears. Just as gardens rest through winter, our lives require seasons of reflection before new breakthroughs emerge...\n\nEmbrace the quiet phases of your personal and professional development. Trust that every season serves a higher purpose in cultivating maturity and resilience.",
 			status: ContentStatus.PUBLISHED,
 			seoTitle: "Whispers in the Garden - Abimbola Lawuyi",
 			seoDescription:
 				"Reflections on growth, patience, and personal transformation.",
+			featuredMediaKey: "static_blog_featured_2",
 			publishedAt: new Date(),
 		},
 		{
@@ -396,10 +443,11 @@ async function main() {
 			slug: "the-last-letter-from-the-village",
 			excerpt:
 				"An evocative story about uncovering ancestral letters filled with courage, faith, and enduring hope.",
-			body: "Uncovering old letters preserved across generations reminds us of the strength and values that anchored those who came before us. Resilience is built when we honor our heritage while courageously building the future...",
+			body: "Uncovering old letters preserved across generations reminds us of the strength and values that anchored those who came before us. Resilience is built when we honor our heritage while courageously building the future...\n\nThe stories of our elders provide timeless blueprints for navigating uncertainty with dignity and unwavering faith.",
 			status: ContentStatus.PUBLISHED,
 			seoTitle: "Lessons in Resilience - Abimbola Lawuyi",
 			seoDescription: "A story of courage, family legacy, and enduring values.",
+			featuredMediaKey: "static_blog_featured_3",
 			publishedAt: new Date(),
 		},
 		{
@@ -407,11 +455,12 @@ async function main() {
 			slug: "creating-a-space-for-quiet-reflection",
 			excerpt:
 				"Practical ways to design a quiet, peaceful corner in your home for reading, prayer, and deep thought.",
-			body: "Your home environment deeply impacts your internal state. Creating a dedicated space—free from digital clutter—invites peace, creativity, and spiritual clarity into your daily routine...",
+			body: "Your home environment deeply impacts your internal state. Creating a dedicated space—free from digital clutter—invites peace, creativity, and spiritual clarity into your daily routine...\n\nFill this nook with welcoming light, inspirational books, and comfortable seating to create your personal haven of tranquility.",
 			status: ContentStatus.PUBLISHED,
 			seoTitle: "Creating a Sanctuary at Home - Abimbola Lawuyi",
 			seoDescription:
 				"Design a sanctuary for quiet reflection and peace at home.",
+			featuredMediaKey: "static_blog_featured_4",
 			publishedAt: new Date(),
 		},
 		{
@@ -419,42 +468,48 @@ async function main() {
 			slug: "50-life-lessons-for-modern-leaders",
 			excerpt:
 				"Key principles for school proprietors and administrators navigating leadership, vision, and staff development.",
-			body: "Educational leadership demands vision, empathy, and resilience. Leading a school is not just managing operations; it is nurturing an ecosystem where students and teachers thrive together...",
+			body: "Educational leadership demands vision, empathy, and resilience. Leading a school is not just managing operations; it is nurturing an ecosystem where students and teachers thrive together...\n\nPrioritize integrity, continuous learning, and compassionate guidance to build lasting legacy institutions.",
 			status: ContentStatus.PUBLISHED,
 			seoTitle: "50 Life Lessons for Educational Leaders - Abimbola Lawuyi",
 			seoDescription:
 				"Leadership principles for school owners, directors, and educators.",
+			featuredMediaKey: "50_50_abimbola_tuaugi",
 			publishedAt: new Date(),
 		},
 	];
 
 	for (const postInfo of postsData) {
+		const { featuredMediaKey, ...postFields } = postInfo;
+		const featuredImageId = mediaMap.get(featuredMediaKey) || null;
+
 		const existingPost = await prisma.post.findFirst({
-			where: { slug: postInfo.slug },
+			where: { slug: postFields.slug },
 		});
 
 		if (existingPost) {
 			await prisma.post.update({
 				where: { id: existingPost.id },
 				data: {
-					title: postInfo.title,
-					excerpt: postInfo.excerpt,
-					body: postInfo.body,
-					status: postInfo.status,
-					seoTitle: postInfo.seoTitle,
-					seoDescription: postInfo.seoDescription,
-					publishedAt: postInfo.publishedAt,
+					title: postFields.title,
+					excerpt: postFields.excerpt,
+					body: postFields.body,
+					status: postFields.status,
+					seoTitle: postFields.seoTitle,
+					seoDescription: postFields.seoDescription,
+					featuredImageId: featuredImageId || existingPost.featuredImageId,
+					publishedAt: postFields.publishedAt,
 				},
 			});
-			console.log(`✓ Updated post: ${existingPost.title}`);
+			console.log(`✓ Updated post with featured image: ${existingPost.title}`);
 		} else {
 			const newPost = await prisma.post.create({
 				data: {
-					...postInfo,
+					...postFields,
+					featuredImageId,
 					authorId: admin.id,
 				},
 			});
-			console.log(`✓ Created post: ${newPost.title}`);
+			console.log(`✓ Created post with featured image: ${newPost.title}`);
 		}
 	}
 

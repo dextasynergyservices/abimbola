@@ -583,6 +583,126 @@ const Index = () => {
 			</section>
 
 			{/* ═══════════════════════════════════════════
+          BLOG / REFLECTIONS SECTION
+          ═══════════════════════════════════════════ */}
+			<section
+				id="blog"
+				className="section-padding bg-neutral-50 border-t border-neutral-100"
+			>
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+						<div>
+							<span className="reveal section-label mb-3 block">
+								Reflections & Insights
+							</span>
+							<h2 className="reveal font-display text-3xl md:text-4xl lg:text-[2.5rem] font-semibold text-black">
+								Latest from the <em className="text-gold not-italic">Blog</em>
+							</h2>
+						</div>
+						<Link
+							href="/blog"
+							className="reveal mt-4 md:mt-0 inline-flex items-center gap-2 text-sm font-semibold text-black hover:text-amber-600 transition-colors"
+						>
+							View All Articles
+							<ArrowRight className="h-4 w-4" />
+						</Link>
+					</div>
+
+					<div className="grid md:grid-cols-3 gap-8">
+						<div className="bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm flex flex-col group">
+							<div className="w-full h-48 overflow-hidden bg-slate-100 relative">
+								<img
+									src="/assets/blog-featured-1.jpg"
+									alt="The Art of Mindful Reading"
+									className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+								/>
+							</div>
+							<div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+								<div>
+									<span className="bg-amber-100 text-amber-800 text-[11px] font-semibold px-2.5 py-0.5 rounded-full uppercase">
+										Reflections
+									</span>
+									<h3 className="font-display text-lg font-bold text-black mt-3 group-hover:text-amber-600 transition-colors">
+										The Art of Mindful Reading in a Distracted World
+									</h3>
+									<p className="text-neutral-600 text-sm mt-2 line-clamp-3">
+										Discover how to transform your reading habits into a
+										contemplative practice that enriches mind and soul.
+									</p>
+								</div>
+								<Link
+									href="/blog/the-art-of-mindful-reading"
+									className="inline-flex items-center text-xs font-semibold text-black hover:text-amber-600 pt-2"
+								>
+									Read Article <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+								</Link>
+							</div>
+						</div>
+
+						<div className="bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm flex flex-col group">
+							<div className="w-full h-48 overflow-hidden bg-slate-100 relative">
+								<img
+									src="/assets/blog-featured-2.jpg"
+									alt="Whispers in the Garden"
+									className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+								/>
+							</div>
+							<div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+								<div>
+									<span className="bg-amber-100 text-amber-800 text-[11px] font-semibold px-2.5 py-0.5 rounded-full uppercase">
+										Poems
+									</span>
+									<h3 className="font-display text-lg font-bold text-black mt-3 group-hover:text-amber-600 transition-colors">
+										Whispers in the Garden: Growth Through Seasons
+									</h3>
+									<p className="text-neutral-600 text-sm mt-2 line-clamp-3">
+										Reflections and prose exploring personal growth, patience,
+										and quiet moments between seasons.
+									</p>
+								</div>
+								<Link
+									href="/blog/whispers-in-the-garden"
+									className="inline-flex items-center text-xs font-semibold text-black hover:text-amber-600 pt-2"
+								>
+									Read Article <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+								</Link>
+							</div>
+						</div>
+
+						<div className="bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm flex flex-col group">
+							<div className="w-full h-48 overflow-hidden bg-slate-100 relative">
+								<img
+									src="/assets/hero-image.jpg"
+									alt="Lessons in Resilience"
+									className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+								/>
+							</div>
+							<div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+								<div>
+									<span className="bg-amber-100 text-amber-800 text-[11px] font-semibold px-2.5 py-0.5 rounded-full uppercase">
+										Stories
+									</span>
+									<h3 className="font-display text-lg font-bold text-black mt-3 group-hover:text-amber-600 transition-colors">
+										The Last Letter from the Village: Lessons in Resilience
+									</h3>
+									<p className="text-neutral-600 text-sm mt-2 line-clamp-3">
+										An evocative story about uncovering ancestral letters filled
+										with courage, faith, and enduring hope.
+									</p>
+								</div>
+								<Link
+									href="/blog/the-last-letter-from-the-village"
+									className="inline-flex items-center text-xs font-semibold text-black hover:text-amber-600 pt-2"
+								>
+									Read Article <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+								</Link>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			{/* ═══════════════════════════════════════════
           COMMUNITY SECTION — THE CLARITY SPACE
           ═══════════════════════════════════════════ */}
 			<section id="community" className="section-padding bg-white">
