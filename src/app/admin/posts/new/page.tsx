@@ -233,7 +233,7 @@ export default function CreatePostScreen() {
 					</Card>
 				</div>
 
-				{/* Right Sidebar Metadata */}
+				{/* Right Sidebar Metadataaa */}
 				<div className="space-y-6">
 					{/* Status Control */}
 					<Card className="border-slate-200 bg-white p-6 space-y-4 shadow-sm">
