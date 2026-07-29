@@ -154,7 +154,7 @@ function HeroSection({
 				</div>
 
 				{imageUrl ? (
-					<div className="relative aspect-4/3 sm:aspect-16/9 lg:aspect-square w-full rounded-2xl overflow-hidden shadow-lg border border-slate-800">
+					<div className="relative aspect-[4/3] sm:aspect-video lg:aspect-square w-full rounded-2xl overflow-hidden shadow-lg border border-slate-800">
 						<Image
 							src={imageUrl}
 							alt={imageAlt}
@@ -164,7 +164,7 @@ function HeroSection({
 						/>
 					</div>
 				) : (
-					<div className="relative aspect-4/3 w-full rounded-2xl bg-gradient-to-tr from-amber-600/30 to-slate-800 flex items-center justify-center p-8 border border-slate-800 text-center">
+					<div className="relative aspect-[4/3] w-full rounded-2xl bg-gradient-to-tr from-amber-600/30 to-slate-800 flex items-center justify-center p-8 border border-slate-800 text-center">
 						<div className="space-y-3">
 							<Feather className="h-12 w-12 text-amber-400 mx-auto" />
 							<p className="text-slate-300 font-display italic text-lg">
@@ -207,7 +207,7 @@ function TextBlockSection({
 				</div>
 
 				{imageUrl && (
-					<div className="relative aspect-4/3 w-full rounded-2xl overflow-hidden shadow-md border border-slate-200">
+					<div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-md border border-slate-200">
 						<Image
 							src={imageUrl}
 							alt={imageAlt}
@@ -532,7 +532,7 @@ function BooksSection({
 						key={book.id || `book-${idx}`}
 						className="group bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col h-full"
 					>
-						<div className="relative aspect-3/4 w-full bg-slate-100 overflow-hidden">
+						<div className="relative aspect-[3/4] w-full bg-slate-100 overflow-hidden">
 							{book.image ? (
 								<Image
 									src={book.image}

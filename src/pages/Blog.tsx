@@ -7,7 +7,6 @@ import {
 	ChevronRight,
 	Search,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import Footer from "@/components/Footer";
@@ -46,12 +45,14 @@ export default function Blog({
 	// Use database posts if available, fallback to static mock posts
 	const displayPosts =
 		publishedPosts.length > 0
-			? publishedPosts.map((p) => ({
+			? publishedPosts.map((p, idx) => ({
 					id: p.id,
 					slug: p.slug,
 					title: p.title,
 					excerpt: p.excerpt || "Read full article insights and reflections.",
-					image: p.featuredImage?.secureUrl || blogFeatured1,
+					image:
+						p.featuredImage?.secureUrl ||
+						(idx % 2 === 0 ? blogFeatured1 : blogFeatured2),
 					date: p.publishedAt
 						? new Date(p.publishedAt).toLocaleDateString()
 						: "Recent",
@@ -183,13 +184,16 @@ export default function Blog({
 								key={post.id}
 								className="border-slate-200 bg-white overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col group"
 							>
-								<div className="relative aspect-16/9 overflow-hidden bg-slate-100">
-									<Image
+								<div className="w-full h-48 sm:h-52 overflow-hidden bg-slate-100 relative">
+									<img
 										src={post.image}
 										alt={post.title}
-										fill
-										sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-										className="object-cover group-hover:scale-105 transition-transform duration-300"
+										onError={(e) => {
+											const target = e.currentTarget;
+											target.onerror = null;
+											target.src = "/assets/blog-featured-1.jpg";
+										}}
+										className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
 									/>
 								</div>
 								<CardContent className="pt-6 flex-1 space-y-3">

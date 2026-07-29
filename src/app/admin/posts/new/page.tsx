@@ -1,15 +1,18 @@
 "use client";
 
-import { ArrowLeft, Image as ImageIcon, Plus, X } from "lucide-react";
+import {
+	ArrowLeft,
+	Image as ImageIcon,
+	Loader2,
+	Plus,
+	Upload,
+	X,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import {
-	type MediaItem,
-	MediaPickerModal,
-} from "@/components/admin/MediaPickerModal";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,6 +25,8 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import type { UploadedMedia } from "@/hooks/useCloudinaryUpload";
+import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
 
 export default function CreatePostScreen() {
 	const router = useRouter();
@@ -35,12 +40,15 @@ export default function CreatePostScreen() {
 	const [status, setStatus] = useState<"DRAFT" | "PUBLISHED" | "ARCHIVED">(
 		"DRAFT",
 	);
-	const [featuredImage, setFeaturedImage] = useState<MediaItem | null>(null);
-	const [isImagePickerOpen, setIsImagePickerOpen] = useState(false);
+	const [featuredImage, setFeaturedImage] = useState<UploadedMedia | null>(
+		null,
+	);
 	const [categoryId, setCategoryId] = useState<string>("NONE");
 	const [categories, setCategories] = useState<{ id: string; name: string }[]>(
 		[],
 	);
+	const fileInputRef = useRef<HTMLInputElement>(null);
+	const { uploading, upload } = useCloudinaryUpload();
 
 	const fetchCategories = useCallback(async () => {
 		try {
@@ -69,6 +77,13 @@ export default function CreatePostScreen() {
 					.replace(/^-+|-+$/g, ""),
 			);
 		}
+	};
+
+	const handleFileUpload = async (files: FileList | null) => {
+		const media = await upload(files);
+		if (media) setFeaturedImage(media);
+		// Reset file input so same file can be re-uploaded
+		if (fileInputRef.current) fileInputRef.current.value = "";
 	};
 
 	const handleCreate = async () => {
@@ -218,7 +233,7 @@ export default function CreatePostScreen() {
 					</Card>
 				</div>
 
-				{/* Right Sidebar Metadata */}
+				{/* Right Sidebar Metadataaa */}
 				<div className="space-y-6">
 					{/* Status Control */}
 					<Card className="border-slate-200 bg-white p-6 space-y-4 shadow-sm">
@@ -278,7 +293,7 @@ export default function CreatePostScreen() {
 						</div>
 					</Card>
 
-					{/* Featured Image Picker */}
+					{/* Featured Image — Direct Upload */}
 					<Card className="border-slate-200 bg-white p-6 space-y-4 shadow-sm">
 						<h2 className="text-lg font-semibold text-slate-900">
 							Featured Image
@@ -298,30 +313,52 @@ export default function CreatePostScreen() {
 								>
 									<X className="h-4 w-4" />
 								</button>
+								{/* Change image button */}
+								<label className="absolute bottom-2 left-2 cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-slate-950/70 hover:bg-slate-950/90 text-white text-xs font-medium px-3 py-1.5 transition-colors">
+									<Upload className="h-3.5 w-3.5" />
+									Change
+									<input
+										type="file"
+										accept="image/*"
+										disabled={uploading}
+										className="hidden"
+										onChange={(e) => handleFileUpload(e.target.files)}
+									/>
+								</label>
 							</div>
 						) : (
-							<Button
-								type="button"
-								variant="outline"
-								onClick={() => setIsImagePickerOpen(true)}
-								className="w-full min-h-[44px] border-dashed border-slate-300 text-slate-600 hover:text-amber-700 hover:bg-amber-50/50"
+							<label
+								className={`flex flex-col items-center justify-center w-full min-h-[120px] rounded-lg border-2 border-dashed transition-colors cursor-pointer ${uploading ? "border-amber-400 bg-amber-50/50" : "border-slate-300 hover:border-amber-500 hover:bg-amber-50/30"}`}
 							>
-								<ImageIcon className="h-4 w-4 mr-2 text-amber-600" />
-								Select Cloudinary Image
-							</Button>
+								{uploading ? (
+									<div className="flex flex-col items-center gap-2 text-amber-600">
+										<Loader2 className="h-6 w-6 animate-spin" />
+										<span className="text-sm font-medium">Uploading...</span>
+									</div>
+								) : (
+									<div className="flex flex-col items-center gap-2 text-slate-500">
+										<ImageIcon className="h-8 w-8 text-amber-500" />
+										<span className="text-sm font-medium">
+											Click to upload image
+										</span>
+										<span className="text-xs text-slate-400">
+											JPG, PNG, WebP supported
+										</span>
+									</div>
+								)}
+								<input
+									ref={fileInputRef}
+									type="file"
+									accept="image/*"
+									disabled={uploading}
+									className="hidden"
+									onChange={(e) => handleFileUpload(e.target.files)}
+								/>
+							</label>
 						)}
 					</Card>
 				</div>
 			</div>
-
-			{/* Image Picker Modal */}
-			<MediaPickerModal
-				open={isImagePickerOpen}
-				onOpenChange={setIsImagePickerOpen}
-				onSelectImage={(media) => setFeaturedImage(media)}
-				selectedImageId={featuredImage?.id}
-				title="Select Featured Article Image"
-			/>
 		</div>
 	);
 }
