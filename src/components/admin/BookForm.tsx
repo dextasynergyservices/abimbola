@@ -19,6 +19,16 @@ import {
 	createDefaultPriceRows,
 	type PriceFormRow,
 } from "@/components/admin/BookPriceEditor";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -30,6 +40,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import type { UploadedMedia } from "@/hooks/useCloudinaryUpload";
 import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
@@ -60,11 +71,35 @@ export function BookForm({ bookId }: BookFormProps) {
 	const [status, setStatus] = useState<"DRAFT" | "PUBLISHED" | "ARCHIVED">(
 		"DRAFT",
 	);
+	const [featuredOnHome, setFeaturedOnHome] = useState(false);
+	const [featuredConfirmOpen, setFeaturedConfirmOpen] = useState(false);
 	const [coverImage, setCoverImage] = useState<UploadedMedia | null>(null);
 	const [categories, setCategories] = useState<BookCategory[]>([]);
 	const [priceRows, setPriceRows] = useState(createDefaultPriceRows());
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const { uploading, upload } = useCloudinaryUpload();
+
+	const handleFeaturedToggle = async (checked: boolean) => {
+		if (checked && !featuredOnHome) {
+			try {
+				const res = await fetch("/api/admin/books");
+				if (res.ok) {
+					const data = await res.json();
+					const featuredList = (data.books || []).filter(
+						(b: { featuredOnHome: boolean; id: string }) =>
+							b.featuredOnHome && b.id !== bookId,
+					);
+					if (featuredList.length >= 3) {
+						setFeaturedConfirmOpen(true);
+						return;
+					}
+				}
+			} catch (err) {
+				console.error(err);
+			}
+		}
+		setFeaturedOnHome(checked);
+	};
 
 	const fetchCategories = useCallback(async () => {
 		try {
@@ -99,6 +134,7 @@ export function BookForm({ bookId }: BookFormProps) {
 				setPublicationDate(book.publicationDate || "");
 				setCategoryId(book.categoryId || "NONE");
 				setStatus(book.status);
+				setFeaturedOnHome(Boolean(book.featuredOnHome));
 
 				if (book.coverImageId) {
 					const mediaRes = await fetch(
@@ -116,6 +152,7 @@ export function BookForm({ bookId }: BookFormProps) {
 						type: p.type,
 						enabled: true,
 						amount: p.amount != null ? String(p.amount) : "",
+						url: p.url || "",
 					};
 				}
 				setPriceRows(rows);
@@ -158,6 +195,13 @@ export function BookForm({ bookId }: BookFormProps) {
 		}
 
 		const enabledPrices = Object.values(priceRows).filter((r) => r.enabled);
+		if (enabledPrices.length === 0) {
+			toast.error(
+				"At least one pricing option (Free, Soft Copy, Hard Copy, or Coming Soon) is required to save a book",
+			);
+			return;
+		}
+
 		for (const row of enabledPrices) {
 			if (
 				(row.type === "HARD_COPY" || row.type === "SOFT_COPY") &&
@@ -181,12 +225,14 @@ export function BookForm({ bookId }: BookFormProps) {
 				coverImageId: coverImage?.id || null,
 				categoryId: categoryId === "NONE" ? null : categoryId,
 				status,
+				featuredOnHome,
 				prices: enabledPrices.map((row) => ({
 					type: row.type,
 					amount:
 						row.type === "HARD_COPY" || row.type === "SOFT_COPY"
 							? Number(row.amount)
 							: null,
+					url: row.url.trim() || null,
 					available: true,
 				})),
 			};
@@ -440,6 +486,25 @@ export function BookForm({ bookId }: BookFormProps) {
 								</SelectContent>
 							</Select>
 						</div>
+
+						<div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+							<div className="space-y-0.5 pr-2">
+								<Label
+									htmlFor="book-featured"
+									className="text-slate-800 font-semibold cursor-pointer text-sm"
+								>
+									Featured on Homepage
+								</Label>
+								<p className="text-xs text-slate-500">
+									Display this book in the homepage book section
+								</p>
+							</div>
+							<Switch
+								id="book-featured"
+								checked={featuredOnHome}
+								onCheckedChange={handleFeaturedToggle}
+							/>
+						</div>
 					</Card>
 
 					<Card className="border-slate-200 bg-white p-6 space-y-4 shadow-sm">
@@ -514,6 +579,41 @@ export function BookForm({ bookId }: BookFormProps) {
 					</Card>
 				</div>
 			</div>
+
+			<AlertDialog
+				open={featuredConfirmOpen}
+				onOpenChange={setFeaturedConfirmOpen}
+			>
+				<AlertDialogContent className="bg-white border-slate-200">
+					<AlertDialogHeader>
+						<AlertDialogTitle className="text-slate-900 font-bold">
+							Homepage Featured Limit Reached (3/3)
+						</AlertDialogTitle>
+						<AlertDialogDescription className="text-slate-600">
+							There are already 3 books featured on the homepage. Enabling
+							featured status for this book will automatically remove the oldest
+							featured book and replace it with this one.
+							<br />
+							<br />
+							Do you want to proceed?
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel onClick={() => setFeaturedConfirmOpen(false)}>
+							Cancel
+						</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={() => {
+								setFeaturedOnHome(true);
+								setFeaturedConfirmOpen(false);
+							}}
+							className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold"
+						>
+							Yes, Replace Oldest
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 }

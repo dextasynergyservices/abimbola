@@ -21,8 +21,9 @@ interface BookDetailProps {
 const BookDetail = ({ book, bookId }: BookDetailProps) => {
 	if (book) {
 		const relatedBooks = books.slice(0, 2);
-		const hasComingSoon = book.prices.some((p) => p.type === "COMING_SOON");
-		const hasPricing = book.prices.length > 0 && !hasComingSoon;
+		const prices = book.prices || [];
+		const hasComingSoon = prices.some((p) => p.type === "COMING_SOON");
+		const hasPricing = prices.length > 0 && !hasComingSoon;
 
 		return (
 			<div className="min-h-screen flex flex-col">
@@ -79,38 +80,65 @@ const BookDetail = ({ book, bookId }: BookDetailProps) => {
 
 							{hasPricing ? (
 								<div className="space-y-3">
-									{book.prices.map((price) => (
-										<div
-											key={price.type}
-											className="flex items-center justify-between p-4 rounded-xl border border-border bg-card"
-										>
-											<div>
-												<p className="font-semibold">
-													{PRICE_TYPE_LABELS[price.type]}
-												</p>
-												{price.type === "FREE" ? (
-													<p className="text-sm text-muted-foreground">Free</p>
-												) : (
-													<p className="text-lg font-bold text-primary">
-														₦{(price.amount || 0).toLocaleString()}
+									{book.prices.map((price) => {
+										const targetUrl = price.url;
+										return (
+											<div
+												key={price.type}
+												className="flex items-center justify-between p-4 rounded-xl border border-border bg-card"
+											>
+												<div>
+													<p className="font-semibold">
+														{PRICE_TYPE_LABELS[price.type]}
 													</p>
+													{price.type === "FREE" ? (
+														<p className="text-sm text-muted-foreground">
+															Free
+														</p>
+													) : (
+														<p className="text-lg font-bold text-primary">
+															₦{(price.amount || 0).toLocaleString()}
+														</p>
+													)}
+												</div>
+												{targetUrl ? (
+													<Button size="lg" asChild>
+														<a
+															href={targetUrl}
+															target="_blank"
+															rel="noopener noreferrer"
+														>
+															{price.type === "FREE" ? (
+																<>
+																	<Download className="mr-2 h-5 w-5" />
+																	Download
+																</>
+															) : (
+																<>
+																	<ShoppingCart className="mr-2 h-5 w-5" />
+																	Buy
+																</>
+															)}
+														</a>
+													</Button>
+												) : (
+													<Button size="lg">
+														{price.type === "FREE" ? (
+															<>
+																<Download className="mr-2 h-5 w-5" />
+																Download
+															</>
+														) : (
+															<>
+																<ShoppingCart className="mr-2 h-5 w-5" />
+																Buy
+															</>
+														)}
+													</Button>
 												)}
 											</div>
-											<Button size="lg">
-												{price.type === "FREE" ? (
-													<>
-														<Download className="mr-2 h-5 w-5" />
-														Download
-													</>
-												) : (
-													<>
-														<ShoppingCart className="mr-2 h-5 w-5" />
-														Buy
-													</>
-												)}
-											</Button>
-										</div>
-									))}
+										);
+									})}
 								</div>
 							) : (
 								<div className="inline-flex items-center text-sm font-semibold bg-primary/10 text-primary px-4 py-1.5 rounded-full uppercase tracking-wider">

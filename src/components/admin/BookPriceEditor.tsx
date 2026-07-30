@@ -11,6 +11,7 @@ export interface PriceFormRow {
 	type: BookPriceType;
 	enabled: boolean;
 	amount: string;
+	url: string;
 }
 
 export const PRICE_TYPE_LABELS: Record<BookPriceType, string> = {
@@ -61,23 +62,51 @@ export function BookPriceEditor({ rows, onChange }: BookPriceEditorProps) {
 							/>
 						</div>
 
-						{row.enabled && needsAmount && (
-							<div className="mt-3">
-								<Label
-									htmlFor={`price-amount-${type}`}
-									className="text-xs text-slate-500"
-								>
-									Amount (₦)
-								</Label>
-								<Input
-									id={`price-amount-${type}`}
-									type="number"
-									min={0}
-									value={row.amount}
-									onChange={(e) => onChange(type, { amount: e.target.value })}
-									placeholder="e.g. 15000"
-									className="mt-1 bg-white border-slate-200 min-h-[40px]"
-								/>
+						{row.enabled && (
+							<div className="mt-3 space-y-3">
+								{needsAmount && (
+									<div>
+										<Label
+											htmlFor={`price-amount-${type}`}
+											className="text-xs text-slate-500 font-medium"
+										>
+											Amount (₦)
+										</Label>
+										<Input
+											id={`price-amount-${type}`}
+											type="number"
+											min={0}
+											value={row.amount}
+											onChange={(e) =>
+												onChange(type, { amount: e.target.value })
+											}
+											placeholder="e.g. 15000"
+											className="mt-1 bg-white border-slate-200 min-h-[40px]"
+										/>
+									</div>
+								)}
+								<div>
+									<Label
+										htmlFor={`price-url-${type}`}
+										className="text-xs text-slate-500 font-medium"
+									>
+										{type === "FREE"
+											? "Download / Access Link (URL)"
+											: "Purchase / Order Link (URL)"}
+									</Label>
+									<Input
+										id={`price-url-${type}`}
+										type="url"
+										value={row.url}
+										onChange={(e) => onChange(type, { url: e.target.value })}
+										placeholder={
+											type === "FREE"
+												? "https://drive.google.com/... or https://..."
+												: "https://paystack.com/... or https://selar.co/..."
+										}
+										className="mt-1 bg-white border-slate-200 min-h-[40px]"
+									/>
+								</div>
 							</div>
 						)}
 					</Card>
@@ -89,9 +118,9 @@ export function BookPriceEditor({ rows, onChange }: BookPriceEditorProps) {
 
 export function createDefaultPriceRows(): Record<BookPriceType, PriceFormRow> {
 	return {
-		HARD_COPY: { type: "HARD_COPY", enabled: false, amount: "" },
-		SOFT_COPY: { type: "SOFT_COPY", enabled: false, amount: "" },
-		FREE: { type: "FREE", enabled: false, amount: "" },
-		COMING_SOON: { type: "COMING_SOON", enabled: false, amount: "" },
+		HARD_COPY: { type: "HARD_COPY", enabled: false, amount: "", url: "" },
+		SOFT_COPY: { type: "SOFT_COPY", enabled: false, amount: "", url: "" },
+		FREE: { type: "FREE", enabled: false, amount: "", url: "" },
+		COMING_SOON: { type: "COMING_SOON", enabled: false, amount: "", url: "" },
 	};
 }

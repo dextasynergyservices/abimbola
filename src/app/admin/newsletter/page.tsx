@@ -1,6 +1,14 @@
 "use client";
 
-import { Loader2, Trash2, Users } from "lucide-react";
+import {
+	ChevronDown,
+	Download,
+	FileSpreadsheet,
+	FileText,
+	Loader2,
+	Trash2,
+	Users,
+} from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -15,6 +23,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface SubscriberItem {
@@ -29,6 +43,7 @@ export default function AdminNewsletterPage() {
 	const [loading, setLoading] = useState(true);
 	const [deleteTarget, setDeleteTarget] = useState<SubscriberItem | null>(null);
 	const [actionLoading, setActionLoading] = useState(false);
+	const [exporting, setExporting] = useState(false);
 
 	const fetchSubscribers = useCallback(async () => {
 		setLoading(true);
@@ -65,19 +80,190 @@ export default function AdminNewsletterPage() {
 		}
 	};
 
+	const handleExportPDF = async () => {
+		if (subscribers.length === 0) {
+			toast.error("No subscribers to export");
+			return;
+		}
+		setExporting(true);
+		try {
+			const jsPDFModule = await import("jspdf");
+			const jsPDF = jsPDFModule.default;
+			const autoTableModule = await import("jspdf-autotable");
+
+			const doc = new jsPDF();
+
+			// Title
+			doc.setFontSize(18);
+			doc.setFont("helvetica", "bold");
+			doc.text("Newsletter Subscribers", 14, 22);
+
+			// Subtitle with date
+			doc.setFontSize(10);
+			doc.setFont("helvetica", "normal");
+			doc.setTextColor(100);
+			doc.text(
+				`Exported on ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}  •  ${subscribers.length} subscriber${subscribers.length !== 1 ? "s" : ""}`,
+				14,
+				30,
+			);
+			doc.setTextColor(0);
+
+			// Table
+			const tableData = subscribers.map((sub, idx) => [
+				idx + 1,
+				sub.firstName,
+				sub.email,
+				new Date(sub.createdAt).toLocaleDateString("en-US", {
+					year: "numeric",
+					month: "short",
+					day: "numeric",
+				}),
+			]);
+
+			(
+				autoTableModule as unknown as {
+					default: (
+						doc: InstanceType<typeof jsPDF>,
+						options: Record<string, unknown>,
+					) => void;
+				}
+			).default(doc, {
+				startY: 36,
+				head: [["#", "Name", "Email", "Subscribed"]],
+				body: tableData,
+				theme: "striped",
+				headStyles: {
+					fillColor: [245, 158, 11],
+					textColor: [15, 23, 42],
+					fontStyle: "bold",
+					fontSize: 10,
+				},
+				bodyStyles: {
+					fontSize: 9,
+					textColor: [51, 65, 85],
+				},
+				alternateRowStyles: {
+					fillColor: [248, 250, 252],
+				},
+				styles: {
+					cellPadding: 4,
+					lineColor: [226, 232, 240],
+					lineWidth: 0.1,
+				},
+				margin: { left: 14, right: 14 },
+			});
+
+			doc.save(
+				`newsletter-subscribers-${new Date().toISOString().slice(0, 10)}.pdf`,
+			);
+			toast.success("PDF downloaded successfully");
+		} catch (err) {
+			console.error("PDF export error:", err);
+			toast.error("Failed to export PDF");
+		} finally {
+			setExporting(false);
+		}
+	};
+
+	const handleExportExcel = async () => {
+		if (subscribers.length === 0) {
+			toast.error("No subscribers to export");
+			return;
+		}
+		setExporting(true);
+		try {
+			const XLSX = await import("xlsx");
+
+			const worksheetData = subscribers.map((sub, idx) => ({
+				"#": idx + 1,
+				Name: sub.firstName,
+				Email: sub.email,
+				"Subscribed Date": new Date(sub.createdAt).toLocaleDateString("en-US", {
+					year: "numeric",
+					month: "short",
+					day: "numeric",
+				}),
+			}));
+
+			const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+
+			// Set column widths
+			worksheet["!cols"] = [{ wch: 5 }, { wch: 20 }, { wch: 35 }, { wch: 18 }];
+
+			const workbook = XLSX.utils.book_new();
+			XLSX.utils.book_append_sheet(workbook, worksheet, "Subscribers");
+
+			XLSX.writeFile(
+				workbook,
+				`newsletter-subscribers-${new Date().toISOString().slice(0, 10)}.xlsx`,
+			);
+			toast.success("Excel file downloaded successfully");
+		} catch (err) {
+			console.error("Excel export error:", err);
+			toast.error("Failed to export Excel file");
+		} finally {
+			setExporting(false);
+		}
+	};
+
 	return (
 		<div className="space-y-6">
-			<div>
-				<div className="flex items-center space-x-2">
-					<Users className="h-6 w-6 text-amber-600" />
-					<h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-						Newsletter
-					</h1>
+			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+				<div>
+					<div className="flex items-center space-x-2">
+						<Users className="h-6 w-6 text-amber-600" />
+						<h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+							Newsletter
+						</h1>
+					</div>
+					<p className="text-sm text-slate-500 mt-1">
+						Everyone who signed up for &ldquo;Get the Letters&rdquo; on the
+						homepage.
+					</p>
 				</div>
-				<p className="text-sm text-slate-500 mt-1">
-					Everyone who signed up for &ldquo;Get the Letters&rdquo; on the
-					homepage.
-				</p>
+
+				{/* Export Dropdown */}
+				{!loading && subscribers.length > 0 && (
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button
+								variant="outline"
+								disabled={exporting}
+								className="border-slate-200 bg-white text-slate-700 hover:bg-slate-50 min-h-[40px] gap-2"
+							>
+								{exporting ? (
+									<Loader2 className="h-4 w-4 animate-spin" />
+								) : (
+									<Download className="h-4 w-4" />
+								)}
+								{exporting ? "Exporting..." : "Export"}
+								<ChevronDown className="h-3.5 w-3.5 opacity-60" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent
+							align="end"
+							className="w-48 bg-white border-slate-200 shadow-lg"
+						>
+							<DropdownMenuItem
+								onClick={handleExportPDF}
+								disabled={exporting}
+								className="gap-2.5 cursor-pointer text-slate-700 focus:bg-slate-50 focus:text-slate-900"
+							>
+								<FileText className="h-4 w-4 text-rose-500" />
+								Download as PDF
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								onClick={handleExportExcel}
+								disabled={exporting}
+								className="gap-2.5 cursor-pointer text-slate-700 focus:bg-slate-50 focus:text-slate-900"
+							>
+								<FileSpreadsheet className="h-4 w-4 text-emerald-500" />
+								Download as Excel
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				)}
 			</div>
 
 			{loading ? (

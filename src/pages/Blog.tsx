@@ -131,8 +131,8 @@ export default function Blog({
 						{heroTitle}
 					</h1>
 					<p className="text-lg sm:text-xl text-slate-600 max-w-2xl">
-						Insights, stories, and musings on educational leadership, parenting,
-						literature, and life.
+						A place to pause, reflect, and return to the questions that shape
+						the way we live and love.
 					</p>
 				</div>
 			</section>

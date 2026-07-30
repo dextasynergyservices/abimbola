@@ -21,9 +21,14 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import type { PublishedBook } from "@/lib/books";
 
 const aboutImage = "/assets/about%20IMAGE.png";
 const bookHardestPart = "/assets/For%20BOOKS%20(3).png";
+
+interface IndexProps {
+	featuredBooks?: PublishedBook[];
+}
 
 /* ─── Scroll reveal hook ─── */
 function useReveal() {
@@ -57,7 +62,81 @@ function useReveal() {
 	return ref;
 }
 
-const Index = () => {
+function HomepageBookPrice({ book }: { book: PublishedBook }) {
+	const prices = book.prices || [];
+	if (prices.length === 0) {
+		return (
+			<span className="inline-flex items-center text-xs font-semibold bg-amber-500/20 text-amber-800 border border-amber-500/30 px-3 py-1 rounded-full uppercase tracking-wider">
+				Coming Soon
+			</span>
+		);
+	}
+
+	const free = prices.find((p) => p.type === "FREE");
+	const softCopy = prices.find((p) => p.type === "SOFT_COPY");
+	const hardCopy = prices.find((p) => p.type === "HARD_COPY");
+
+	if (softCopy && hardCopy) {
+		return (
+			<div className="space-y-1 py-1 border-t border-neutral-100">
+				<div className="flex items-center justify-between text-xs sm:text-sm">
+					<span className="text-neutral-500 font-medium">Soft Copy:</span>
+					<span className="font-bold text-neutral-900">
+						₦{(softCopy.amount || 0).toLocaleString()}
+					</span>
+				</div>
+				<div className="flex items-center justify-between text-xs sm:text-sm">
+					<span className="text-neutral-500 font-medium">Hard Copy:</span>
+					<span className="font-bold text-neutral-900">
+						₦{(hardCopy.amount || 0).toLocaleString()}
+					</span>
+				</div>
+			</div>
+		);
+	}
+
+	if (softCopy) {
+		return (
+			<div className="flex items-center justify-between text-sm py-1">
+				<span className="text-xs text-neutral-500 font-medium uppercase tracking-wider bg-neutral-100 px-2 py-0.5 rounded">
+					Soft Copy
+				</span>
+				<span className="text-base font-bold text-neutral-900">
+					₦{(softCopy.amount || 0).toLocaleString()}
+				</span>
+			</div>
+		);
+	}
+
+	if (hardCopy) {
+		return (
+			<div className="flex items-center justify-between text-sm py-1">
+				<span className="text-xs text-neutral-500 font-medium uppercase tracking-wider bg-neutral-100 px-2 py-0.5 rounded">
+					Hard Copy
+				</span>
+				<span className="text-base font-bold text-neutral-900">
+					₦{(hardCopy.amount || 0).toLocaleString()}
+				</span>
+			</div>
+		);
+	}
+
+	if (free) {
+		return (
+			<span className="inline-flex items-center text-xs font-semibold bg-emerald-500/20 text-emerald-800 border border-emerald-500/30 px-3 py-1 rounded-full uppercase tracking-wider">
+				Free
+			</span>
+		);
+	}
+
+	return (
+		<span className="inline-flex items-center text-xs font-semibold bg-amber-500/20 text-amber-800 border border-amber-500/30 px-3 py-1 rounded-full uppercase tracking-wider">
+			Coming Soon
+		</span>
+	);
+}
+
+const Index = ({ featuredBooks = [] }: IndexProps) => {
 	const pageRef = useReveal();
 	const [formSubmitted, setFormSubmitted] = useState(false);
 	const [formData, setFormData] = useState({ firstName: "", email: "" });
@@ -382,202 +461,293 @@ const Index = () => {
 
 					{/* Books grid */}
 					<div className="grid md:grid-cols-3 gap-8 stagger-children">
-						{/* Book 1 — Dear Single (Featured) */}
-						<div className="reveal bg-white rounded-2xl overflow-hidden border border-neutral-100 card-lift relative flex flex-col h-full">
-							<div className="absolute top-4 right-4 z-10">
-								<span className="px-3 py-1 bg-neutral-900 text-white text-[11px] font-semibold tracking-wider uppercase rounded-full">
-									Coming Soon
-								</span>
-							</div>
-							<div className="aspect-[3/4] overflow-hidden bg-neutral-100">
-								<img
-									src="https://res.cloudinary.com/dxoorukfj/image/upload/v1782469054/DS_NEW_niyokf.png"
-									alt="Dear Single by Abimbola Lawuyi"
-									className="w-full h-full object-cover"
-								/>
-							</div>
-							<div className="p-6 flex flex-col flex-1">
-								<span className="text-gold text-[11px] font-medium tracking-wider uppercase">
-									RELATIONSHIP & LOVE
-								</span>
-								<h3 className="font-display text-xl font-semibold text-black mt-2 mb-1">
-									Dear Single
-								</h3>
-								<p className="text-neutral-400 text-xs italic mb-3">
-									Letters for the journey you are on right now
-								</p>
-								<p className="text-neutral-600 text-sm leading-relaxed mb-1 line-clamp-3">
-									This book is not only for single people. It is for anyone who
-									wants to love well, the one at a crossroads, the one in a
-									relationship searching for clarity, the one who has loved
-									before and is learning what it really means to choose wisely.
-								</p>
-								<Dialog>
-									<DialogTrigger className="text-sm font-semibold hover:underline text-black mb-4 text-left">
-										Read more
-									</DialogTrigger>
-									<DialogContent className="max-w-md">
-										<DialogHeader>
-											<DialogTitle>Dear Single</DialogTitle>
-											<DialogDescription className="sr-only">
-												Details for Dear Single book
-											</DialogDescription>
-										</DialogHeader>
-										<div className="text-neutral-600 text-sm leading-relaxed mt-2 space-y-4">
-											<p>
-												This book is not only for single people. It is for
-												anyone who wants to love well, the one at a crossroads,
-												the one in a relationship searching for clarity, the one
-												who has loved before and is learning what it really
-												means to choose wisely.
-											</p>
-											<p className="font-display text-neutral-500 italic">
-												"Singleness is not a waiting room for life, it is life.
-												It is a season filled with purpose, growth, and
-												self-discovery."
-											</p>
-										</div>
-									</DialogContent>
-								</Dialog>
-								<div className="mt-auto pt-4">
-									<span className="inline-flex items-center gap-2 px-6 py-2.5 bg-neutral-100 text-neutral-500 text-sm font-medium rounded-full cursor-default">
-										Coming Soon
-									</span>
-								</div>
-							</div>
-						</div>
+						{featuredBooks && featuredBooks.length > 0 ? (
+							featuredBooks.slice(0, 3).map((book) => {
+								const imageUrl = book.coverImage?.secureUrl || bookHardestPart;
+								const prices = book.prices || [];
+								const isComingSoon =
+									prices.some((p) => p.type === "COMING_SOON") ||
+									prices.length === 0;
 
-						{/* Book 2 — The Hardest Part of Loving Your Child */}
-						<div className="reveal bg-white rounded-2xl overflow-hidden border border-neutral-100 card-lift flex flex-col h-full">
-							<div className="absolute top-4 right-4 z-10">
-								<span className="px-3 py-1 bg-neutral-900 text-white text-[11px] font-semibold tracking-wider uppercase rounded-full">
-									New Book
-								</span>
-							</div>
-							<div className="aspect-[3/4] overflow-hidden bg-neutral-100">
-								<img
-									src={bookHardestPart}
-									alt="The Hardest Part of Loving Your Child"
-									className="w-full h-full object-cover"
-								/>
-							</div>
-							<div className="p-6 flex flex-col flex-1">
-								<span className="text-gold text-[11px] font-medium tracking-wider uppercase">
-									FAMILY & PARENTING
-								</span>
-								<h3 className="font-display text-xl font-semibold text-black mt-2 mb-1">
-									The Hardest Part of Loving Your Child
-								</h3>
-								<p className="text-neutral-600 text-sm leading-relaxed mb-1 line-clamp-3">
-									A heartfelt and thought-provoking book for every parent who
-									struggles with the tension between protecting their child and
-									preparing them for life. Inspired by the parenting instincts
-									of twelve animals, this book holds up a mirror to the ways we
-									love our children and invites us to look honestly at what we
-									see. It is a soul-stirring reminder that true love doesn’t
-									just hold on it knows when to let go
-								</p>
-								<Dialog>
-									<DialogTrigger className="text-sm font-semibold hover:underline text-black mb-4 text-left">
-										Read more
-									</DialogTrigger>
-									<DialogContent className="max-w-md">
-										<DialogHeader>
-											<DialogTitle>
-												The Hardest Part of Loving Your Child
-											</DialogTitle>
-											<DialogDescription className="sr-only">
-												Details for The Hardest Part of Loving Your Child
-											</DialogDescription>
-										</DialogHeader>
-										<div className="text-neutral-600 text-sm leading-relaxed mt-2 space-y-4">
-											<p>
-												A heartfelt and thought-provoking book for every parent
-												who struggles with the tension between protecting their
-												child and preparing them for life. Inspired by the
-												parenting instincts of twelve animals, this book holds
-												up a mirror to the ways we love our children and invites
-												us to look honestly at what we see. It is a
-												soul-stirring reminder that true love doesn’t just hold
-												on it knows when to let go
-											</p>
+								const isFree = prices.some((p) => p.type === "FREE");
+								const isPaid = prices.some(
+									(p) =>
+										(p.type === "HARD_COPY" || p.type === "SOFT_COPY") &&
+										(p.amount || 0) > 0,
+								);
+
+								return (
+									<div
+										key={book.id}
+										className="reveal bg-white rounded-2xl overflow-hidden border border-neutral-100 card-lift flex flex-col h-full relative"
+									>
+										{isComingSoon && (
+											<div className="absolute top-4 right-4 z-10">
+												<span className="px-3 py-1 bg-neutral-900 text-white text-[11px] font-semibold tracking-wider uppercase rounded-full">
+													Coming Soon
+												</span>
+											</div>
+										)}
+										<div className="aspect-[3/4] overflow-hidden bg-neutral-100">
+											<img
+												src={imageUrl}
+												alt={book.title}
+												className="w-full h-full object-cover"
+											/>
 										</div>
-									</DialogContent>
-								</Dialog>
-								<div className="mt-auto">
-									<div className="flex items-baseline gap-3 mb-5 mt-2">
-										<span className="text-black font-semibold">Free</span>
-										<span className="text-neutral-400 text-xs">
-											Digital Download
+										<div className="p-6 flex flex-col flex-1">
+											{book.category && (
+												<span className="text-gold text-[11px] font-medium tracking-wider uppercase">
+													{book.category.name}
+												</span>
+											)}
+											<h3 className="font-display text-xl font-semibold text-black mt-2 mb-1">
+												{book.title}
+											</h3>
+											<p className="text-neutral-600 text-sm leading-relaxed mb-4 line-clamp-3">
+												{book.description || "No description available."}
+											</p>
+
+											<div className="mt-auto pt-4">
+												{isComingSoon ? (
+													<span className="inline-flex items-center text-xs font-semibold bg-amber-500/20 text-amber-800 border border-amber-500/30 px-4 py-2 rounded-full uppercase tracking-wider">
+														Coming Soon
+													</span>
+												) : isFree && !isPaid ? (
+													<div className="flex items-center justify-between gap-4">
+														<span className="inline-flex items-center text-xs font-semibold bg-emerald-500/20 text-emerald-800 border border-emerald-500/30 px-3.5 py-1.5 rounded-full uppercase tracking-wider">
+															Free
+														</span>
+														<Link
+															href={`/books/${book.slug}`}
+															className="inline-flex items-center gap-2 px-5 py-2 border border-black text-black text-sm font-medium rounded-full hover:bg-black hover:text-white transition-colors"
+														>
+															Get Your Copy
+														</Link>
+													</div>
+												) : (
+													<div className="space-y-3">
+														<HomepageBookPrice book={book} />
+														<div>
+															<Link
+																href={`/books/${book.slug}`}
+																className="inline-flex items-center gap-2 px-6 py-2.5 border border-black text-black text-sm font-medium rounded-full hover:bg-black hover:text-white transition-colors"
+															>
+																Get Your Copy
+															</Link>
+														</div>
+													</div>
+												)}
+											</div>
+										</div>
+									</div>
+								);
+							})
+						) : (
+							<>
+								{/* Book 1 — Dear Single (Featured) */}
+								<div className="reveal bg-white rounded-2xl overflow-hidden border border-neutral-100 card-lift relative flex flex-col h-full">
+									<div className="absolute top-4 right-4 z-10">
+										<span className="px-3 py-1 bg-neutral-900 text-white text-[11px] font-semibold tracking-wider uppercase rounded-full">
+											Coming Soon
 										</span>
 									</div>
-									<Link
-										href="/books"
-										className="inline-flex items-center gap-2 px-6 py-2.5 border border-black text-black text-sm font-medium rounded-full hover:bg-black hover:text-white transition-colors"
-									>
-										Get Your Copy
-									</Link>
-								</div>
-							</div>
-						</div>
-
-						{/* Book 3 — 50 Life Lessons */}
-						<div className="reveal bg-white rounded-2xl overflow-hidden border border-neutral-100 card-lift relative flex flex-col h-full">
-							<div className="absolute top-4 right-4 z-10">
-								<span className="px-3 py-1 bg-neutral-900 text-white text-[11px] font-semibold tracking-wider uppercase rounded-full">
-									Coming Soon
-								</span>
-							</div>
-							<div className="aspect-[3/4] overflow-hidden bg-neutral-100">
-								<img
-									src={
-										"https://res.cloudinary.com/dxoorukfj/image/upload/v1784550650/50_50_Abimbola_tuaugi.png"
-									}
-									alt="50 Life Lessons by Abimbola Lawuyi"
-									className="w-full h-full object-cover"
-								/>
-							</div>
-							<div className="p-6 flex flex-col flex-1">
-								<span className="text-gold text-[11px] font-medium tracking-wider uppercase">
-									LIFE & WISDOM
-								</span>
-								<h3 className="font-display text-xl font-semibold text-black mt-2 mb-1">
-									50 Life Lessons
-								</h3>
-								<p className="text-neutral-600 text-sm leading-relaxed mb-1 line-clamp-3">
-									Fifty years of living teaches you things no classroom ever
-									could. A collection of hard-won wisdom for the person who is
-									approaching a new decade or simply ready to stop living on
-									autopilot.
-								</p>
-								<Dialog>
-									<DialogTrigger className="text-sm font-semibold hover:underline text-black mb-4 text-left">
-										Read more
-									</DialogTrigger>
-									<DialogContent className="max-w-md">
-										<DialogHeader>
-											<DialogTitle>50 Life Lessons</DialogTitle>
-											<DialogDescription className="sr-only">
-												Details for 50 Life Lessons book
-											</DialogDescription>
-										</DialogHeader>
-										<div className="text-neutral-600 text-sm leading-relaxed mt-2 space-y-4">
-											<p>
-												Fifty years of living teaches you things no classroom
-												ever could. A collection of hard-won wisdom for the
-												person who is approaching a new decade or simply ready
-												to stop living on autopilot.
-											</p>
+									<div className="aspect-[3/4] overflow-hidden bg-neutral-100">
+										<img
+											src="https://res.cloudinary.com/dxoorukfj/image/upload/v1782469054/DS_NEW_niyokf.png"
+											alt="Dear Single by Abimbola Lawuyi"
+											className="w-full h-full object-cover"
+										/>
+									</div>
+									<div className="p-6 flex flex-col flex-1">
+										<span className="text-gold text-[11px] font-medium tracking-wider uppercase">
+											RELATIONSHIP & LOVE
+										</span>
+										<h3 className="font-display text-xl font-semibold text-black mt-2 mb-1">
+											Dear Single
+										</h3>
+										<p className="text-neutral-400 text-xs italic mb-3">
+											Letters for the journey you are on right now
+										</p>
+										<p className="text-neutral-600 text-sm leading-relaxed mb-1 line-clamp-3">
+											This book is not only for single people. It is for anyone
+											who wants to love well, the one at a crossroads, the one
+											in a relationship searching for clarity, the one who has
+											loved before and is learning what it really means to
+											choose wisely.
+										</p>
+										<Dialog>
+											<DialogTrigger className="text-sm font-semibold hover:underline text-black mb-4 text-left">
+												Read more
+											</DialogTrigger>
+											<DialogContent className="max-w-md">
+												<DialogHeader>
+													<DialogTitle>Dear Single</DialogTitle>
+													<DialogDescription className="sr-only">
+														Details for Dear Single book
+													</DialogDescription>
+												</DialogHeader>
+												<div className="text-neutral-600 text-sm leading-relaxed mt-2 space-y-4">
+													<p>
+														This book is not only for single people. It is for
+														anyone who wants to love well, the one at a
+														crossroads, the one in a relationship searching for
+														clarity, the one who has loved before and is
+														learning what it really means to choose wisely.
+													</p>
+													<p className="font-display text-neutral-500 italic">
+														"Singleness is not a waiting room for life, it is
+														life. It is a season filled with purpose, growth,
+														and self-discovery."
+													</p>
+												</div>
+											</DialogContent>
+										</Dialog>
+										<div className="mt-auto pt-4">
+											<span className="inline-flex items-center text-xs font-semibold bg-amber-500/20 text-amber-800 border border-amber-500/30 px-4 py-2 rounded-full uppercase tracking-wider">
+												Coming Soon
+											</span>
 										</div>
-									</DialogContent>
-								</Dialog>
-								<div className="mt-auto pt-4">
-									<span className="inline-flex items-center gap-2 px-6 py-2.5 bg-neutral-100 text-neutral-500 text-sm font-medium rounded-full cursor-default">
-										Coming Soon
-									</span>
+									</div>
 								</div>
-							</div>
-						</div>
+
+								{/* Book 2 — The Hardest Part of Loving Your Child */}
+								<div className="reveal bg-white rounded-2xl overflow-hidden border border-neutral-100 card-lift flex flex-col h-full">
+									<div className="absolute top-4 right-4 z-10">
+										<span className="px-3 py-1 bg-neutral-900 text-white text-[11px] font-semibold tracking-wider uppercase rounded-full">
+											New Book
+										</span>
+									</div>
+									<div className="aspect-[3/4] overflow-hidden bg-neutral-100">
+										<img
+											src={bookHardestPart}
+											alt="The Hardest Part of Loving Your Child"
+											className="w-full h-full object-cover"
+										/>
+									</div>
+									<div className="p-6 flex flex-col flex-1">
+										<span className="text-gold text-[11px] font-medium tracking-wider uppercase">
+											FAMILY & PARENTING
+										</span>
+										<h3 className="font-display text-xl font-semibold text-black mt-2 mb-1">
+											The Hardest Part of Loving Your Child
+										</h3>
+										<p className="text-neutral-600 text-sm leading-relaxed mb-1 line-clamp-3">
+											A heartfelt and thought-provoking book for every parent
+											who struggles with the tension between protecting their
+											child and preparing them for life. Inspired by the
+											parenting instincts of twelve animals, this book holds up
+											a mirror to the ways we love our children and invites us
+											to look honestly at what we see. It is a soul-stirring
+											reminder that true love doesn’t just hold on it knows when
+											to let go
+										</p>
+										<Dialog>
+											<DialogTrigger className="text-sm font-semibold hover:underline text-black mb-4 text-left">
+												Read more
+											</DialogTrigger>
+											<DialogContent className="max-w-md">
+												<DialogHeader>
+													<DialogTitle>
+														The Hardest Part of Loving Your Child
+													</DialogTitle>
+													<DialogDescription className="sr-only">
+														Details for The Hardest Part of Loving Your Child
+													</DialogDescription>
+												</DialogHeader>
+												<div className="text-neutral-600 text-sm leading-relaxed mt-2 space-y-4">
+													<p>
+														A heartfelt and thought-provoking book for every
+														parent who struggles with the tension between
+														protecting their child and preparing them for life.
+														Inspired by the parenting instincts of twelve
+														animals, this book holds up a mirror to the ways we
+														love our children and invites us to look honestly at
+														what we see. It is a soul-stirring reminder that
+														true love doesn’t just hold on it knows when to let
+														go
+													</p>
+												</div>
+											</DialogContent>
+										</Dialog>
+										<div className="mt-auto pt-4 space-y-3">
+											<div className="flex items-baseline gap-3">
+												<span className="text-black font-semibold">Free</span>
+												<span className="text-neutral-400 text-xs">
+													Digital Download
+												</span>
+											</div>
+											<div>
+												<Link
+													href="/books/the-hardest-part-of-loving-your-child"
+													className="inline-flex items-center gap-2 px-6 py-2.5 border border-black text-black text-sm font-medium rounded-full hover:bg-black hover:text-white transition-colors"
+												>
+													Get Your Copy
+												</Link>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								{/* Book 3 — 50 Life Lessons */}
+								<div className="reveal bg-white rounded-2xl overflow-hidden border border-neutral-100 card-lift relative flex flex-col h-full">
+									<div className="absolute top-4 right-4 z-10">
+										<span className="px-3 py-1 bg-neutral-900 text-white text-[11px] font-semibold tracking-wider uppercase rounded-full">
+											Coming Soon
+										</span>
+									</div>
+									<div className="aspect-[3/4] overflow-hidden bg-neutral-100">
+										<img
+											src={
+												"https://res.cloudinary.com/dxoorukfj/image/upload/v1784550650/50_50_Abimbola_tuaugi.png"
+											}
+											alt="50 Life Lessons by Abimbola Lawuyi"
+											className="w-full h-full object-cover"
+										/>
+									</div>
+									<div className="p-6 flex flex-col flex-1">
+										<span className="text-gold text-[11px] font-medium tracking-wider uppercase">
+											LIFE & WISDOM
+										</span>
+										<h3 className="font-display text-xl font-semibold text-black mt-2 mb-1">
+											50 Life Lessons
+										</h3>
+										<p className="text-neutral-600 text-sm leading-relaxed mb-1 line-clamp-3">
+											Fifty years of living teaches you things no classroom ever
+											could. A collection of hard-won wisdom for the person who
+											is approaching a new decade or simply ready to stop living
+											on autopilot.
+										</p>
+										<Dialog>
+											<DialogTrigger className="text-sm font-semibold hover:underline text-black mb-4 text-left">
+												Read more
+											</DialogTrigger>
+											<DialogContent className="max-w-md">
+												<DialogHeader>
+													<DialogTitle>50 Life Lessons</DialogTitle>
+													<DialogDescription className="sr-only">
+														Details for 50 Life Lessons book
+													</DialogDescription>
+												</DialogHeader>
+												<div className="text-neutral-600 text-sm leading-relaxed mt-2 space-y-4">
+													<p>
+														Fifty years of living teaches you things no
+														classroom ever could. A collection of hard-won
+														wisdom for the person who is approaching a new
+														decade or simply ready to stop living on autopilot.
+													</p>
+												</div>
+											</DialogContent>
+										</Dialog>
+										<div className="mt-auto pt-4">
+											<span className="inline-flex items-center text-xs font-semibold bg-amber-500/20 text-amber-800 border border-amber-500/30 px-4 py-2 rounded-full uppercase tracking-wider">
+												Coming Soon
+											</span>
+										</div>
+									</div>
+								</div>
+							</>
+						)}
 					</div>
 				</div>
 			</section>

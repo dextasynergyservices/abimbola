@@ -19,27 +19,84 @@ interface BooksProps {
 	categories?: PublishedBookCategory[];
 }
 
-function formatPriceSummary(book: PublishedBook) {
+function BookPriceDisplay({ book }: { book: PublishedBook }) {
 	const prices = book.prices || [];
-	if (prices.length === 0) return { label: "Coming Soon", isComingSoon: true };
-
-	const comingSoon = prices.find((p) => p.type === "COMING_SOON");
-	const free = prices.find((p) => p.type === "FREE");
-	const paid = prices.filter(
-		(p) => p.type === "HARD_COPY" || p.type === "SOFT_COPY",
-	);
-
-	if (paid.length > 0) {
-		const lowest = Math.min(...paid.map((p) => p.amount || 0));
-		return {
-			label: `From ₦${lowest.toLocaleString()}`,
-			isComingSoon: false,
-		};
+	if (prices.length === 0) {
+		return (
+			<div>
+				<span className="inline-flex items-center text-xs font-semibold bg-amber-500/20 text-amber-800 border border-amber-500/30 px-3 py-1 rounded-full uppercase tracking-wider">
+					Coming Soon
+				</span>
+			</div>
+		);
 	}
 
-	if (free) return { label: "Free", isComingSoon: false };
-	if (comingSoon) return { label: "Coming Soon", isComingSoon: true };
-	return { label: "Coming Soon", isComingSoon: true };
+	const free = prices.find((p) => p.type === "FREE");
+	const softCopy = prices.find((p) => p.type === "SOFT_COPY");
+	const hardCopy = prices.find((p) => p.type === "HARD_COPY");
+
+	if (softCopy && hardCopy) {
+		return (
+			<div className="space-y-1.5 pt-2 border-t border-slate-100">
+				<div className="flex items-center justify-between text-xs sm:text-sm">
+					<span className="text-slate-500 font-medium">Soft Copy:</span>
+					<span className="font-bold text-slate-900">
+						₦{(softCopy.amount || 0).toLocaleString()}
+					</span>
+				</div>
+				<div className="flex items-center justify-between text-xs sm:text-sm">
+					<span className="text-slate-500 font-medium">Hard Copy:</span>
+					<span className="font-bold text-slate-900">
+						₦{(hardCopy.amount || 0).toLocaleString()}
+					</span>
+				</div>
+			</div>
+		);
+	}
+
+	if (softCopy) {
+		return (
+			<div className="flex items-center justify-between text-sm pt-1">
+				<span className="text-xs text-slate-500 font-medium uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded">
+					Soft Copy
+				</span>
+				<span className="text-lg font-bold text-slate-900">
+					₦{(softCopy.amount || 0).toLocaleString()}
+				</span>
+			</div>
+		);
+	}
+
+	if (hardCopy) {
+		return (
+			<div className="flex items-center justify-between text-sm pt-1">
+				<span className="text-xs text-slate-500 font-medium uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded">
+					Hard Copy
+				</span>
+				<span className="text-lg font-bold text-slate-900">
+					₦{(hardCopy.amount || 0).toLocaleString()}
+				</span>
+			</div>
+		);
+	}
+
+	if (free) {
+		return (
+			<div className="pt-1">
+				<span className="inline-flex items-center text-xs font-semibold bg-emerald-500/20 text-emerald-800 border border-emerald-500/30 px-3 py-1 rounded-full uppercase tracking-wider">
+					Free
+				</span>
+			</div>
+		);
+	}
+
+	return (
+		<div className="pt-1">
+			<span className="inline-flex items-center text-xs font-semibold bg-amber-500/20 text-amber-800 border border-amber-500/30 px-3 py-1 rounded-full uppercase tracking-wider">
+				Coming Soon
+			</span>
+		</div>
+	);
 }
 
 export default function Books({
@@ -91,8 +148,7 @@ export default function Books({
 						{heroTitle}
 					</h1>
 					<p className="text-lg sm:text-xl text-slate-600 max-w-2xl">
-						Carefully curated books to nourish your mind, empower your family,
-						and inspire your journey.
+						Books that nourish your mind and inspire your journey.
 					</p>
 				</div>
 			</section>
@@ -136,7 +192,6 @@ export default function Books({
 					<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
 						{usingDbBooks
 							? (filteredBooks as PublishedBook[]).map((book) => {
-									const price = formatPriceSummary(book);
 									const imageUrl = book.coverImage?.secureUrl;
 									return (
 										<Card
@@ -185,17 +240,7 @@ export default function Books({
 														({book.rating || 5.0})
 													</span>
 												</div>
-												{price.isComingSoon ? (
-													<div>
-														<span className="inline-flex items-center text-xs font-semibold bg-amber-500/20 text-amber-800 border border-amber-500/30 px-3 py-1 rounded-full uppercase tracking-wider">
-															{price.label}
-														</span>
-													</div>
-												) : (
-													<p className="text-xl font-bold text-slate-900">
-														{price.label}
-													</p>
-												)}
+												<BookPriceDisplay book={book} />
 											</CardContent>
 
 											<CardFooter className="pt-0 gap-2">

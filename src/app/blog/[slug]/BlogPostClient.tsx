@@ -29,6 +29,9 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
 	const imageUrl =
 		post.featuredImage?.secureUrl || "/assets/blog-featured-1.jpg";
 
+	// Detect if content is HTML (from rich text editor) or plain text
+	const isHtml = /<[a-z][\s\S]*>/i.test(post.body);
+
 	return (
 		<main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
 			{/* Back Button */}
@@ -89,13 +92,29 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
 				</div>
 
 				{/* Body Content */}
-				<div className="prose prose-slate max-w-none space-y-6 pt-4 text-slate-800 leading-relaxed text-base sm:text-lg">
-					{post.body.split("\n\n").map((paragraph, idx) => (
-						<p key={`p-${idx}`} className="text-slate-700 leading-relaxed">
-							{paragraph}
-						</p>
-					))}
-				</div>
+				{isHtml ? (
+					<div
+						className="prose prose-slate prose-lg max-w-none pt-4
+							prose-headings:font-display prose-headings:font-bold prose-headings:text-slate-900
+							prose-p:text-slate-700
+							prose-a:text-amber-600 prose-a:underline hover:prose-a:text-amber-700
+							prose-strong:text-slate-900 prose-strong:font-semibold
+							prose-blockquote:border-l-amber-400 prose-blockquote:text-slate-600 prose-blockquote:italic
+							prose-code:text-amber-700 prose-code:bg-amber-50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-sm
+							prose-ul:text-slate-700 prose-ol:text-slate-700
+							prose-hr:border-slate-200
+							prose-img:rounded-xl prose-img:shadow-sm"
+						dangerouslySetInnerHTML={{ __html: post.body }}
+					/>
+				) : (
+					<div className="prose prose-slate max-w-none space-y-6 pt-4 text-slate-800 leading-relaxed text-base sm:text-lg">
+						{post.body.split("\n\n").map((paragraph, idx) => (
+							<p key={`p-${idx}`} className="text-slate-700 leading-relaxed">
+								{paragraph}
+							</p>
+						))}
+					</div>
+				)}
 
 				{/* Author Bio Footer */}
 				<div className="mt-12 p-6 rounded-2xl bg-amber-50/60 border border-amber-200/80 flex items-start space-x-4">

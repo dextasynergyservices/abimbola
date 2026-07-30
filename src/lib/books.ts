@@ -5,6 +5,7 @@ export interface PublishedBookPrice {
 	type: "HARD_COPY" | "SOFT_COPY" | "FREE" | "COMING_SOON";
 	amount: number | null;
 	currency: string | null;
+	url: string | null;
 	available: boolean;
 }
 
@@ -23,9 +24,25 @@ export interface PublishedBook {
 	rating: number | null;
 	publisher: string | null;
 	publicationDate: string | null;
+	buyUrl: string | null;
+	featuredOnHome: boolean;
 	category: PublishedBookCategory | null;
 	coverImage: PublishedMedia | null;
 	prices: PublishedBookPrice[];
+}
+
+export async function getFeaturedBooks(): Promise<PublishedBook[]> {
+	try {
+		const books = await getPublishedBooks();
+		const featured = books.filter((b) => b.featuredOnHome).slice(0, 3);
+		if (featured.length > 0) {
+			return featured;
+		}
+		return books.slice(0, 3);
+	} catch (error) {
+		console.error("Error fetching featured books:", error);
+		return [];
+	}
 }
 
 export async function getPublishedBooks(): Promise<PublishedBook[]> {

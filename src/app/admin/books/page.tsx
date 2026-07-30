@@ -8,6 +8,7 @@ import {
 	Edit,
 	Plus,
 	Search,
+	Star,
 	Tags,
 	Trash2,
 } from "lucide-react";
@@ -63,6 +64,7 @@ interface BookItem {
 	title: string;
 	slug: string;
 	status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+	featuredOnHome?: boolean;
 	updatedAt: string;
 	category?: BookCategory | null;
 	prices: BookPrice[];
@@ -224,8 +226,9 @@ export default function AdminBooksPage() {
 							</SelectTrigger>
 							<SelectContent className="bg-white border-slate-200">
 								<SelectItem value="ALL">All Statuses</SelectItem>
-								<SelectItem value="DRAFT">Draft</SelectItem>
+								<SelectItem value="FEATURED">★ Featured on Home</SelectItem>
 								<SelectItem value="PUBLISHED">Published</SelectItem>
+								<SelectItem value="DRAFT">Draft</SelectItem>
 								<SelectItem value="ARCHIVED">Archived</SelectItem>
 							</SelectContent>
 						</Select>
@@ -344,18 +347,29 @@ export default function AdminBooksPage() {
 											{priceSummary(book.prices)}
 										</TableCell>
 										<TableCell>
-											<Badge
-												variant="outline"
-												className={`text-xs font-semibold ${
-													book.status === "PUBLISHED"
-														? "bg-emerald-50 text-emerald-700 border-emerald-200"
-														: book.status === "DRAFT"
-															? "bg-amber-50 text-amber-700 border-amber-200"
-															: "bg-slate-100 text-slate-600 border-slate-200"
-												}`}
-											>
-												{book.status}
-											</Badge>
+											<div className="flex flex-col gap-1 items-start">
+												<Badge
+													variant="outline"
+													className={`text-xs font-semibold ${
+														book.status === "PUBLISHED"
+															? "bg-emerald-50 text-emerald-700 border-emerald-200"
+															: book.status === "DRAFT"
+																? "bg-amber-50 text-amber-700 border-amber-200"
+																: "bg-slate-100 text-slate-600 border-slate-200"
+													}`}
+												>
+													{book.status}
+												</Badge>
+												{book.featuredOnHome && (
+													<Badge
+														variant="outline"
+														className="bg-amber-500/15 text-amber-900 border-amber-300 font-semibold gap-1 text-[10px]"
+													>
+														<Star className="h-2.5 w-2.5 fill-amber-500 text-amber-500" />
+														Featured
+													</Badge>
+												)}
+											</div>
 										</TableCell>
 										<TableCell className="text-right">
 											<div className="flex items-center justify-end space-x-1">
@@ -407,16 +421,27 @@ export default function AdminBooksPage() {
 											</p>
 										)}
 									</div>
-									<Badge
-										variant="outline"
-										className={`text-xs font-semibold ${
-											book.status === "PUBLISHED"
-												? "bg-emerald-50 text-emerald-700 border-emerald-200"
-												: "bg-amber-50 text-amber-700 border-amber-200"
-										}`}
-									>
-										{book.status}
-									</Badge>
+									<div className="flex flex-col items-end gap-1">
+										<Badge
+											variant="outline"
+											className={`text-xs font-semibold ${
+												book.status === "PUBLISHED"
+													? "bg-emerald-50 text-emerald-700 border-emerald-200"
+													: "bg-amber-50 text-amber-700 border-amber-200"
+											}`}
+										>
+											{book.status}
+										</Badge>
+										{book.featuredOnHome && (
+											<Badge
+												variant="outline"
+												className="bg-amber-500/15 text-amber-900 border-amber-300 font-semibold gap-1 text-[10px]"
+											>
+												<Star className="h-2.5 w-2.5 fill-amber-500 text-amber-500" />
+												Featured
+											</Badge>
+										)}
+									</div>
 								</div>
 								<p className="text-xs text-slate-600">
 									{priceSummary(book.prices)}

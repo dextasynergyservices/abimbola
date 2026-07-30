@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 const priceSchema = z.object({
 	type: z.enum(["HARD_COPY", "SOFT_COPY", "FREE", "COMING_SOON"]),
 	amount: z.number().positive().optional().nullable(),
+	url: z.string().optional().nullable(),
 	available: z.boolean().default(true),
 });
 
@@ -17,10 +18,14 @@ const createBookSchema = z.object({
 	rating: z.number().min(0).max(5).optional().nullable(),
 	publisher: z.string().optional().nullable(),
 	publicationDate: z.string().optional().nullable(),
+	buyUrl: z.string().optional().nullable(),
 	coverImageId: z.string().optional().nullable(),
 	categoryId: z.string().optional().nullable(),
 	status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]).default("DRAFT"),
-	prices: z.array(priceSchema).default([]),
+	featuredOnHome: z.boolean().optional().default(false),
+	prices: z
+		.array(priceSchema)
+		.min(1, "At least one pricing option is required to save a book"),
 });
 
 export async function GET(request: Request) {
@@ -40,7 +45,11 @@ export async function GET(request: Request) {
 		];
 
 		if (statusFilter && statusFilter !== "ALL") {
-			whereConditions.push({ status: statusFilter });
+			if (statusFilter === "FEATURED") {
+				whereConditions.push({ featuredOnHome: true });
+			} else {
+				whereConditions.push({ status: statusFilter });
+			}
 		}
 
 		if (categoryFilter && categoryFilter !== "ALL") {
@@ -94,6 +103,23 @@ export async function POST(request: Request) {
 			);
 		}
 
+		if (validated.featuredOnHome) {
+			const currentFeatured = await prisma.book.findMany({
+				where: { featuredOnHome: true, deletedAt: null },
+				orderBy: { updatedAt: "desc" },
+			});
+			if (currentFeatured.length >= 3) {
+				const toKeepIds = currentFeatured.slice(0, 2).map((b) => b.id);
+				await prisma.book.updateMany({
+					where: {
+						featuredOnHome: true,
+						id: { notIn: toKeepIds },
+					},
+					data: { featuredOnHome: false },
+				});
+			}
+		}
+
 		const book = await prisma.book.create({
 			data: {
 				title: validated.title,
@@ -103,14 +129,17 @@ export async function POST(request: Request) {
 				rating: validated.rating ?? 5.0,
 				publisher: validated.publisher ?? null,
 				publicationDate: validated.publicationDate ?? null,
+				buyUrl: validated.buyUrl ?? null,
 				coverImageId: validated.coverImageId ?? null,
 				categoryId: validated.categoryId ?? null,
 				status: validated.status,
+				featuredOnHome: validated.featuredOnHome ?? false,
 				prices: {
 					create: validated.prices.map((p) => ({
 						type: p.type,
 						amount:
 							p.type === "FREE" || p.type === "COMING_SOON" ? null : p.amount,
+						url: p.url || null,
 						available: p.available,
 					})),
 				},

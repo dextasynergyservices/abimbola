@@ -8,6 +8,7 @@ import {
 	Upload,
 	X,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -27,6 +28,18 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import type { UploadedMedia } from "@/hooks/useCloudinaryUpload";
 import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
+
+const RichTextEditor = dynamic(
+	() => import("@/components/admin/RichTextEditor"),
+	{
+		ssr: false,
+		loading: () => (
+			<div className="mt-1.5 rounded-lg border border-slate-200 bg-slate-50 min-h-[320px] flex items-center justify-center">
+				<Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+			</div>
+		),
+	},
+);
 
 export default function CreatePostScreen() {
 	const router = useRouter();
@@ -220,13 +233,10 @@ export default function CreatePostScreen() {
 								>
 									Article Body Content <span className="text-rose-500">*</span>
 								</Label>
-								<Textarea
-									id="create-post-body"
-									rows={12}
+								<RichTextEditor
 									value={body}
-									onChange={(e) => setBody(e.target.value)}
+									onChange={setBody}
 									placeholder="Write your article content here..."
-									className="mt-1.5 bg-slate-50 border-slate-200 text-slate-900 text-sm font-sans leading-relaxed"
 								/>
 							</div>
 						</div>
