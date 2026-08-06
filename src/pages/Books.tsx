@@ -21,12 +21,28 @@ interface BooksProps {
 
 function BookPriceDisplay({ book }: { book: PublishedBook }) {
 	const prices = book.prices || [];
-	if (prices.length === 0) {
+	const comingSoonPrice = prices.find((p) => p.type === "COMING_SOON");
+	const preOrderUrl = book.preOrderUrl || comingSoonPrice?.url || null;
+	const comingSoonDateStr = book.comingSoonDate || book.publicationDate;
+
+	if (prices.length === 0 || prices.some((p) => p.type === "COMING_SOON")) {
 		return (
-			<div>
+			<div className="space-y-2 pt-1">
 				<span className="inline-flex items-center text-xs font-semibold bg-amber-500/20 text-amber-800 border border-amber-500/30 px-3 py-1 rounded-full uppercase tracking-wider">
-					Coming Soon
+					Coming Soon {comingSoonDateStr ? `— ${comingSoonDateStr}` : ""}
 				</span>
+				{preOrderUrl && preOrderUrl.trim() !== "" && (
+					<div>
+						<a
+							href={preOrderUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-500 text-slate-950 font-semibold text-xs rounded-full hover:bg-amber-600 transition-colors shadow-xs inline-block"
+						>
+							Pre-Order Now
+						</a>
+					</div>
+				)}
 			</div>
 		);
 	}

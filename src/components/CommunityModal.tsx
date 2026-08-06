@@ -68,7 +68,12 @@ export function CommunityModal({ open, onOpenChange }: CommunityModalProps) {
 	}, [open]);
 
 	const availableChannels = settings
-		? CHANNELS.filter((channel) => Boolean(settings[channel.key]))
+		? CHANNELS.filter(
+				(channel) =>
+					Boolean(settings[channel.key]) &&
+					typeof settings[channel.key] === "string" &&
+					(settings[channel.key] as string).trim() !== "",
+			)
 		: [];
 
 	return (

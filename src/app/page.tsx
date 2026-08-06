@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getFeaturedBooks } from "@/lib/books";
+import { getPublishedPosts } from "@/lib/cms";
 import Index from "@/pages/Index";
 
 export const revalidate = 60;
@@ -11,6 +12,9 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-	const featuredBooks = await getFeaturedBooks();
-	return <Index featuredBooks={featuredBooks} />;
+	const [featuredBooks, latestPosts] = await Promise.all([
+		getFeaturedBooks(),
+		getPublishedPosts(3),
+	]);
+	return <Index featuredBooks={featuredBooks} latestPosts={latestPosts} />;
 }

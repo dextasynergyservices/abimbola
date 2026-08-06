@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -150,16 +149,28 @@ export default function CreatePostScreen() {
 			{/* Header Navigation */}
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 				<div className="flex items-center space-x-3">
-					<Button
-						asChild
-						variant="outline"
-						size="icon"
-						className="h-9 w-9 border-slate-200 bg-white text-slate-700"
+					<button
+						type="button"
+						onClick={() => {
+							if (typeof window !== "undefined") {
+								const startUrl = window.location.href;
+								if (document.referrer?.includes(window.location.host)) {
+									window.history.back();
+									setTimeout(() => {
+										if (window.location.href === startUrl) {
+											router.push("/admin/posts");
+										}
+									}, 150);
+								} else {
+									router.push("/admin/posts");
+								}
+							}
+						}}
+						className="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-amber-100 text-slate-800 hover:text-amber-900 text-xs font-semibold rounded-full border border-slate-200 hover:border-amber-300 transition-all duration-200 shadow-xs cursor-pointer"
 					>
-						<Link href="/admin/posts">
-							<ArrowLeft className="h-4 w-4" />
-						</Link>
-					</Button>
+						<ArrowLeft className="h-4 w-4" />
+						<span>Back</span>
+					</button>
 					<div>
 						<h1 className="text-xl sm:text-2xl font-bold font-display text-slate-900">
 							Create New Article

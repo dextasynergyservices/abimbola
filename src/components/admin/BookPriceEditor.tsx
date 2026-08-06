@@ -90,9 +90,11 @@ export function BookPriceEditor({ rows, onChange }: BookPriceEditorProps) {
 										htmlFor={`price-url-${type}`}
 										className="text-xs text-slate-500 font-medium"
 									>
-										{type === "FREE"
-											? "Download / Access Link (URL)"
-											: "Purchase / Order Link (URL)"}
+										{type === "COMING_SOON"
+											? "Pre-Order Link (URL)"
+											: type === "FREE"
+												? "Download / Access Link (URL)"
+												: "Purchase / Order Link (URL)"}
 									</Label>
 									<Input
 										id={`price-url-${type}`}
@@ -100,9 +102,11 @@ export function BookPriceEditor({ rows, onChange }: BookPriceEditorProps) {
 										value={row.url}
 										onChange={(e) => onChange(type, { url: e.target.value })}
 										placeholder={
-											type === "FREE"
-												? "https://drive.google.com/... or https://..."
-												: "https://paystack.com/... or https://selar.co/..."
+											type === "COMING_SOON"
+												? "https://paystack.com/... or https://selar.co/... (Leave empty if no pre-order link)"
+												: type === "FREE"
+													? "https://drive.google.com/... or https://..."
+													: "https://paystack.com/... or https://selar.co/..."
 										}
 										className="mt-1 bg-white border-slate-200 min-h-[40px]"
 									/>

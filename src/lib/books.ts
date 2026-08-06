@@ -24,6 +24,9 @@ export interface PublishedBook {
 	rating: number | null;
 	publisher: string | null;
 	publicationDate: string | null;
+	comingSoonDate?: string | null;
+	preOrderUrl?: string | null;
+	relatedBookIds?: string[];
 	buyUrl: string | null;
 	featuredOnHome: boolean;
 	category: PublishedBookCategory | null;
@@ -125,5 +128,30 @@ export async function getPublishedBookById(
 	} catch (error) {
 		console.error(`Error fetching published book "${idOrSlug}":`, error);
 		return null;
+	}
+}
+
+export async function getRelatedBooksForBook(
+	book: PublishedBook,
+): Promise<PublishedBook[]> {
+	try {
+		const allBooks = await getPublishedBooks();
+		const otherBooks = allBooks.filter((b) => b.id !== book.id);
+
+		if (book.relatedBookIds && book.relatedBookIds.length > 0) {
+			const bookMap = new Map(otherBooks.map((b) => [b.id, b]));
+			const selected = book.relatedBookIds
+				.map((id) => bookMap.get(id))
+				.filter((b): b is PublishedBook => Boolean(b));
+
+			if (selected.length > 0) {
+				return selected;
+			}
+		}
+
+		return otherBooks.slice(0, 4);
+	} catch (error) {
+		console.error("Error fetching related books:", error);
+		return [];
 	}
 }

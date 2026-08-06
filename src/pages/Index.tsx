@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { CommunityModal } from "@/components/CommunityModal";
 import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
 import {
@@ -22,12 +23,14 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import type { PublishedBook } from "@/lib/books";
+import type { PublishedPost } from "@/lib/cms";
 
 const aboutImage = "/assets/about%20IMAGE.png";
 const bookHardestPart = "/assets/For%20BOOKS%20(3).png";
 
 interface IndexProps {
 	featuredBooks?: PublishedBook[];
+	latestPosts?: PublishedPost[];
 }
 
 /* ─── Scroll reveal hook ─── */
@@ -136,11 +139,12 @@ function HomepageBookPrice({ book }: { book: PublishedBook }) {
 	);
 }
 
-const Index = ({ featuredBooks = [] }: IndexProps) => {
+const Index = ({ featuredBooks = [], latestPosts = [] }: IndexProps) => {
 	const pageRef = useReveal();
 	const [formSubmitted, setFormSubmitted] = useState(false);
 	const [formData, setFormData] = useState({ firstName: "", email: "" });
 	const [submitting, setSubmitting] = useState(false);
+	const [communityOpen, setCommunityOpen] = useState(false);
 
 	const handleNewsletterSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -239,7 +243,11 @@ const Index = ({ featuredBooks = [] }: IndexProps) => {
 								</Link>
 								<a
 									href="#community"
-									className="inline-flex items-center justify-center gap-2 px-7 py-[0.9rem] border border-black/15 bg-white/80 text-black text-sm font-medium tracking-wide rounded-full hover:bg-white transition-colors duration-300 shadow-sm"
+									onClick={(e) => {
+										e.preventDefault();
+										setCommunityOpen(true);
+									}}
+									className="inline-flex items-center justify-center gap-2 px-7 py-[0.9rem] border border-black/15 bg-white/80 text-black text-sm font-medium tracking-wide rounded-full hover:bg-white transition-colors duration-300 shadow-sm cursor-pointer"
 								>
 									Join the Community
 								</a>
@@ -510,9 +518,27 @@ const Index = ({ featuredBooks = [] }: IndexProps) => {
 
 											<div className="mt-auto pt-4">
 												{isComingSoon ? (
-													<span className="inline-flex items-center text-xs font-semibold bg-amber-500/20 text-amber-800 border border-amber-500/30 px-4 py-2 rounded-full uppercase tracking-wider">
-														Coming Soon
-													</span>
+													<div className="space-y-3">
+														<span className="inline-flex items-center text-xs font-semibold bg-amber-500/20 text-amber-800 border border-amber-500/30 px-4 py-2 rounded-full uppercase tracking-wider">
+															Coming Soon{" "}
+															{book.comingSoonDate
+																? `— ${book.comingSoonDate}`
+																: ""}
+														</span>
+														{book.preOrderUrl &&
+															book.preOrderUrl.trim() !== "" && (
+																<div>
+																	<a
+																		href={book.preOrderUrl}
+																		target="_blank"
+																		rel="noopener noreferrer"
+																		className="inline-flex items-center gap-2 px-5 py-2 bg-amber-500 text-slate-950 font-semibold text-xs rounded-full hover:bg-amber-600 transition-colors shadow-xs"
+																	>
+																		Pre-Order Now
+																	</a>
+																</div>
+															)}
+													</div>
 												) : isFree && !isPaid ? (
 													<div className="flex items-center justify-between gap-4">
 														<span className="inline-flex items-center text-xs font-semibold bg-emerald-500/20 text-emerald-800 border border-emerald-500/30 px-3.5 py-1.5 rounded-full uppercase tracking-wider">
@@ -779,95 +805,137 @@ const Index = ({ featuredBooks = [] }: IndexProps) => {
 					</div>
 
 					<div className="grid md:grid-cols-3 gap-8">
-						<div className="bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm flex flex-col group">
-							<div className="w-full h-48 overflow-hidden bg-slate-100 relative">
-								<img
-									src="/assets/blog-featured-1.jpg"
-									alt="The Art of Mindful Reading"
-									className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-								/>
-							</div>
-							<div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-								<div>
-									<span className="bg-amber-100 text-amber-800 text-[11px] font-semibold px-2.5 py-0.5 rounded-full uppercase">
-										Reflections
-									</span>
-									<h3 className="font-display text-lg font-bold text-black mt-3 group-hover:text-amber-600 transition-colors">
-										The Art of Mindful Reading in a Distracted World
-									</h3>
-									<p className="text-neutral-600 text-sm mt-2 line-clamp-3">
-										Discover how to transform your reading habits into a
-										contemplative practice that enriches mind and soul.
-									</p>
-								</div>
-								<Link
-									href="/blog/the-art-of-mindful-reading"
-									className="inline-flex items-center text-xs font-semibold text-black hover:text-amber-600 pt-2"
+						{latestPosts && latestPosts.length > 0 ? (
+							latestPosts.slice(0, 3).map((post) => (
+								<div
+									key={post.id}
+									className="bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm flex flex-col group"
 								>
-									Read Article <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-								</Link>
-							</div>
-						</div>
+									<div className="w-full h-48 overflow-hidden bg-slate-100 relative">
+										<img
+											src={
+												post.featuredImage?.secureUrl ||
+												"/assets/blog-featured-1.jpg"
+											}
+											alt={post.title}
+											className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+										/>
+									</div>
+									<div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+										<div>
+											<span className="bg-amber-100 text-amber-800 text-[11px] font-semibold px-2.5 py-0.5 rounded-full uppercase">
+												{post.category?.name || "Reflections"}
+											</span>
+											<h3 className="font-display text-lg font-bold text-black mt-3 group-hover:text-amber-600 transition-colors">
+												{post.title}
+											</h3>
+											<p className="text-neutral-600 text-sm mt-2 line-clamp-3">
+												{post.excerpt ||
+													post.body.replace(/<[^>]*>?/gm, "").substring(0, 120)}
+											</p>
+										</div>
+										<Link
+											href={`/blog/${post.slug}`}
+											className="inline-flex items-center text-xs font-semibold text-black hover:text-amber-600 pt-2"
+										>
+											Read Article <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+										</Link>
+									</div>
+								</div>
+							))
+						) : (
+							<>
+								<div className="bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm flex flex-col group">
+									<div className="w-full h-48 overflow-hidden bg-slate-100 relative">
+										<img
+											src="/assets/blog-featured-1.jpg"
+											alt="The Art of Mindful Reading"
+											className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+										/>
+									</div>
+									<div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+										<div>
+											<span className="bg-amber-100 text-amber-800 text-[11px] font-semibold px-2.5 py-0.5 rounded-full uppercase">
+												Reflections
+											</span>
+											<h3 className="font-display text-lg font-bold text-black mt-3 group-hover:text-amber-600 transition-colors">
+												The Art of Mindful Reading in a Distracted World
+											</h3>
+											<p className="text-neutral-600 text-sm mt-2 line-clamp-3">
+												Discover how to transform your reading habits into a
+												contemplative practice that enriches mind and soul.
+											</p>
+										</div>
+										<Link
+											href="/blog/the-art-of-mindful-reading"
+											className="inline-flex items-center text-xs font-semibold text-black hover:text-amber-600 pt-2"
+										>
+											Read Article <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+										</Link>
+									</div>
+								</div>
 
-						<div className="bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm flex flex-col group">
-							<div className="w-full h-48 overflow-hidden bg-slate-100 relative">
-								<img
-									src="/assets/blog-featured-2.jpg"
-									alt="Whispers in the Garden"
-									className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-								/>
-							</div>
-							<div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-								<div>
-									<span className="bg-amber-100 text-amber-800 text-[11px] font-semibold px-2.5 py-0.5 rounded-full uppercase">
-										Poems
-									</span>
-									<h3 className="font-display text-lg font-bold text-black mt-3 group-hover:text-amber-600 transition-colors">
-										Whispers in the Garden: Growth Through Seasons
-									</h3>
-									<p className="text-neutral-600 text-sm mt-2 line-clamp-3">
-										Reflections and prose exploring personal growth, patience,
-										and quiet moments between seasons.
-									</p>
+								<div className="bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm flex flex-col group">
+									<div className="w-full h-48 overflow-hidden bg-slate-100 relative">
+										<img
+											src="/assets/blog-featured-2.jpg"
+											alt="Whispers in the Garden"
+											className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+										/>
+									</div>
+									<div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+										<div>
+											<span className="bg-amber-100 text-amber-800 text-[11px] font-semibold px-2.5 py-0.5 rounded-full uppercase">
+												Poems
+											</span>
+											<h3 className="font-display text-lg font-bold text-black mt-3 group-hover:text-amber-600 transition-colors">
+												Whispers in the Garden: Growth Through Seasons
+											</h3>
+											<p className="text-neutral-600 text-sm mt-2 line-clamp-3">
+												Reflections and prose exploring personal growth,
+												patience, and quiet moments between seasons.
+											</p>
+										</div>
+										<Link
+											href="/blog/whispers-in-the-garden"
+											className="inline-flex items-center text-xs font-semibold text-black hover:text-amber-600 pt-2"
+										>
+											Read Article <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+										</Link>
+									</div>
 								</div>
-								<Link
-									href="/blog/whispers-in-the-garden"
-									className="inline-flex items-center text-xs font-semibold text-black hover:text-amber-600 pt-2"
-								>
-									Read Article <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-								</Link>
-							</div>
-						</div>
 
-						<div className="bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm flex flex-col group">
-							<div className="w-full h-48 overflow-hidden bg-slate-100 relative">
-								<img
-									src="/assets/hero-image.jpg"
-									alt="Lessons in Resilience"
-									className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-								/>
-							</div>
-							<div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-								<div>
-									<span className="bg-amber-100 text-amber-800 text-[11px] font-semibold px-2.5 py-0.5 rounded-full uppercase">
-										Stories
-									</span>
-									<h3 className="font-display text-lg font-bold text-black mt-3 group-hover:text-amber-600 transition-colors">
-										The Last Letter from the Village: Lessons in Resilience
-									</h3>
-									<p className="text-neutral-600 text-sm mt-2 line-clamp-3">
-										An evocative story about uncovering ancestral letters filled
-										with courage, faith, and enduring hope.
-									</p>
+								<div className="bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm flex flex-col group">
+									<div className="w-full h-48 overflow-hidden bg-slate-100 relative">
+										<img
+											src="/assets/hero-image.jpg"
+											alt="Lessons in Resilience"
+											className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+										/>
+									</div>
+									<div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+										<div>
+											<span className="bg-amber-100 text-amber-800 text-[11px] font-semibold px-2.5 py-0.5 rounded-full uppercase">
+												Stories
+											</span>
+											<h3 className="font-display text-lg font-bold text-black mt-3 group-hover:text-amber-600 transition-colors">
+												The Last Letter from the Village: Lessons in Resilience
+											</h3>
+											<p className="text-neutral-600 text-sm mt-2 line-clamp-3">
+												An evocative story about uncovering ancestral letters
+												filled with courage, faith, and enduring hope.
+											</p>
+										</div>
+										<Link
+											href="/blog/the-last-letter-from-the-village"
+											className="inline-flex items-center text-xs font-semibold text-black hover:text-amber-600 pt-2"
+										>
+											Read Article <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+										</Link>
+									</div>
 								</div>
-								<Link
-									href="/blog/the-last-letter-from-the-village"
-									className="inline-flex items-center text-xs font-semibold text-black hover:text-amber-600 pt-2"
-								>
-									Read Article <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-								</Link>
-							</div>
-						</div>
+							</>
+						)}
 					</div>
 				</div>
 			</section>
@@ -899,8 +967,12 @@ const Index = ({ featuredBooks = [] }: IndexProps) => {
 
 							<div className="reveal pt-2">
 								<a
-									href="#newsletter"
-									className="inline-flex items-center gap-2 px-8 py-3.5 bg-black text-white text-sm font-semibold tracking-wide rounded-full hover:bg-neutral-800 transition-colors duration-300"
+									href="#community"
+									onClick={(e) => {
+										e.preventDefault();
+										setCommunityOpen(true);
+									}}
+									className="inline-flex items-center gap-2 px-8 py-3.5 bg-black text-white text-sm font-semibold tracking-wide rounded-full hover:bg-neutral-800 transition-colors duration-300 cursor-pointer"
 								>
 									Join Now
 									<ArrowRight className="h-4 w-4" />
@@ -1097,6 +1169,7 @@ const Index = ({ featuredBooks = [] }: IndexProps) => {
 				</div>
 			</section>
 
+			<CommunityModal open={communityOpen} onOpenChange={setCommunityOpen} />
 			<Footer />
 		</div>
 	);

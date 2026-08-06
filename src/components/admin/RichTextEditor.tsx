@@ -159,6 +159,26 @@ const EnterAsHardBreak = Extension.create({
 	},
 });
 
+const _lineSpacings = [
+	{ label: "1.0 (Tight / 1pt)", value: "1.0" },
+	{ label: "1.15 (Default)", value: "1.15" },
+	{ label: "1.3 (Compact)", value: "1.3" },
+	{ label: "1.5 (1.5 Spacing)", value: "1.5" },
+	{ label: "1.75 (Relaxed)", value: "1.75" },
+	{ label: "2.0 (Double)", value: "2.0" },
+	{ label: "Reset Spacing", value: "normal" },
+];
+
+const _fontSizes = [
+	{ label: "Small (12px)", value: "12px" },
+	{ label: "Normal (14px)", value: "14px" },
+	{ label: "Medium (16px)", value: "16px" },
+	{ label: "Large (18px)", value: "18px" },
+	{ label: "X-Large (24px)", value: "24px" },
+	{ label: "XX-Large (32px)", value: "32px" },
+	{ label: "Reset Size", value: "normal" },
+];
+
 interface RichTextEditorProps {
 	value: string;
 	onChange: (html: string) => void;
@@ -208,7 +228,7 @@ export default function RichTextEditor({
 		editorProps: {
 			attributes: {
 				class:
-					"prose prose-slate max-w-none min-h-[300px] px-4 py-3 focus:outline-none text-sm leading-relaxed",
+					"prose prose-slate max-w-none min-h-[300px] px-4 py-3 focus:outline-none text-sm leading-snug [&_p]:my-1 [&_p]:leading-snug",
 			},
 		},
 		onUpdate: ({ editor: ed }) => {

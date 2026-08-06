@@ -121,6 +121,9 @@ model Book {
   rating          Float?        @default(5.0)
   publisher       String?
   publicationDate String?
+  comingSoonDate  String?
+  preOrderUrl     String?
+  relatedBookIds  String[]      @default([])
   buyUrl          String?
   coverImageId    String?
   categoryId      String?

@@ -9,7 +9,6 @@ import {
 	X,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -67,6 +66,12 @@ export function BookForm({ bookId }: BookFormProps) {
 	const [rating, setRating] = useState("5");
 	const [publisher, setPublisher] = useState("");
 	const [publicationDate, setPublicationDate] = useState("");
+	const [comingSoonDate, setComingSoonDate] = useState("");
+	const [preOrderUrl, setPreOrderUrl] = useState("");
+	const [relatedBookIds, setRelatedBookIds] = useState<string[]>([]);
+	const [allBooks, setAllBooks] = useState<
+		Array<{ id: string; title: string }>
+	>([]);
 	const [categoryId, setCategoryId] = useState<string>("NONE");
 	const [status, setStatus] = useState<"DRAFT" | "PUBLISHED" | "ARCHIVED">(
 		"DRAFT",
@@ -101,20 +106,33 @@ export function BookForm({ bookId }: BookFormProps) {
 		setFeaturedOnHome(checked);
 	};
 
-	const fetchCategories = useCallback(async () => {
+	const fetchCategoriesAndBooks = useCallback(async () => {
 		try {
-			const res = await fetch("/api/admin/book-categories");
-			if (!res.ok) return;
-			const data = await res.json();
-			setCategories(data.categories || []);
+			const [catRes, booksRes] = await Promise.all([
+				fetch("/api/admin/book-categories"),
+				fetch("/api/admin/books"),
+			]);
+			if (catRes.ok) {
+				const data = await catRes.json();
+				setCategories(data.categories || []);
+			}
+			if (booksRes.ok) {
+				const data = await booksRes.json();
+				setAllBooks(
+					(data.books || []).map((b: { id: string; title: string }) => ({
+						id: b.id,
+						title: b.title,
+					})),
+				);
+			}
 		} catch (err) {
 			console.error(err);
 		}
 	}, []);
 
 	useEffect(() => {
-		fetchCategories();
-	}, [fetchCategories]);
+		fetchCategoriesAndBooks();
+	}, [fetchCategoriesAndBooks]);
 
 	useEffect(() => {
 		if (!bookId) return;
@@ -132,6 +150,9 @@ export function BookForm({ bookId }: BookFormProps) {
 				setRating(String(book.rating ?? 5));
 				setPublisher(book.publisher || "");
 				setPublicationDate(book.publicationDate || "");
+				setComingSoonDate(book.comingSoonDate || "");
+				setPreOrderUrl(book.preOrderUrl || "");
+				setRelatedBookIds(book.relatedBookIds || []);
 				setCategoryId(book.categoryId || "NONE");
 				setStatus(book.status);
 				setFeaturedOnHome(Boolean(book.featuredOnHome));
@@ -154,6 +175,9 @@ export function BookForm({ bookId }: BookFormProps) {
 						amount: p.amount != null ? String(p.amount) : "",
 						url: p.url || "",
 					};
+					if (p.type === "COMING_SOON" && p.url && !book.preOrderUrl) {
+						setPreOrderUrl(p.url);
+					}
 				}
 				setPriceRows(rows);
 			} catch (err) {
@@ -222,6 +246,14 @@ export function BookForm({ bookId }: BookFormProps) {
 				rating: rating ? Number(rating) : null,
 				publisher: publisher.trim() || null,
 				publicationDate: publicationDate.trim() || null,
+				comingSoonDate: comingSoonDate.trim() || null,
+				preOrderUrl:
+					preOrderUrl.trim() ||
+					(priceRows.COMING_SOON?.enabled
+						? priceRows.COMING_SOON.url.trim()
+						: null) ||
+					null,
+				relatedBookIds,
 				coverImageId: coverImage?.id || null,
 				categoryId: categoryId === "NONE" ? null : categoryId,
 				status,
@@ -232,7 +264,10 @@ export function BookForm({ bookId }: BookFormProps) {
 						row.type === "HARD_COPY" || row.type === "SOFT_COPY"
 							? Number(row.amount)
 							: null,
-					url: row.url.trim() || null,
+					url:
+						row.type === "COMING_SOON" && preOrderUrl.trim()
+							? preOrderUrl.trim()
+							: row.url.trim() || null,
 					available: true,
 				})),
 			};
@@ -276,16 +311,28 @@ export function BookForm({ bookId }: BookFormProps) {
 		<div className="space-y-6 max-w-6xl mx-auto">
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 				<div className="flex items-center space-x-3">
-					<Button
-						asChild
-						variant="outline"
-						size="icon"
-						className="h-9 w-9 border-slate-200 bg-white text-slate-700"
+					<button
+						type="button"
+						onClick={() => {
+							if (typeof window !== "undefined") {
+								const startUrl = window.location.href;
+								if (document.referrer?.includes(window.location.host)) {
+									window.history.back();
+									setTimeout(() => {
+										if (window.location.href === startUrl) {
+											router.push("/admin/books");
+										}
+									}, 150);
+								} else {
+									router.push("/admin/books");
+								}
+							}
+						}}
+						className="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-amber-100 text-slate-800 hover:text-amber-900 text-xs font-semibold rounded-full border border-slate-200 hover:border-amber-300 transition-all duration-200 shadow-xs cursor-pointer"
 					>
-						<Link href="/admin/books">
-							<ArrowLeft className="h-4 w-4" />
-						</Link>
-					</Button>
+						<ArrowLeft className="h-4 w-4" />
+						<span>Back</span>
+					</button>
 					<div>
 						<h1 className="text-xl sm:text-2xl font-bold font-display text-slate-900">
 							{isEdit ? "Edit Book" : "Add New Book"}
@@ -401,6 +448,40 @@ export function BookForm({ bookId }: BookFormProps) {
 								</div>
 							</div>
 
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+								<div>
+									<Label
+										htmlFor="book-comingsoon"
+										className="text-slate-700 font-medium"
+									>
+										Coming Soon Time / Date
+									</Label>
+									<Input
+										id="book-comingsoon"
+										value={comingSoonDate}
+										onChange={(e) => setComingSoonDate(e.target.value)}
+										placeholder="e.g. Sept 2026 or 2026-10-15 14:00"
+										className="mt-1.5 bg-slate-50 border-slate-200 text-slate-900 min-h-[44px]"
+									/>
+								</div>
+								<div>
+									<Label
+										htmlFor="book-preorder"
+										className="text-slate-700 font-medium"
+									>
+										Pre-Order Link (URL)
+									</Label>
+									<Input
+										id="book-preorder"
+										type="url"
+										value={preOrderUrl}
+										onChange={(e) => setPreOrderUrl(e.target.value)}
+										placeholder="https://... (leave empty if no pre-order button)"
+										className="mt-1.5 bg-slate-50 border-slate-200 text-slate-900 min-h-[44px]"
+									/>
+								</div>
+							</div>
+
 							<div>
 								<Label
 									htmlFor="book-description"
@@ -427,6 +508,58 @@ export function BookForm({ bookId }: BookFormProps) {
 							shown to visitors.
 						</p>
 						<BookPriceEditor rows={priceRows} onChange={handlePriceChange} />
+					</Card>
+
+					<Card className="border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+						<div>
+							<h2 className="text-lg font-semibold text-slate-900">
+								You May Also Like (Related Books)
+							</h2>
+							<p className="text-xs text-slate-500 mt-1">
+								Select which specific books display under &quot;You May Also
+								Like&quot; for this book.
+							</p>
+						</div>
+						<div className="space-y-2 max-h-48 overflow-y-auto border border-slate-200 rounded-lg p-3 bg-slate-50">
+							{allBooks.filter((b) => b.id !== bookId).length === 0 ? (
+								<p className="text-xs text-slate-400">
+									No other books available to select.
+								</p>
+							) : (
+								allBooks
+									.filter((b) => b.id !== bookId)
+									.map((otherBook) => {
+										const isSelected = relatedBookIds.includes(otherBook.id);
+										return (
+											<label
+												key={otherBook.id}
+												className="flex items-center space-x-3 p-2 hover:bg-white rounded-md cursor-pointer border border-transparent hover:border-slate-200 transition-colors"
+											>
+												<input
+													type="checkbox"
+													checked={isSelected}
+													onChange={(e) => {
+														if (e.target.checked) {
+															setRelatedBookIds((prev) => [
+																...prev,
+																otherBook.id,
+															]);
+														} else {
+															setRelatedBookIds((prev) =>
+																prev.filter((id) => id !== otherBook.id),
+															);
+														}
+													}}
+													className="rounded border-slate-300 text-amber-500 focus:ring-amber-400 h-4 w-4"
+												/>
+												<span className="text-sm font-medium text-slate-800">
+													{otherBook.title}
+												</span>
+											</label>
+										);
+									})
+							)}
+						</div>
 					</Card>
 				</div>
 

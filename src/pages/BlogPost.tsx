@@ -1,5 +1,8 @@
+"use client";
+
 import { ArrowLeft, ArrowRight, Calendar, User } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -9,6 +12,18 @@ const blogFeatured1 = "/assets/blog-featured-1.jpg";
 const blogFeatured2 = "/assets/blog-featured-2.jpg";
 
 const BlogPost = () => {
+	const _router = useRouter();
+
+	const handleBack = () => {
+		if (typeof window !== "undefined") {
+			if (document.referrer?.includes(window.location.host)) {
+				window.history.back();
+			} else {
+				window.location.href = "/blog";
+			}
+		}
+	};
+
 	const relatedPosts = [
 		{
 			id: 2,
@@ -27,13 +42,15 @@ const BlogPost = () => {
 			<Navigation />
 
 			{/* Back Button */}
-			<div className="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-8">
-				<Link href="/blog">
-					<Button variant="ghost" size="sm">
-						<ArrowLeft className="mr-2 h-4 w-4" />
-						Back to Blog
-					</Button>
-				</Link>
+			<div className="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-28">
+				<button
+					type="button"
+					onClick={handleBack}
+					className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-amber-500 text-slate-800 hover:text-slate-950 text-xs sm:text-sm font-semibold rounded-full border border-slate-200 hover:border-amber-600 transition-all duration-200 shadow-xs cursor-pointer"
+				>
+					<ArrowLeft className="h-4 w-4" />
+					Back
+				</button>
 			</div>
 
 			{/* Article Header */}
@@ -68,7 +85,7 @@ const BlogPost = () => {
 				</div>
 
 				{/* Article Content */}
-				<div className="prose prose-lg max-w-none space-y-6">
+				<div className="prose max-w-none [&_p]:my-1.5 [&_p]:leading-snug space-y-4">
 					<p className="text-lg text-muted-foreground leading-relaxed">
 						In our fast-paced digital world, reading has often become just
 						another task to check off our endless to-do lists. But what if we

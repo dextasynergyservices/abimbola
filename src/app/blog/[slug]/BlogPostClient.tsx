@@ -1,8 +1,7 @@
 "use client";
 
 import { ArrowLeft, Calendar, User } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface BlogPostClientProps {
 	post: {
@@ -17,6 +16,18 @@ interface BlogPostClientProps {
 }
 
 export default function BlogPostClient({ post }: BlogPostClientProps) {
+	const _router = useRouter();
+
+	const handleBack = () => {
+		if (typeof window !== "undefined") {
+			if (document.referrer?.includes(window.location.host)) {
+				window.history.back();
+			} else {
+				window.location.href = "/blog";
+			}
+		}
+	};
+
 	const publishedDate = post.publishedAt
 		? new Date(post.publishedAt).toLocaleDateString("en-US", {
 				year: "numeric",
@@ -33,20 +44,17 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
 	const isHtml = /<[a-z][\s\S]*>/i.test(post.body);
 
 	return (
-		<main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
+		<main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 pt-28">
 			{/* Back Button */}
 			<div className="mb-8">
-				<Button
-					asChild
-					variant="ghost"
-					size="sm"
-					className="text-slate-600 hover:text-amber-600 -ml-2"
+				<button
+					type="button"
+					onClick={handleBack}
+					className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-amber-500 text-slate-800 hover:text-slate-950 text-xs sm:text-sm font-semibold rounded-full border border-slate-200 hover:border-amber-600 transition-all duration-200 shadow-xs cursor-pointer"
 				>
-					<Link href="/blog">
-						<ArrowLeft className="mr-2 h-4 w-4" />
-						Back to All Articles
-					</Link>
-				</Button>
+					<ArrowLeft className="h-4 w-4" />
+					Back
+				</button>
 			</div>
 
 			<article className="space-y-8">
@@ -94,9 +102,10 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
 				{/* Body Content */}
 				{isHtml ? (
 					<div
-						className="prose prose-slate prose-lg max-w-none pt-4
+						className="prose prose-slate max-w-none pt-4
 							prose-headings:font-display prose-headings:font-bold prose-headings:text-slate-900
-							prose-p:text-slate-700
+							[&_p]:text-slate-700 [&_p]:my-2.5 [&_p]:leading-snug
+							[&_p:empty]:h-4 [&_p:empty]:block
 							prose-a:text-amber-600 prose-a:underline hover:prose-a:text-amber-700
 							prose-strong:text-slate-900 prose-strong:font-semibold
 							prose-blockquote:border-l-amber-400 prose-blockquote:text-slate-600 prose-blockquote:italic
@@ -107,12 +116,20 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
 						dangerouslySetInnerHTML={{ __html: post.body }}
 					/>
 				) : (
-					<div className="prose prose-slate max-w-none space-y-6 pt-4 text-slate-800 leading-relaxed text-base sm:text-lg">
-						{post.body.split("\n\n").map((paragraph, idx) => (
-							<p key={`p-${idx}`} className="text-slate-700 leading-relaxed">
-								{paragraph}
-							</p>
-						))}
+					<div className="prose prose-slate max-w-none pt-4 text-slate-800 space-y-4">
+						{post.body.split(/\n\s*\n/).map((block, i) => {
+							const lines = block.split("\n");
+							return (
+								<p key={i} className="text-slate-700 leading-snug m-0">
+									{lines.map((line, j) => (
+										<span key={j}>
+											{line}
+											{j < lines.length - 1 && <br />}
+										</span>
+									))}
+								</p>
+							);
+						})}
 					</div>
 				)}
 
