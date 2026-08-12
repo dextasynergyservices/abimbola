@@ -200,7 +200,7 @@ const Index = ({ featuredBooks = [], latestPosts = [] }: IndexProps) => {
 								<br />
 								about{" "}
 								<em className="text-[#d4930a] not-italic relative inline-block font-display italic">
-									love.
+									life.
 									<svg
 										className="hero-love-underline absolute -bottom-3 left-0 w-[110%] h-[18px] pointer-events-none"
 										viewBox="0 0 100 20"
