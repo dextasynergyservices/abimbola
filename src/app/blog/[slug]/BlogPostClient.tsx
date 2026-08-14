@@ -2,6 +2,11 @@
 
 import { ArrowLeft, Calendar, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import {
+	type AuthorProfile,
+	DEFAULT_AUTHOR_PROFILE,
+	resolveAuthorProfile,
+} from "@/lib/author";
 
 interface BlogPostClientProps {
 	post: {
@@ -11,11 +16,18 @@ interface BlogPostClientProps {
 		body: string;
 		publishedAt?: Date | string | null;
 		author?: { name: string } | null;
+		authorName?: string | null;
+		authorInitials?: string | null;
+		authorBio?: string | null;
 		featuredImage?: { secureUrl: string; altText?: string | null } | null;
 	};
+	authorProfile?: AuthorProfile;
 }
 
-export default function BlogPostClient({ post }: BlogPostClientProps) {
+export default function BlogPostClient({
+	post,
+	authorProfile = DEFAULT_AUTHOR_PROFILE,
+}: BlogPostClientProps) {
 	const _router = useRouter();
 
 	const handleBack = () => {
@@ -36,7 +48,20 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
 			})
 		: "Recent";
 
-	const authorName = post.author?.name || "Abimbola Lawuyi";
+	// Show author bio card unless explicitly disabled (empty string)
+	const hasAuthorBio = post.authorBio !== "";
+
+	const resolvedAuthorProfile = resolveAuthorProfile(
+		{
+			name: post.authorName,
+			initials: post.authorInitials,
+			bio: post.authorBio,
+		},
+		authorProfile,
+	);
+
+	const authorName =
+		post.authorName?.trim() || post.author?.name || resolvedAuthorProfile.name;
 	const imageUrl =
 		post.featuredImage?.secureUrl || "/assets/blog-featured-1.jpg";
 
@@ -134,21 +159,24 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
 				)}
 
 				{/* Author Bio Footer */}
-				<div className="mt-12 p-6 rounded-2xl bg-amber-50/60 border border-amber-200/80 flex items-start space-x-4">
-					<div className="h-12 w-12 rounded-full bg-amber-500 text-slate-950 font-bold flex items-center justify-center text-lg shrink-0">
-						AL
+				{hasAuthorBio && (
+					<div className="mt-12 p-6 rounded-2xl bg-amber-50/60 border border-amber-200/80 flex items-start space-x-4">
+						<div className="h-12 w-12 rounded-full bg-amber-500 text-slate-950 font-bold flex items-center justify-center text-lg shrink-0">
+							{resolvedAuthorProfile.initials}
+						</div>
+						<div className="space-y-1">
+							<h3 className="font-display font-bold text-slate-900 text-base">
+								Written by {resolvedAuthorProfile.name}
+							</h3>
+							<p
+								className="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line"
+								suppressHydrationWarning
+							>
+								{resolvedAuthorProfile.bio}
+							</p>
+						</div>
 					</div>
-					<div className="space-y-1">
-						<h3 className="font-display font-bold text-slate-900 text-base">
-							Written by {authorName}
-						</h3>
-						<p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-							Abimbola Lawuyi is an author, educational leader, and parenting
-							consultant dedicated to empowering minds and raising purposeful
-							leaders.
-						</p>
-					</div>
-				</div>
+				)}
 			</article>
 		</main>
 	);

@@ -1,3 +1,4 @@
+import { type AuthorProfile, DEFAULT_AUTHOR_PROFILE } from "@/lib/author";
 import { prisma } from "@/lib/prisma";
 
 export interface PublishedMedia {
@@ -45,6 +46,9 @@ export interface PublishedPost {
 	seoTitle?: string | null;
 	seoDescription?: string | null;
 	authorId: string;
+	authorName?: string | null;
+	authorInitials?: string | null;
+	authorBio?: string | null;
 	categoryId?: string | null;
 	publishedAt?: Date | string | null;
 	author?: {
@@ -173,6 +177,29 @@ export async function getPublishedPosts(
 /**
  * Fetch single published post by slug from Neon database.
  */
+/**
+ * The "Written by" card shown under each blog post. Editable from
+ * Admin → System Settings → Blog Author Bio.
+ */
+export async function getAuthorProfile(): Promise<AuthorProfile> {
+	try {
+		const settings = await prisma.siteSettings.findUnique({
+			where: { id: "singleton" },
+			select: { authorName: true, authorInitials: true, authorBio: true },
+		});
+
+		return {
+			name: settings?.authorName?.trim() || DEFAULT_AUTHOR_PROFILE.name,
+			initials:
+				settings?.authorInitials?.trim() || DEFAULT_AUTHOR_PROFILE.initials,
+			bio: settings?.authorBio?.trim() || DEFAULT_AUTHOR_PROFILE.bio,
+		};
+	} catch (error) {
+		console.error("Error fetching author profile:", error);
+		return DEFAULT_AUTHOR_PROFILE;
+	}
+}
+
 export async function getPublishedPostBySlug(
 	slugOrId: string,
 ): Promise<PublishedPost | null> {

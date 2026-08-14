@@ -4,6 +4,9 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
 const settingsSchema = z.object({
+	authorName: z.string().optional().nullable(),
+	authorInitials: z.string().max(3).optional().nullable(),
+	authorBio: z.string().optional().nullable(),
 	contactEmail: z.string().email().optional().nullable().or(z.literal("")),
 	contactPhone: z.string().optional().nullable(),
 	address: z.string().optional().nullable(),
@@ -33,7 +36,7 @@ export async function GET() {
 	} catch (error) {
 		console.error("Failed to fetch settings:", error);
 		return NextResponse.json(
-			{ error: "Failed to fetch settings" },
+			{ error: (error as Error).message || "Failed to fetch settings" },
 			{ status: 500 },
 		);
 	}
@@ -50,6 +53,9 @@ export async function PUT(request: Request) {
 		const validated = settingsSchema.parse(body);
 
 		const data = {
+			authorName: validated.authorName?.trim() || null,
+			authorInitials: validated.authorInitials?.trim().toUpperCase() || null,
+			authorBio: validated.authorBio?.trim() || null,
 			contactEmail: validated.contactEmail || null,
 			contactPhone: validated.contactPhone || null,
 			address: validated.address || null,

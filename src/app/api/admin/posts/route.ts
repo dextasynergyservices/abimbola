@@ -13,6 +13,9 @@ const createPostSchema = z.object({
 	status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]).default("DRAFT"),
 	seoTitle: z.string().optional().nullable(),
 	seoDescription: z.string().optional().nullable(),
+	authorName: z.string().optional().nullable(),
+	authorInitials: z.string().max(3).optional().nullable(),
+	authorBio: z.string().optional().nullable(),
 });
 
 export async function GET(request: Request) {
@@ -63,7 +66,7 @@ export async function GET(request: Request) {
 	} catch (error) {
 		console.error("Failed to fetch posts:", error);
 		return NextResponse.json(
-			{ error: "Failed to fetch posts" },
+			{ error: (error as Error).message || "Failed to fetch posts" },
 			{ status: 500 },
 		);
 	}
@@ -107,6 +110,9 @@ export async function POST(request: Request) {
 				seoTitle: validated.seoTitle ?? null,
 				seoDescription: validated.seoDescription ?? null,
 				authorId: userId,
+				authorName: validated.authorName?.trim() || null,
+				authorInitials: validated.authorInitials?.trim().toUpperCase() || null,
+				authorBio: validated.authorBio?.trim() || null,
 				publishedAt: validated.status === "PUBLISHED" ? new Date() : null,
 			},
 			include: {

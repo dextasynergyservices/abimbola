@@ -4,6 +4,7 @@ import {
 	ArrowLeft,
 	Image as ImageIcon,
 	Loader2,
+	PenLine,
 	Plus,
 	Upload,
 	X,
@@ -24,9 +25,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import type { UploadedMedia } from "@/hooks/useCloudinaryUpload";
 import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
+import { DEFAULT_AUTHOR_PROFILE } from "@/lib/author";
 
 const RichTextEditor = dynamic(
 	() => import("@/components/admin/RichTextEditor"),
@@ -59,6 +62,15 @@ export default function CreatePostScreen() {
 	const [categories, setCategories] = useState<{ id: string; name: string }[]>(
 		[],
 	);
+
+	// Author Bio Fields (Pre-filled with site defaults)
+	const [showAuthorBio, setShowAuthorBio] = useState(true);
+	const [authorName, setAuthorName] = useState(DEFAULT_AUTHOR_PROFILE.name);
+	const [authorInitials, setAuthorInitials] = useState(
+		DEFAULT_AUTHOR_PROFILE.initials,
+	);
+	const [authorBio, setAuthorBio] = useState(DEFAULT_AUTHOR_PROFILE.bio);
+
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const { uploading, upload } = useCloudinaryUpload();
 
@@ -126,6 +138,11 @@ export default function CreatePostScreen() {
 					status,
 					featuredImageId: featuredImage?.id || null,
 					categoryId: categoryId === "NONE" ? null : categoryId,
+					authorName: showAuthorBio ? authorName.trim() || null : null,
+					authorInitials: showAuthorBio
+						? authorInitials.trim().toUpperCase() || null
+						: null,
+					authorBio: showAuthorBio ? authorBio.trim() || null : "",
 				}),
 			});
 
@@ -376,6 +393,108 @@ export default function CreatePostScreen() {
 									onChange={(e) => handleFileUpload(e.target.files)}
 								/>
 							</label>
+						)}
+					</Card>
+
+					{/* Blog Author Bio Card */}
+					<Card className="border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+						<div className="flex items-center justify-between">
+							<h2 className="text-lg font-semibold text-slate-900 flex items-center">
+								<PenLine className="h-5 w-5 mr-2 text-amber-600" />
+								Author Bio Card
+							</h2>
+							<div className="flex items-center space-x-2">
+								<Switch
+									id="create-post-toggle-author-bio"
+									checked={showAuthorBio}
+									onCheckedChange={setShowAuthorBio}
+								/>
+								<Label
+									htmlFor="create-post-toggle-author-bio"
+									className="text-xs text-slate-600 font-medium cursor-pointer"
+								>
+									{showAuthorBio ? "Include Card" : "Hide Card"}
+								</Label>
+							</div>
+						</div>
+
+						{showAuthorBio ? (
+							<div className="space-y-4 pt-2">
+								<div className="grid grid-cols-1 sm:grid-cols-[1fr_90px] gap-3">
+									<div>
+										<Label
+											htmlFor="create-post-author-name"
+											className="text-xs font-medium text-slate-700"
+										>
+											Author Name
+										</Label>
+										<Input
+											id="create-post-author-name"
+											value={authorName}
+											onChange={(e) => setAuthorName(e.target.value)}
+											placeholder={DEFAULT_AUTHOR_PROFILE.name}
+											className="mt-1 bg-slate-50 border-slate-200 text-slate-900 text-sm"
+										/>
+									</div>
+									<div>
+										<Label
+											htmlFor="create-post-author-initials"
+											className="text-xs font-medium text-slate-700"
+										>
+											Initials
+										</Label>
+										<Input
+											id="create-post-author-initials"
+											maxLength={3}
+											value={authorInitials}
+											onChange={(e) => setAuthorInitials(e.target.value)}
+											placeholder={DEFAULT_AUTHOR_PROFILE.initials}
+											className="mt-1 bg-slate-50 border-slate-200 text-slate-900 text-sm uppercase"
+										/>
+									</div>
+								</div>
+
+								<div>
+									<Label
+										htmlFor="create-post-author-bio"
+										className="text-xs font-medium text-slate-700"
+									>
+										Author Bio
+									</Label>
+									<Textarea
+										id="create-post-author-bio"
+										rows={3}
+										value={authorBio}
+										onChange={(e) => setAuthorBio(e.target.value)}
+										placeholder="Write bio for this article..."
+										className="mt-1 bg-slate-50 border-slate-200 text-slate-900 text-xs leading-relaxed"
+									/>
+									<p className="mt-1 text-[11px] text-slate-500">
+										If cleared or disabled, the bio layout will be hidden for
+										this post.
+									</p>
+								</div>
+
+								{/* Live Preview */}
+								<div className="p-3.5 rounded-xl bg-amber-50/60 border border-amber-200/80 flex items-start space-x-3 text-xs">
+									<div className="h-9 w-9 rounded-full bg-amber-500 text-slate-950 font-bold flex items-center justify-center text-sm shrink-0">
+										{(authorInitials || "AL").trim().toUpperCase()}
+									</div>
+									<div className="space-y-0.5 min-w-0">
+										<h4 className="font-display font-bold text-slate-900 truncate">
+											Written by {authorName || "Abimbola Lawuyi"}
+										</h4>
+										<p className="text-slate-600 text-[11px] leading-relaxed line-clamp-3">
+											{authorBio || "(Bio text here...)"}
+										</p>
+									</div>
+								</div>
+							</div>
+						) : (
+							<p className="text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-200">
+								The &quot;Written by&quot; author bio card will be completely
+								hidden for this article.
+							</p>
 						)}
 					</Card>
 				</div>

@@ -8,6 +8,9 @@ export async function GET() {
 		const settings = await prisma.siteSettings.findUnique({
 			where: { id: "singleton" },
 			select: {
+				authorName: true,
+				authorInitials: true,
+				authorBio: true,
 				contactEmail: true,
 				contactPhone: true,
 				address: true,

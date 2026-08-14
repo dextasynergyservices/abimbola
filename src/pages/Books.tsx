@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { books as staticBooks } from "@/data/books";
 import type { PublishedBook, PublishedBookCategory } from "@/lib/books";
 import type { PublishedPage } from "@/lib/cms";
+import { formatPublicationDate } from "@/lib/dates";
 
 interface BooksProps {
 	publishedPage?: PublishedPage | null;
@@ -23,13 +24,13 @@ function BookPriceDisplay({ book }: { book: PublishedBook }) {
 	const prices = book.prices || [];
 	const comingSoonPrice = prices.find((p) => p.type === "COMING_SOON");
 	const preOrderUrl = book.preOrderUrl || comingSoonPrice?.url || null;
-	const comingSoonDateStr = book.comingSoonDate || book.publicationDate;
+	const publicationDateStr = formatPublicationDate(book.publicationDate);
 
 	if (prices.length === 0 || prices.some((p) => p.type === "COMING_SOON")) {
 		return (
 			<div className="space-y-2 pt-1">
 				<span className="inline-flex items-center text-xs font-semibold bg-amber-500/20 text-amber-800 border border-amber-500/30 px-3 py-1 rounded-full uppercase tracking-wider">
-					Coming Soon {comingSoonDateStr ? `— ${comingSoonDateStr}` : ""}
+					Coming Soon {publicationDateStr ? `— ${publicationDateStr}` : ""}
 				</span>
 				{preOrderUrl && preOrderUrl.trim() !== "" && (
 					<div>

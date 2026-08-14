@@ -24,7 +24,6 @@ export interface PublishedBook {
 	rating: number | null;
 	publisher: string | null;
 	publicationDate: string | null;
-	comingSoonDate?: string | null;
 	preOrderUrl?: string | null;
 	relatedBookIds?: string[];
 	buyUrl: string | null;

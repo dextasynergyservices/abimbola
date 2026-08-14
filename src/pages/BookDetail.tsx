@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { books } from "@/data/books";
 import type { PublishedBook } from "@/lib/books";
+import { formatPublicationDate } from "@/lib/dates";
 
 const PRICE_TYPE_LABELS: Record<string, string> = {
 	HARD_COPY: "Hard Copy",
@@ -51,10 +52,7 @@ const BookDetail = ({ book, bookId, dbRelatedBooks = [] }: BookDetailProps) => {
 			(book as { preOrderUrl?: string | null }).preOrderUrl ||
 			comingSoonPrice?.url ||
 			null;
-		const comingSoonDateStr =
-			(book as { comingSoonDate?: string | null }).comingSoonDate ||
-			book.publicationDate ||
-			"";
+		const publicationDateStr = formatPublicationDate(book.publicationDate);
 
 		const hasPricing = prices.length > 0 && !hasComingSoon;
 
@@ -188,7 +186,7 @@ const BookDetail = ({ book, bookId, dbRelatedBooks = [] }: BookDetailProps) => {
 								<div className="space-y-4">
 									<div className="inline-flex items-center text-xs font-semibold bg-amber-500/20 text-amber-900 border border-amber-500/30 px-4 py-2 rounded-full uppercase tracking-wider">
 										Coming Soon{" "}
-										{comingSoonDateStr ? `— ${comingSoonDateStr}` : ""}
+										{publicationDateStr ? `— ${publicationDateStr}` : ""}
 									</div>
 									{preOrderUrl && preOrderUrl.trim() !== "" && (
 										<div>
@@ -234,7 +232,7 @@ const BookDetail = ({ book, bookId, dbRelatedBooks = [] }: BookDetailProps) => {
 									<div className="flex justify-between">
 										<dt className="text-neutral-500">Publication Date:</dt>
 										<dd className="font-medium text-black">
-											{book.publicationDate || comingSoonDateStr || "TBA"}
+											{publicationDateStr || "TBA"}
 										</dd>
 									</div>
 								</dl>

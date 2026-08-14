@@ -25,6 +25,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface SettingsData {
+	authorName: string | null;
+	authorInitials: string | null;
+	authorBio: string | null;
 	contactEmail: string | null;
 	contactPhone: string | null;
 	address: string | null;
@@ -38,6 +41,9 @@ interface SettingsData {
 }
 
 const emptySettings: SettingsData = {
+	authorName: "",
+	authorInitials: "",
+	authorBio: "",
 	contactEmail: "",
 	contactPhone: "",
 	address: "",
@@ -59,12 +65,14 @@ export default function AdminSettingsScreen() {
 		(async () => {
 			try {
 				const res = await fetch("/api/admin/settings");
-				if (!res.ok) throw new Error("Failed to load settings");
 				const data = await res.json();
+				if (!res.ok) {
+					throw new Error(data.error || "Failed to load settings");
+				}
 				setSettings({ ...emptySettings, ...data.settings });
 			} catch (err) {
 				console.error(err);
-				toast.error("Failed to load settings");
+				toast.error((err as Error).message || "Failed to load settings");
 			} finally {
 				setLoading(false);
 			}

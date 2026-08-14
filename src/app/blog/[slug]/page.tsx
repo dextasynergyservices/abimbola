@@ -1,7 +1,7 @@
 import BlogPostClient from "@/app/blog/[slug]/BlogPostClient";
 import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
-import { getPublishedPostBySlug } from "@/lib/cms";
+import { getAuthorProfile, getPublishedPostBySlug } from "@/lib/cms";
 
 export const revalidate = 60; // 1 minute revalidation
 
@@ -11,7 +11,10 @@ export default async function BlogPostBySlugPage({
 	params: Promise<{ slug: string }>;
 }) {
 	const { slug } = await params;
-	const post = await getPublishedPostBySlug(slug);
+	const [post, authorProfile] = await Promise.all([
+		getPublishedPostBySlug(slug),
+		getAuthorProfile(),
+	]);
 
 	if (!post) {
 		// Fallback mock post if database record not found
@@ -32,7 +35,7 @@ export default async function BlogPostBySlugPage({
 		return (
 			<div className="min-h-screen flex flex-col bg-white">
 				<Navigation />
-				<BlogPostClient post={fallbackPost} />
+				<BlogPostClient post={fallbackPost} authorProfile={authorProfile} />
 				<Footer />
 			</div>
 		);
@@ -41,7 +44,7 @@ export default async function BlogPostBySlugPage({
 	return (
 		<div className="min-h-screen flex flex-col bg-white">
 			<Navigation />
-			<BlogPostClient post={post} />
+			<BlogPostClient post={post} authorProfile={authorProfile} />
 			<Footer />
 		</div>
 	);

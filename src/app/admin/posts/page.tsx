@@ -88,9 +88,11 @@ export default function AdminPostsPage() {
 			if (statusFilter !== "ALL") params.set("status", statusFilter);
 
 			const res = await fetch(`/api/admin/posts?${params.toString()}`);
-			if (!res.ok) throw new Error("Failed to fetch blog posts");
-
 			const data = await res.json();
+			if (!res.ok) {
+				throw new Error(data.error || "Failed to fetch blog posts");
+			}
+
 			setPosts(data.posts || []);
 		} catch (err: unknown) {
 			console.error(err);

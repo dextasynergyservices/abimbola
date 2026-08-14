@@ -26,16 +26,16 @@ enum MessageStatus {
 }
 
 model User {
-  id           String     @id @default(cuid())
+  id           String   @id @default(cuid())
   name         String
-  email        String     @unique
+  email        String   @unique
   passwordHash String?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  posts        Post[]     @relation("PostAuthor")
-  media        Media[]    @relation("MediaUploader")
-  auditLogs    AuditLog[] @relation("UserAuditLogs")
+  posts     Post[]     @relation("PostAuthor")
+  media     Media[]    @relation("MediaUploader")
+  auditLogs AuditLog[] @relation("UserAuditLogs")
 }
 
 model Page {
@@ -51,7 +51,7 @@ model Page {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  sections       PageSection[]
+  sections PageSection[]
 }
 
 model PageSection {
@@ -66,7 +66,7 @@ model PageSection {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
-  page      Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
 }
 
 model Post {
@@ -80,14 +80,17 @@ model Post {
   seoTitle        String?
   seoDescription  String?
   authorId        String
+  authorName      String?
+  authorInitials  String?
+  authorBio       String?
   categoryId      String?
   publishedAt     DateTime?
   deletedAt       DateTime?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
-  author          User          @relation("PostAuthor", fields: [authorId], references: [id])
-  category        BlogCategory? @relation(fields: [categoryId], references: [id])
+  author   User          @relation("PostAuthor", fields: [authorId], references: [id])
+  category BlogCategory? @relation(fields: [categoryId], references: [id])
 }
 
 model BlogCategory {
@@ -98,7 +101,7 @@ model BlogCategory {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  posts     Post[]
+  posts Post[]
 }
 
 model BookCategory {
@@ -109,7 +112,7 @@ model BookCategory {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  books     Book[]
+  books Book[]
 }
 
 model Book {
@@ -133,8 +136,8 @@ model Book {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
-  category        BookCategory? @relation(fields: [categoryId], references: [id])
-  prices          BookPrice[]
+  category BookCategory? @relation(fields: [categoryId], references: [id])
+  prices   BookPrice[]
 }
 
 model BookPrice {
@@ -148,7 +151,7 @@ model BookPrice {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
-  book      Book          @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
   @@unique([bookId, type])
 }
@@ -171,18 +174,21 @@ model NewsletterSubscriber {
 }
 
 model SiteSettings {
-  id            String   @id @default("singleton")
-  contactEmail  String?
-  contactPhone  String?
-  address       String?
-  instagramUrl  String?
-  facebookUrl   String?
-  whatsappUrl   String?
-  telegramUrl   String?
-  discordUrl    String?
-  tiktokUrl     String?
-  youtubeUrl    String?
-  updatedAt     DateTime @updatedAt
+  id             String   @id @default("singleton")
+  authorName     String?
+  authorInitials String?
+  authorBio      String?
+  contactEmail   String?
+  contactPhone   String?
+  address        String?
+  instagramUrl   String?
+  facebookUrl    String?
+  whatsappUrl    String?
+  telegramUrl    String?
+  discordUrl     String?
+  tiktokUrl      String?
+  youtubeUrl     String?
+  updatedAt      DateTime @updatedAt
 }
 
 model Media {
@@ -197,7 +203,7 @@ model Media {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  uploadedBy         User     @relation("MediaUploader", fields: [uploadedById], references: [id])
+  uploadedBy User @relation("MediaUploader", fields: [uploadedById], references: [id])
 }
 
 model AuditLog {
@@ -209,5 +215,5 @@ model AuditLog {
   metadata   Json?
   createdAt  DateTime @default(now())
 
-  user       User     @relation("UserAuditLogs", fields: [userId], references: [id])
+  user User @relation("UserAuditLogs", fields: [userId], references: [id])
 }

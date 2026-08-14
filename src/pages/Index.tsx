@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import type { PublishedBook } from "@/lib/books";
 import type { PublishedPost } from "@/lib/cms";
+import { formatPublicationDate } from "@/lib/dates";
 
 const aboutImage = "/assets/about%20IMAGE.png";
 const bookHardestPart = "/assets/For%20BOOKS%20(3).png";
@@ -483,6 +484,9 @@ const Index = ({ featuredBooks = [], latestPosts = [] }: IndexProps) => {
 										(p.type === "HARD_COPY" || p.type === "SOFT_COPY") &&
 										(p.amount || 0) > 0,
 								);
+								const publicationDateStr = formatPublicationDate(
+									book.publicationDate,
+								);
 
 								return (
 									<div
@@ -521,8 +525,8 @@ const Index = ({ featuredBooks = [], latestPosts = [] }: IndexProps) => {
 													<div className="space-y-3">
 														<span className="inline-flex items-center text-xs font-semibold bg-amber-500/20 text-amber-800 border border-amber-500/30 px-4 py-2 rounded-full uppercase tracking-wider">
 															Coming Soon{" "}
-															{book.comingSoonDate
-																? `— ${book.comingSoonDate}`
+															{publicationDateStr
+																? `— ${publicationDateStr}`
 																: ""}
 														</span>
 														{book.preOrderUrl &&
@@ -953,7 +957,7 @@ const Index = ({ featuredBooks = [], latestPosts = [] }: IndexProps) => {
 							</span>
 
 							<h2 className="reveal font-display text-3xl md:text-4xl lg:text-[2.75rem] font-semibold leading-tight text-black">
-								You should not have to figure out love{" "}
+								You should not have to figure out life{" "}
 								<em className="text-gold not-italic">alone.</em>
 							</h2>
 

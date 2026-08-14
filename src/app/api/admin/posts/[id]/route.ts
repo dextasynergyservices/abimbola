@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
@@ -13,6 +14,9 @@ const updatePostSchema = z.object({
 	status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]),
 	seoTitle: z.string().optional().nullable(),
 	seoDescription: z.string().optional().nullable(),
+	authorName: z.string().optional().nullable(),
+	authorInitials: z.string().max(3).optional().nullable(),
+	authorBio: z.string().optional().nullable(),
 });
 
 export async function GET(
@@ -99,6 +103,9 @@ async function handleUpdate(request: Request, id: string) {
 				status: validated.status,
 				seoTitle: validated.seoTitle ?? null,
 				seoDescription: validated.seoDescription ?? null,
+				authorName: validated.authorName?.trim() || null,
+				authorInitials: validated.authorInitials?.trim().toUpperCase() || null,
+				authorBio: validated.authorBio?.trim() || null,
 				publishedAt:
 					validated.status === "PUBLISHED"
 						? existing.publishedAt || new Date()
@@ -122,6 +129,13 @@ async function handleUpdate(request: Request, id: string) {
 			action = "PUBLISH_POST";
 		} else if (existing.status === "PUBLISHED" && post.status !== "PUBLISHED") {
 			action = "UNPUBLISH_POST";
+		}
+
+		try {
+			revalidatePath(`/blog/${post.slug}`);
+			revalidatePath("/blog");
+		} catch (_e) {
+			// Ignore cache revalidation errors if outside request lifecycle
 		}
 
 		await prisma.auditLog.create({

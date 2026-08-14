@@ -43,6 +43,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import type { UploadedMedia } from "@/hooks/useCloudinaryUpload";
 import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
+import { toDateTimeLocalValue } from "@/lib/dates";
 
 interface BookCategory {
 	id: string;
@@ -66,7 +67,7 @@ export function BookForm({ bookId }: BookFormProps) {
 	const [rating, setRating] = useState("5");
 	const [publisher, setPublisher] = useState("");
 	const [publicationDate, setPublicationDate] = useState("");
-	const [comingSoonDate, setComingSoonDate] = useState("");
+	const [legacyPublicationDate, setLegacyPublicationDate] = useState("");
 	const [preOrderUrl, setPreOrderUrl] = useState("");
 	const [relatedBookIds, setRelatedBookIds] = useState<string[]>([]);
 	const [allBooks, setAllBooks] = useState<
@@ -149,8 +150,11 @@ export function BookForm({ bookId }: BookFormProps) {
 				setDescription(book.description || "");
 				setRating(String(book.rating ?? 5));
 				setPublisher(book.publisher || "");
-				setPublicationDate(book.publicationDate || "");
-				setComingSoonDate(book.comingSoonDate || "");
+				const pubDate = toDateTimeLocalValue(book.publicationDate);
+				setPublicationDate(pubDate);
+				setLegacyPublicationDate(
+					!pubDate && book.publicationDate ? book.publicationDate : "",
+				);
 				setPreOrderUrl(book.preOrderUrl || "");
 				setRelatedBookIds(book.relatedBookIds || []);
 				setCategoryId(book.categoryId || "NONE");
@@ -246,7 +250,6 @@ export function BookForm({ bookId }: BookFormProps) {
 				rating: rating ? Number(rating) : null,
 				publisher: publisher.trim() || null,
 				publicationDate: publicationDate.trim() || null,
-				comingSoonDate: comingSoonDate.trim() || null,
 				preOrderUrl:
 					preOrderUrl.trim() ||
 					(priceRows.COMING_SOON?.enabled
@@ -436,34 +439,24 @@ export function BookForm({ bookId }: BookFormProps) {
 										htmlFor="book-pubdate"
 										className="text-slate-700 font-medium"
 									>
-										Publication Date
+										Publication Date &amp; Time
 									</Label>
 									<Input
 										id="book-pubdate"
+										type="datetime-local"
 										value={publicationDate}
 										onChange={(e) => setPublicationDate(e.target.value)}
-										placeholder="2026"
 										className="mt-1.5 bg-slate-50 border-slate-200 text-slate-900 min-h-[44px]"
 									/>
+									<p className="mt-1 text-xs text-slate-500">
+										{legacyPublicationDate
+											? `Currently saved as "${legacyPublicationDate}" — pick a full date and time to replace it.`
+											: "Entered and shown in West Africa Time (WAT), including for books that are still coming soon."}
+									</p>
 								</div>
 							</div>
 
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-								<div>
-									<Label
-										htmlFor="book-comingsoon"
-										className="text-slate-700 font-medium"
-									>
-										Coming Soon Time / Date
-									</Label>
-									<Input
-										id="book-comingsoon"
-										value={comingSoonDate}
-										onChange={(e) => setComingSoonDate(e.target.value)}
-										placeholder="e.g. Sept 2026 or 2026-10-15 14:00"
-										className="mt-1.5 bg-slate-50 border-slate-200 text-slate-900 min-h-[44px]"
-									/>
-								</div>
 								<div>
 									<Label
 										htmlFor="book-preorder"
