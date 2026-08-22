@@ -6,7 +6,12 @@ const connectionString = process.env.DATABASE_URL?.replace(
 	"sslmode=require",
 	"sslmode=verify-full",
 );
-const pool = new Pool({ connectionString });
+const pool = new Pool({
+	connectionString,
+	max: process.env.NODE_ENV === "production" ? 10 : 5,
+	idleTimeoutMillis: 10000,
+	connectionTimeoutMillis: 5000,
+});
 const adapter = new PrismaPg(pool);
 
 const globalForPrisma = globalThis as unknown as {

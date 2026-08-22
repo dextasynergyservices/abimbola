@@ -8,21 +8,19 @@ import { CommunityModal } from "@/components/CommunityModal";
 const logo =
 	"https://res.cloudinary.com/dxoorukfj/image/upload/v1782315132/Abimbola_LOGO_white_pwezaa.png";
 
-interface PublicSettings {
-	contactEmail?: string | null;
-	instagramUrl?: string | null;
-	facebookUrl?: string | null;
-}
+import {
+	getClientPublicSettings,
+	type PublicSettings,
+} from "@/lib/public-settings";
 
 const Footer = () => {
 	const [settings, setSettings] = useState<PublicSettings>({});
 	const [communityOpen, setCommunityOpen] = useState(false);
 
 	useEffect(() => {
-		fetch("/api/settings/public")
-			.then((res) => res.json())
-			.then((data) => setSettings(data.settings || {}))
-			.catch(() => {});
+		getClientPublicSettings().then((data) => {
+			setSettings(data);
+		});
 	}, []);
 
 	const email = settings.contactEmail || "hello@abimbolalawuyi.com";

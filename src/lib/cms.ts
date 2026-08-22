@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { type AuthorProfile, DEFAULT_AUTHOR_PROFILE } from "@/lib/author";
 import { prisma } from "@/lib/prisma";
 
@@ -64,124 +65,175 @@ export interface PublishedPost {
 	featuredImage?: PublishedMedia | null;
 }
 
+const mediaSelect = {
+	id: true,
+	cloudinaryPublicId: true,
+	secureUrl: true,
+	width: true,
+	height: true,
+	altText: true,
+	caption: true,
+};
+
 /**
  * Fetch published page by slug from Neon database.
- * Hides drafts, archived, and soft-deleted pages & sections.
+ * Wrapped with React cache() to deduplicate requests during SSR (e.g. generateMetadata + Page component).
  */
-export async function getPublishedPageBySlug(
-	rawSlug: string,
-): Promise<PublishedPage | null> {
-	try {
-		const cleanSlug = rawSlug.trim().toLowerCase();
-		const slugVariants = [
-			cleanSlug,
-			cleanSlug.startsWith("/") ? cleanSlug.slice(1) : `/${cleanSlug}`,
-			cleanSlug === "" || cleanSlug === "home" ? "/" : cleanSlug,
-		];
+export const getPublishedPageBySlug = cache(
+	async (rawSlug: string): Promise<PublishedPage | null> => {
+		try {
+			const cleanSlug = rawSlug.trim().toLowerCase();
+			const slugVariants = [
+				cleanSlug,
+				cleanSlug.startsWith("/") ? cleanSlug.slice(1) : `/${cleanSlug}`,
+				cleanSlug === "" || cleanSlug === "home" ? "/" : cleanSlug,
+			];
 
-		const page = await prisma.page.findFirst({
-			where: {
-				slug: { in: slugVariants },
-				status: "PUBLISHED",
-				deletedAt: null,
-			},
-			include: {
-				sections: {
-					where: { status: "PUBLISHED" },
-					orderBy: { sortOrder: "asc" },
+			const page = await prisma.page.findFirst({
+				where: {
+					slug: { in: slugVariants },
+					status: "PUBLISHED",
+					deletedAt: null,
 				},
-			},
-		});
-
-		if (!page) return null;
-
-		let seoImage: PublishedMedia | null = null;
-		if (page.seoImageId) {
-			const mediaRecord = await prisma.media.findUnique({
-				where: { id: page.seoImageId },
-			});
-			if (mediaRecord) {
-				seoImage = mediaRecord;
-			}
-		}
-
-		return {
-			...page,
-			sections: page.sections.map((s) => ({
-				...s,
-				content: (s.content as Record<string, unknown>) || {},
-				settings: (s.settings as Record<string, unknown>) || null,
-			})),
-			seoImage,
-		};
-	} catch (error) {
-		console.error(
-			`Error fetching published page for slug "${rawSlug}":`,
-			error,
-		);
-		return null;
-	}
-}
-
-/**
- * Fetch all published posts from Neon database.
- */
-export async function getPublishedPosts(
-	limit?: number,
-): Promise<PublishedPost[]> {
-	try {
-		const posts = await prisma.post.findMany({
-			where: {
-				status: "PUBLISHED",
-				deletedAt: null,
-			},
-			orderBy: { publishedAt: "desc" },
-			take: limit,
-			include: {
-				author: {
-					select: {
-						id: true,
-						name: true,
-						email: true,
+				select: {
+					id: true,
+					title: true,
+					slug: true,
+					status: true,
+					seoTitle: true,
+					seoDescription: true,
+					seoImageId: true,
+					publishedAt: true,
+					sections: {
+						where: { status: "PUBLISHED" },
+						orderBy: { sortOrder: "asc" },
+						select: {
+							id: true,
+							pageId: true,
+							type: true,
+							title: true,
+							content: true,
+							settings: true,
+							sortOrder: true,
+							status: true,
+						},
 					},
 				},
-				category: true,
-			},
-		});
-
-		// Fetch featured images for posts
-		const mediaIds = posts
-			.map((p) => p.featuredImageId)
-			.filter(Boolean) as string[];
-		let mediaMap = new Map<string, PublishedMedia>();
-
-		if (mediaIds.length > 0) {
-			const mediaRecords = await prisma.media.findMany({
-				where: { id: { in: mediaIds } },
 			});
-			mediaMap = new Map(mediaRecords.map((m) => [m.id, m]));
-		}
 
-		return posts.map((post) => ({
-			...post,
-			featuredImage: post.featuredImageId
-				? mediaMap.get(post.featuredImageId) || null
-				: null,
-		}));
-	} catch (error) {
-		console.error("Error fetching published posts:", error);
-		return [];
-	}
-}
+			if (!page) return null;
+
+			let seoImage: PublishedMedia | null = null;
+			if (page.seoImageId) {
+				const mediaRecord = await prisma.media.findUnique({
+					where: { id: page.seoImageId },
+					select: mediaSelect,
+				});
+				if (mediaRecord) {
+					seoImage = mediaRecord;
+				}
+			}
+
+			return {
+				...page,
+				sections: page.sections.map((s) => ({
+					...s,
+					content: (s.content as Record<string, unknown>) || {},
+					settings: (s.settings as Record<string, unknown>) || null,
+				})),
+				seoImage,
+			};
+		} catch (error) {
+			console.error(
+				`Error fetching published page for slug "${rawSlug}":`,
+				error,
+			);
+			return null;
+		}
+	},
+);
 
 /**
- * Fetch single published post by slug from Neon database.
+ * Fetch all published posts from Neon database with optimized SELECT projection.
+ * Omits the heavy 'body' HTML column during list queries to reduce memory and egress.
+ * Wrapped with React cache() to deduplicate requests during SSR.
  */
+export const getPublishedPosts = cache(
+	async (limit?: number): Promise<PublishedPost[]> => {
+		try {
+			const posts = await prisma.post.findMany({
+				where: {
+					status: "PUBLISHED",
+					deletedAt: null,
+				},
+				orderBy: { publishedAt: "desc" },
+				take: limit,
+				select: {
+					id: true,
+					title: true,
+					slug: true,
+					excerpt: true,
+					featuredImageId: true,
+					status: true,
+					seoTitle: true,
+					seoDescription: true,
+					authorId: true,
+					authorName: true,
+					authorInitials: true,
+					authorBio: true,
+					categoryId: true,
+					publishedAt: true,
+					author: {
+						select: {
+							id: true,
+							name: true,
+							email: true,
+						},
+					},
+					category: {
+						select: {
+							id: true,
+							name: true,
+							slug: true,
+						},
+					},
+				},
+			});
+
+			// Fetch featured images for posts in a single batched query
+			const mediaIds = posts
+				.map((p) => p.featuredImageId)
+				.filter(Boolean) as string[];
+			let mediaMap = new Map<string, PublishedMedia>();
+
+			if (mediaIds.length > 0) {
+				const mediaRecords = await prisma.media.findMany({
+					where: { id: { in: mediaIds } },
+					select: mediaSelect,
+				});
+				mediaMap = new Map(mediaRecords.map((m) => [m.id, m]));
+			}
+
+			return posts.map((post) => ({
+				...post,
+				body: "", // Excluded from listing for performance; loaded in getPublishedPostBySlug
+				featuredImage: post.featuredImageId
+					? mediaMap.get(post.featuredImageId) || null
+					: null,
+			}));
+		} catch (error) {
+			console.error("Error fetching published posts:", error);
+			return [];
+		}
+	},
+);
+
 /**
  * The "Written by" card shown under each blog post. Editable from
  * Admin → System Settings → Blog Author Bio.
+ * Wrapped with React cache() to deduplicate requests during SSR.
  */
-export async function getAuthorProfile(): Promise<AuthorProfile> {
+export const getAuthorProfile = cache(async (): Promise<AuthorProfile> => {
 	try {
 		const settings = await prisma.siteSettings.findUnique({
 			where: { id: "singleton" },
@@ -198,49 +250,75 @@ export async function getAuthorProfile(): Promise<AuthorProfile> {
 		console.error("Error fetching author profile:", error);
 		return DEFAULT_AUTHOR_PROFILE;
 	}
-}
+});
 
-export async function getPublishedPostBySlug(
-	slugOrId: string,
-): Promise<PublishedPost | null> {
-	try {
-		const term = slugOrId.trim().toLowerCase();
-		const post = await prisma.post.findFirst({
-			where: {
-				OR: [{ slug: term }, { id: slugOrId }],
-				status: "PUBLISHED",
-				deletedAt: null,
-			},
-			include: {
-				author: {
-					select: {
-						id: true,
-						name: true,
-						email: true,
+/**
+ * Fetch single published post by slug from Neon database, including full body.
+ * Wrapped with React cache() to deduplicate requests during SSR.
+ */
+export const getPublishedPostBySlug = cache(
+	async (slugOrId: string): Promise<PublishedPost | null> => {
+		try {
+			const term = slugOrId.trim().toLowerCase();
+			const post = await prisma.post.findFirst({
+				where: {
+					OR: [{ slug: term }, { id: slugOrId }],
+					status: "PUBLISHED",
+					deletedAt: null,
+				},
+				select: {
+					id: true,
+					title: true,
+					slug: true,
+					excerpt: true,
+					body: true,
+					featuredImageId: true,
+					status: true,
+					seoTitle: true,
+					seoDescription: true,
+					authorId: true,
+					authorName: true,
+					authorInitials: true,
+					authorBio: true,
+					categoryId: true,
+					publishedAt: true,
+					author: {
+						select: {
+							id: true,
+							name: true,
+							email: true,
+						},
+					},
+					category: {
+						select: {
+							id: true,
+							name: true,
+							slug: true,
+						},
 					},
 				},
-				category: true,
-			},
-		});
-
-		if (!post) return null;
-
-		let featuredImage: PublishedMedia | null = null;
-		if (post.featuredImageId) {
-			featuredImage = await prisma.media.findUnique({
-				where: { id: post.featuredImageId },
 			});
-		}
 
-		return {
-			...post,
-			featuredImage,
-		};
-	} catch (error) {
-		console.error(
-			`Error fetching published post for slug "${slugOrId}":`,
-			error,
-		);
-		return null;
-	}
-}
+			if (!post) return null;
+
+			let featuredImage: PublishedMedia | null = null;
+			if (post.featuredImageId) {
+				featuredImage = await prisma.media.findUnique({
+					where: { id: post.featuredImageId },
+					select: mediaSelect,
+				});
+			}
+
+			return {
+				...post,
+				featuredImage,
+			};
+		} catch (error) {
+			console.error(
+				`Error fetching published post for slug "${slugOrId}":`,
+				error,
+			);
+			return null;
+		}
+	},
+);

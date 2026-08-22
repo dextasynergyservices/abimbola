@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function GET() {
 	try {
@@ -24,9 +24,24 @@ export async function GET() {
 			},
 		});
 
-		return NextResponse.json({ settings: settings || {} });
+		return NextResponse.json(
+			{ settings: settings || {} },
+			{
+				headers: {
+					"Cache-Control":
+						"public, s-maxage=3600, stale-while-revalidate=86400",
+				},
+			},
+		);
 	} catch (error) {
 		console.error("Failed to fetch public settings:", error);
-		return NextResponse.json({ settings: {} });
+		return NextResponse.json(
+			{ settings: {} },
+			{
+				headers: {
+					"Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+				},
+			},
+		);
 	}
 }

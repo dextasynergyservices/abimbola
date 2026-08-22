@@ -17,12 +17,10 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 
-interface PublicSettings {
-	whatsappUrl?: string | null;
-	telegramUrl?: string | null;
-	facebookUrl?: string | null;
-	discordUrl?: string | null;
-}
+import {
+	getClientPublicSettings,
+	type PublicSettings,
+} from "@/lib/public-settings";
 
 interface CommunityModalProps {
 	open: boolean;
@@ -61,10 +59,9 @@ export function CommunityModal({ open, onOpenChange }: CommunityModalProps) {
 
 	useEffect(() => {
 		if (!open) return;
-		fetch("/api/settings/public")
-			.then((res) => res.json())
-			.then((data) => setSettings(data.settings || {}))
-			.catch(() => setSettings({}));
+		getClientPublicSettings().then((data) => {
+			setSettings(data);
+		});
 	}, [open]);
 
 	const availableChannels = settings
