@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getBookCategories, getPublishedBooks } from "@/lib/books";
 import { getPublishedPageBySlug } from "@/lib/cms";
-import Books from "@/pages/Books";
+import Books from "@/views/Books";
 
 export const revalidate = 60;
 

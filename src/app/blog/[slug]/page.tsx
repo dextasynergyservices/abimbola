@@ -1,15 +1,71 @@
+import type { Metadata } from "next";
 import BlogPostClient from "@/app/blog/[slug]/BlogPostClient";
 import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
-import { getAuthorProfile, getPublishedPostBySlug } from "@/lib/cms";
+import {
+	getAuthorProfile,
+	getPublishedPostBySlug,
+	getPublishedPosts,
+} from "@/lib/cms";
 
 export const revalidate = 60; // 1 minute revalidation
 
+interface BlogPostPageProps {
+	params: Promise<{ slug: string }>;
+}
+
+export async function generateStaticParams() {
+	try {
+		const posts = await getPublishedPosts();
+		const slugs = posts.map((p) => ({ slug: p.slug }));
+		if (slugs.length > 0) return slugs;
+	} catch {}
+
+	return [
+		{ slug: "the-art-of-mindful-reading" },
+		{ slug: "whispers-in-the-garden" },
+		{ slug: "the-last-letter-from-the-village" },
+	];
+}
+
+export async function generateMetadata({
+	params,
+}: BlogPostPageProps): Promise<Metadata> {
+	const { slug } = await params;
+	const post = await getPublishedPostBySlug(slug);
+
+	if (post) {
+		const seoTitle = post.seoTitle || `${post.title} - Abimbola Lawuyi`;
+		const seoDescription =
+			post.seoDescription || post.excerpt || "Article by Abimbola Lawuyi";
+		const imageUrl = post.featuredImage?.secureUrl;
+
+		return {
+			title: seoTitle,
+			description: seoDescription,
+			openGraph: {
+				title: seoTitle,
+				description: seoDescription,
+				images: imageUrl
+					? [
+							{
+								url: imageUrl,
+								alt: post.featuredImage?.altText || post.title,
+							},
+						]
+					: [],
+			},
+		};
+	}
+
+	return {
+		title: `${slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())} - Abimbola Lawuyi`,
+	};
+}
+
 export default async function BlogPostBySlugPage({
 	params,
-}: {
-	params: Promise<{ slug: string }>;
-}) {
+}: BlogPostPageProps) {
 	const { slug } = await params;
 	const [post, authorProfile] = await Promise.all([
 		getPublishedPostBySlug(slug),

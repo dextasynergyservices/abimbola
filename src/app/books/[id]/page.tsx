@@ -1,13 +1,28 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { books } from "@/data/books";
-import { getPublishedBookById, getRelatedBooksForBook } from "@/lib/books";
-import BookDetail from "@/pages/BookDetail";
+import {
+	getPublishedBookById,
+	getPublishedBooks,
+	getRelatedBooksForBook,
+} from "@/lib/books";
+import BookDetail from "@/views/BookDetail";
 
 export const revalidate = 60;
 
 interface BookDetailPageProps {
 	params: Promise<{ id: string }>;
+}
+
+export async function generateStaticParams() {
+	try {
+		const dbBooks = await getPublishedBooks();
+		const dbParams = dbBooks.map((b) => ({ id: b.id }));
+		const staticParams = books.map((b) => ({ id: String(b.id) }));
+		return [...dbParams, ...staticParams];
+	} catch {
+		return books.map((b) => ({ id: String(b.id) }));
+	}
 }
 
 export async function generateMetadata({

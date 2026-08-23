@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { SessionProvider } from "next-auth/react";
 import { AdminShell } from "./AdminShell";
 
 export function AdminLayoutClient({ children }: { children: React.ReactNode }) {
@@ -10,5 +11,9 @@ export function AdminLayoutClient({ children }: { children: React.ReactNode }) {
 		return <>{children}</>;
 	}
 
-	return <AdminShell>{children}</AdminShell>;
+	return (
+		<SessionProvider refetchOnWindowFocus={false}>
+			<AdminShell>{children}</AdminShell>
+		</SessionProvider>
+	);
 }

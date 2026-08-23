@@ -1,7 +1,6 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SessionProvider } from "next-auth/react";
 import { useState } from "react";
 import Preloader from "@/components/Preloader";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -9,18 +8,27 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-	const [queryClient] = useState(() => new QueryClient());
+	const [queryClient] = useState(
+		() =>
+			new QueryClient({
+				defaultOptions: {
+					queries: {
+						staleTime: 60 * 1000,
+						refetchOnWindowFocus: false,
+						retry: 1,
+					},
+				},
+			}),
+	);
 
 	return (
-		<SessionProvider>
-			<QueryClientProvider client={queryClient}>
-				<TooltipProvider>
-					<Preloader />
-					{children}
-					<Toaster />
-					<Sonner />
-				</TooltipProvider>
-			</QueryClientProvider>
-		</SessionProvider>
+		<QueryClientProvider client={queryClient}>
+			<TooltipProvider>
+				<Preloader />
+				{children}
+				<Toaster />
+				<Sonner />
+			</TooltipProvider>
+		</QueryClientProvider>
 	);
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getPublishedPageBySlug } from "@/lib/cms";
-import About from "@/pages/About";
+import About from "@/views/About";
 
 export const revalidate = 60;
 

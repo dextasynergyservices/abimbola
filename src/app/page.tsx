@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getFeaturedBooks } from "@/lib/books";
 import { getPublishedPosts } from "@/lib/cms";
-import Index from "@/pages/Index";
+import Index from "@/views/Index";
 
 export const revalidate = 60;
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getPublishedPageBySlug } from "@/lib/cms";
-import Contact from "@/pages/Contact";
+import Contact from "@/views/Contact";
 
 export const revalidate = 60;
 
