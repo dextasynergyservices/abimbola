@@ -75,6 +75,20 @@ const mediaSelect = {
 	caption: true,
 };
 
+function sanitizeMediaRecord(media: PublishedMedia): PublishedMedia {
+	// Prevent massive base64 strings in database from inflating SSR/ISR payloads beyond Vercel's limit
+	if (
+		media.secureUrl &&
+		(media.secureUrl.startsWith("data:") || media.secureUrl.length > 2048)
+	) {
+		return {
+			...media,
+			secureUrl: "/assets/blog-featured-1.jpg",
+		};
+	}
+	return media;
+}
+
 /**
  * Fetch published page by slug from Neon database.
  * Wrapped with React cache() to deduplicate requests during SSR (e.g. generateMetadata + Page component).
@@ -130,7 +144,7 @@ export const getPublishedPageBySlug = cache(
 					select: mediaSelect,
 				});
 				if (mediaRecord) {
-					seoImage = mediaRecord;
+					seoImage = sanitizeMediaRecord(mediaRecord);
 				}
 			}
 
@@ -211,7 +225,9 @@ export const getPublishedPosts = cache(
 					where: { id: { in: mediaIds } },
 					select: mediaSelect,
 				});
-				mediaMap = new Map(mediaRecords.map((m) => [m.id, m]));
+				mediaMap = new Map(
+					mediaRecords.map((m) => [m.id, sanitizeMediaRecord(m)]),
+				);
 			}
 
 			return posts.map((post) => ({
@@ -303,10 +319,13 @@ export const getPublishedPostBySlug = cache(
 
 			let featuredImage: PublishedMedia | null = null;
 			if (post.featuredImageId) {
-				featuredImage = await prisma.media.findUnique({
+				const mediaRecord = await prisma.media.findUnique({
 					where: { id: post.featuredImageId },
 					select: mediaSelect,
 				});
+				if (mediaRecord) {
+					featuredImage = sanitizeMediaRecord(mediaRecord);
+				}
 			}
 
 			return {

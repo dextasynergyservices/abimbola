@@ -78,6 +78,20 @@ const mediaSelect = {
 	caption: true,
 };
 
+function sanitizeBookMedia(media: PublishedMedia): PublishedMedia {
+	// Prevent massive base64 strings in database from inflating SSR/ISR payloads beyond Vercel's limit
+	if (
+		media.secureUrl &&
+		(media.secureUrl.startsWith("data:") || media.secureUrl.length > 2048)
+	) {
+		return {
+			...media,
+			secureUrl: "/assets/For%20BOOKS%20(1).png",
+		};
+	}
+	return media;
+}
+
 async function attachMediaToBooks<
 	T extends { coverImageId: string | null; [key: string]: unknown },
 >(rawBooks: T[]): Promise<PublishedBook[]> {
@@ -91,7 +105,7 @@ async function attachMediaToBooks<
 			where: { id: { in: mediaIds } },
 			select: mediaSelect,
 		});
-		mediaMap = new Map(mediaRecords.map((m) => [m.id, m]));
+		mediaMap = new Map(mediaRecords.map((m) => [m.id, sanitizeBookMedia(m)]));
 	}
 
 	return rawBooks.map((book) => ({
@@ -205,10 +219,13 @@ export const getPublishedBookById = cache(
 
 			let coverImage: PublishedMedia | null = null;
 			if (book.coverImageId) {
-				coverImage = await prisma.media.findUnique({
+				const mediaRecord = await prisma.media.findUnique({
 					where: { id: book.coverImageId },
 					select: mediaSelect,
 				});
+				if (mediaRecord) {
+					coverImage = sanitizeBookMedia(mediaRecord);
+				}
 			}
 
 			return { ...book, coverImage };
