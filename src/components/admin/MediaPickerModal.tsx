@@ -2,6 +2,7 @@
 
 import {
 	Check,
+	FolderOpen,
 	Image as ImageIcon,
 	Loader2,
 	Plus,
@@ -9,7 +10,7 @@ import {
 	Search,
 } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -46,13 +47,14 @@ export function MediaPickerModal({
 	onOpenChange,
 	onSelectImage,
 	selectedImageId,
-	title = "Select Image from Media Library",
+	title = "Select Media",
 }: MediaPickerModalProps) {
 	const [mediaList, setMediaList] = useState<MediaItem[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [uploading, setUploading] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [activeSelected, setActiveSelected] = useState<MediaItem | null>(null);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const fetchMedia = useCallback(
 		async (query = "") => {
@@ -86,9 +88,12 @@ export function MediaPickerModal({
 		}
 	}, [open, fetchMedia, searchQuery]);
 
+	const [uploadProgress, setUploadProgress] = useState(0);
+
 	const handleFileUpload = async (files: FileList | null) => {
 		if (!files || files.length === 0) return;
 		setUploading(true);
+		setUploadProgress(0);
 
 		try {
 			const file = files[0];
@@ -103,7 +108,10 @@ export function MediaPickerModal({
 				body: JSON.stringify({ folder: "abimbola_uploads" }),
 			});
 
-			if (!sigRes.ok) throw new Error("Failed to get signature");
+			if (!sigRes.ok) {
+				const sigErr = await sigRes.json().catch(() => ({}));
+				throw new Error(sigErr?.error || "Failed to get signature");
+			}
 			const sigData = await sigRes.json();
 
 			let secureUrl = "";
@@ -112,6 +120,7 @@ export function MediaPickerModal({
 			let height: number | null = null;
 
 			if (sigData.isMock) {
+				setUploadProgress(50);
 				const base64 = await new Promise<string>((resolve) => {
 					const reader = new FileReader();
 					reader.onloadend = () => resolve(reader.result as string);
@@ -130,6 +139,7 @@ export function MediaPickerModal({
 				cloudinaryPublicId = `mock_upload_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9]/g, "_")}`;
 				width = imgDimensions.w;
 				height = imgDimensions.h;
+				setUploadProgress(90);
 			} else {
 				const formData = new FormData();
 				formData.append("file", file);
@@ -138,18 +148,53 @@ export function MediaPickerModal({
 				formData.append("signature", sigData.signature);
 				if (sigData.folder) formData.append("folder", sigData.folder);
 
-				const uploadRes = await fetch(
-					`https://api.cloudinary.com/v1_1/${sigData.cloudName}/image/upload`,
-					{ method: "POST", body: formData },
-				);
+				const uploadData = await new Promise<{
+					secure_url: string;
+					public_id: string;
+					width?: number;
+					height?: number;
+				}>((resolve, reject) => {
+					const xhr = new XMLHttpRequest();
+					xhr.open(
+						"POST",
+						`https://api.cloudinary.com/v1_1/${sigData.cloudName}/image/upload`,
+					);
 
-				if (!uploadRes.ok) throw new Error("Cloudinary upload failed");
-				const uploadData = await uploadRes.json();
+					xhr.upload.onprogress = (event) => {
+						if (event.lengthComputable) {
+							const percent = Math.round((event.loaded / event.total) * 90);
+							setUploadProgress(percent);
+						}
+					};
+
+					xhr.onload = () => {
+						try {
+							const response = JSON.parse(xhr.responseText);
+							if (xhr.status >= 200 && xhr.status < 300) {
+								resolve(response);
+							} else {
+								const errorMsg =
+									response?.error?.message ||
+									`Cloudinary error (${xhr.status}: ${xhr.statusText})`;
+								reject(new Error(errorMsg));
+							}
+						} catch {
+							reject(new Error(`Upload failed with status ${xhr.status}`));
+						}
+					};
+
+					xhr.onerror = () =>
+						reject(new Error("Network error during Cloudinary upload"));
+					xhr.send(formData);
+				});
+
 				secureUrl = uploadData.secure_url;
 				cloudinaryPublicId = uploadData.public_id;
 				width = uploadData.width || null;
 				height = uploadData.height || null;
 			}
+
+			setUploadProgress(95);
 
 			const saveRes = await fetch("/api/admin/media", {
 				method: "POST",
@@ -163,17 +208,24 @@ export function MediaPickerModal({
 				}),
 			});
 
-			if (!saveRes.ok) throw new Error("Failed to save media in database");
+			if (!saveRes.ok) {
+				const saveErr = await saveRes.json().catch(() => ({}));
+				throw new Error(saveErr?.error || "Failed to save media");
+			}
 			const saveJson = await saveRes.json();
 
-			toast.success("Image uploaded successfully");
-			setActiveSelected(saveJson.media);
+			setUploadProgress(100);
+			toast.success("Image uploaded to library");
 			await fetchMedia(searchQuery);
+			if (saveJson.media) {
+				setActiveSelected(saveJson.media);
+			}
 		} catch (err: unknown) {
-			console.error("Upload error:", err);
+			console.error(err);
 			toast.error((err as Error).message || "Failed to upload image");
 		} finally {
 			setUploading(false);
+			if (fileInputRef.current) fileInputRef.current.value = "";
 		}
 	};
 
@@ -186,9 +238,10 @@ export function MediaPickerModal({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-4 sm:p-6 bg-white border-slate-200">
+			<DialogContent className="max-w-4xl max-h-[85vh] flex flex-col p-4 sm:p-6 bg-white">
 				<DialogHeader>
-					<DialogTitle className="text-xl font-bold text-slate-900">
+					<DialogTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
+						<FolderOpen className="h-5 w-5 text-amber-600" />
 						{title}
 					</DialogTitle>
 					<DialogDescription className="text-sm text-slate-500">
@@ -224,7 +277,10 @@ export function MediaPickerModal({
 
 						<label className="cursor-pointer inline-flex items-center justify-center rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-3 py-2 text-sm shadow-sm transition-colors min-h-[44px]">
 							{uploading ? (
-								<Loader2 className="h-4 w-4 animate-spin text-slate-950" />
+								<div className="flex items-center gap-2">
+									<Loader2 className="h-4 w-4 animate-spin text-slate-950" />
+									<span className="text-xs">{uploadProgress}%</span>
+								</div>
 							) : (
 								<>
 									<Plus className="h-4 w-4 mr-1.5" />
@@ -232,6 +288,7 @@ export function MediaPickerModal({
 								</>
 							)}
 							<input
+								ref={fileInputRef}
 								type="file"
 								accept="image/*"
 								disabled={uploading}
@@ -241,6 +298,25 @@ export function MediaPickerModal({
 						</label>
 					</div>
 				</div>
+
+				{/* Uploading progress banner */}
+				{uploading && (
+					<div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg flex flex-col gap-1.5 animate-in fade-in">
+						<div className="flex items-center justify-between text-xs font-semibold text-amber-800">
+							<span className="flex items-center gap-1.5">
+								<Loader2 className="h-3.5 w-3.5 animate-spin text-amber-600" />
+								Uploading to Cloudinary & Media Library...
+							</span>
+							<span>{uploadProgress}%</span>
+						</div>
+						<div className="w-full bg-amber-200 rounded-full h-1.5 overflow-hidden">
+							<div
+								className="bg-amber-600 h-full transition-all duration-150"
+								style={{ width: `${uploadProgress}%` }}
+							/>
+						</div>
+					</div>
+				)}
 
 				{/* Grid Container */}
 				<div className="flex-1 overflow-y-auto min-h-[280px] border border-slate-200 rounded-xl p-3 bg-slate-50">

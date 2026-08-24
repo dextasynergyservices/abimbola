@@ -2,6 +2,7 @@
 
 import {
 	ArrowLeft,
+	FolderOpen,
 	Image as ImageIcon,
 	Loader2,
 	PenLine,
@@ -14,6 +15,7 @@ import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { MediaPickerModal } from "@/components/admin/MediaPickerModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -66,6 +68,7 @@ export default function EditPostScreen() {
 	const [featuredImage, setFeaturedImage] = useState<UploadedMedia | null>(
 		null,
 	);
+	const [mediaModalOpen, setMediaModalOpen] = useState(false);
 	const [categoryId, setCategoryId] = useState<string>("NONE");
 	const [categories, setCategories] = useState<{ id: string; name: string }[]>(
 		[],
@@ -80,7 +83,7 @@ export default function EditPostScreen() {
 	const [authorBio, setAuthorBio] = useState(DEFAULT_AUTHOR_PROFILE.bio);
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const { uploading, upload } = useCloudinaryUpload();
+	const { uploading, progress, stage, upload } = useCloudinaryUpload();
 
 	const fetchCategories = useCallback(async () => {
 		try {
@@ -419,69 +422,152 @@ export default function EditPostScreen() {
 						</div>
 					</Card>
 
-					{/* Featured Image — Direct Upload */}
+					{/* Featured Image — Direct Upload & Library */}
 					<Card className="border-slate-200 bg-white p-6 space-y-4 shadow-sm">
-						<h2 className="text-lg font-semibold text-slate-900">
-							Featured Image
-						</h2>
+						<div className="flex items-center justify-between">
+							<h2 className="text-lg font-semibold text-slate-900">
+								Featured Image
+							</h2>
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={() => setMediaModalOpen(true)}
+								className="text-xs h-8 border-slate-200 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300 transition-colors"
+							>
+								<FolderOpen className="h-3.5 w-3.5 mr-1.5 text-amber-600" />
+								Media Library
+							</Button>
+						</div>
+
 						{featuredImage ? (
-							<div className="relative aspect-video w-full rounded-lg overflow-hidden border border-slate-200 bg-slate-100 group">
+							<div className="relative aspect-video w-full rounded-lg overflow-hidden border border-slate-200 bg-slate-100 group shadow-xs">
 								<Image
 									src={featuredImage.secureUrl}
 									alt={featuredImage.altText || title}
 									fill
 									className="object-cover"
 								/>
-								<button
-									type="button"
-									onClick={() => setFeaturedImage(null)}
-									className="absolute top-2 right-2 p-1.5 rounded-full bg-slate-950/70 text-white hover:bg-rose-600 transition-colors"
+								{uploading && (
+									<div className="absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center p-4 z-20 text-white animate-in fade-in">
+										<Loader2 className="h-8 w-8 animate-spin text-amber-400 mb-2.5" />
+										<span className="text-xs font-semibold tracking-wide text-center">
+											{stage === "signing"
+												? "Preparing upload..."
+												: stage === "uploading"
+													? `Uploading to Cloudinary (${progress}%)`
+													: stage === "saving"
+														? "Saving to database..."
+														: `Uploading (${progress}%)...`}
+										</span>
+										<div className="w-full max-w-[180px] bg-white/20 rounded-full h-2 mt-3 overflow-hidden shadow-inner">
+											<div
+												className="bg-gradient-to-r from-amber-500 to-amber-300 h-full transition-all duration-150 rounded-full"
+												style={{ width: `${Math.max(5, progress)}%` }}
+											/>
+										</div>
+										<span className="text-[10px] text-amber-200/80 mt-1 font-mono">
+											{progress}%
+										</span>
+									</div>
+								)}
+								{!uploading && (
+									<>
+										<button
+											type="button"
+											onClick={() => setFeaturedImage(null)}
+											className="absolute top-2 right-2 p-1.5 rounded-full bg-slate-950/75 text-white hover:bg-rose-600 transition-colors shadow-md z-10"
+										>
+											<X className="h-4 w-4" />
+										</button>
+										<div className="absolute bottom-2 inset-x-2 flex items-center justify-between gap-2 z-10">
+											<label className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-slate-950/80 hover:bg-slate-950 text-white text-xs font-medium px-3 py-1.5 transition-colors shadow-md backdrop-blur-xs">
+												<Upload className="h-3.5 w-3.5" />
+												Change Image
+												<input
+													type="file"
+													accept="image/*"
+													disabled={uploading}
+													className="hidden"
+													onChange={(e) => {
+														handleFileUpload(e.target.files);
+														e.target.value = "";
+													}}
+												/>
+											</label>
+											<button
+												type="button"
+												onClick={() => setMediaModalOpen(true)}
+												className="inline-flex items-center gap-1.5 rounded-lg bg-slate-950/80 hover:bg-slate-950 text-white text-xs font-medium px-3 py-1.5 transition-colors shadow-md backdrop-blur-xs"
+											>
+												<FolderOpen className="h-3.5 w-3.5 text-amber-400" />
+												Library
+											</button>
+										</div>
+									</>
+								)}
+							</div>
+						) : (
+							<div className="space-y-3">
+								<label
+									className={`flex flex-col items-center justify-center w-full min-h-[140px] p-4 rounded-lg border-2 border-dashed transition-colors cursor-pointer ${uploading ? "border-amber-400 bg-amber-50/50" : "border-slate-300 hover:border-amber-500 hover:bg-amber-50/30"}`}
 								>
-									<X className="h-4 w-4" />
-								</button>
-								<label className="absolute bottom-2 left-2 cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-slate-950/70 hover:bg-slate-950/90 text-white text-xs font-medium px-3 py-1.5 transition-colors">
-									<Upload className="h-3.5 w-3.5" />
-									Change Image
+									{uploading ? (
+										<div className="flex flex-col items-center gap-2 text-amber-600 w-full max-w-[200px]">
+											<Loader2 className="h-7 w-7 animate-spin text-amber-600" />
+											<span className="text-xs font-semibold text-center">
+												{stage === "signing"
+													? "Preparing upload..."
+													: stage === "uploading"
+														? `Uploading to Cloudinary (${progress}%)`
+														: stage === "saving"
+															? "Saving to database..."
+															: `Uploading (${progress}%)...`}
+											</span>
+											<div className="w-full bg-amber-200 rounded-full h-2 overflow-hidden shadow-inner">
+												<div
+													className="bg-amber-600 h-full transition-all duration-150 rounded-full"
+													style={{ width: `${Math.max(5, progress)}%` }}
+												/>
+											</div>
+											<span className="text-[10px] text-amber-700 font-mono">
+												{progress}%
+											</span>
+										</div>
+									) : (
+										<div className="flex flex-col items-center gap-2 text-slate-500">
+											<ImageIcon className="h-8 w-8 text-amber-500" />
+											<span className="text-sm font-medium">
+												Click to upload image
+											</span>
+											<span className="text-xs text-slate-400">
+												JPG, PNG, WebP supported
+											</span>
+										</div>
+									)}
 									<input
+										ref={fileInputRef}
 										type="file"
 										accept="image/*"
 										disabled={uploading}
 										className="hidden"
-										onChange={(e) => handleFileUpload(e.target.files)}
+										onChange={(e) => {
+											handleFileUpload(e.target.files);
+											e.target.value = "";
+										}}
 									/>
 								</label>
 							</div>
-						) : (
-							<label
-								className={`flex flex-col items-center justify-center w-full min-h-[120px] rounded-lg border-2 border-dashed transition-colors cursor-pointer ${uploading ? "border-amber-400 bg-amber-50/50" : "border-slate-300 hover:border-amber-500 hover:bg-amber-50/30"}`}
-							>
-								{uploading ? (
-									<div className="flex flex-col items-center gap-2 text-amber-600">
-										<Loader2 className="h-6 w-6 animate-spin" />
-										<span className="text-sm font-medium">Uploading...</span>
-									</div>
-								) : (
-									<div className="flex flex-col items-center gap-2 text-slate-500">
-										<ImageIcon className="h-8 w-8 text-amber-500" />
-										<span className="text-sm font-medium">
-											Click to upload image
-										</span>
-										<span className="text-xs text-slate-400">
-											JPG, PNG, WebP supported
-										</span>
-									</div>
-								)}
-								<input
-									ref={fileInputRef}
-									type="file"
-									accept="image/*"
-									disabled={uploading}
-									className="hidden"
-									onChange={(e) => handleFileUpload(e.target.files)}
-								/>
-							</label>
 						)}
 					</Card>
+
+					<MediaPickerModal
+						open={mediaModalOpen}
+						onOpenChange={setMediaModalOpen}
+						onSelectImage={(media) => setFeaturedImage(media)}
+						selectedImageId={featuredImage?.id}
+						title="Select Featured Image"
+					/>
 
 					{/* Blog Author Bio Card */}
 					<Card className="border-slate-200 bg-white p-6 space-y-4 shadow-sm">
