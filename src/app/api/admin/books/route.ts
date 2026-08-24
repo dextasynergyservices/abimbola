@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
@@ -150,6 +151,14 @@ export async function POST(request: Request) {
 			},
 			include: { category: true, prices: true },
 		});
+
+		try {
+			revalidatePath("/");
+			revalidatePath("/books");
+			revalidatePath(`/books/${book.id}`);
+		} catch (e) {
+			console.error("Revalidation error:", e);
+		}
 
 		return NextResponse.json({ book }, { status: 201 });
 	} catch (error) {

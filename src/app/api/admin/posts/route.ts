@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
@@ -137,6 +138,14 @@ export async function POST(request: Request) {
 				metadata: { title: post.title, slug: post.slug, status: post.status },
 			},
 		});
+
+		try {
+			revalidatePath("/");
+			revalidatePath("/blog");
+			revalidatePath(`/blog/${post.slug}`);
+		} catch (e) {
+			console.error("Revalidation error:", e);
+		}
 
 		return NextResponse.json({ post }, { status: 201 });
 	} catch (error) {

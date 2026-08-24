@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
@@ -73,6 +74,14 @@ export async function PUT(request: Request) {
 			update: data,
 			create: { id: "singleton", ...data },
 		});
+
+		try {
+			revalidatePath("/");
+			revalidatePath("/about");
+			revalidatePath("/contact");
+		} catch (_e) {
+			// Ignore cache revalidation errors
+		}
 
 		return NextResponse.json({ settings });
 	} catch (error) {

@@ -132,8 +132,9 @@ async function handleUpdate(request: Request, id: string) {
 		}
 
 		try {
-			revalidatePath(`/blog/${post.slug}`);
+			revalidatePath("/");
 			revalidatePath("/blog");
+			revalidatePath(`/blog/${post.slug}`);
 		} catch (_e) {
 			// Ignore cache revalidation errors if outside request lifecycle
 		}
@@ -200,6 +201,14 @@ export async function DELETE(
 			where: { id },
 			data: { deletedAt: new Date() },
 		});
+
+		try {
+			revalidatePath("/");
+			revalidatePath("/blog");
+			revalidatePath(`/blog/${existing.slug}`);
+		} catch (_e) {
+			// Ignore cache revalidation errors
+		}
 
 		const userId = session.user.id as string;
 		await prisma.auditLog.create({

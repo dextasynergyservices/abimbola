@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
@@ -135,6 +136,14 @@ async function handleUpdate(request: Request, id: string) {
 			include: { category: true, prices: true },
 		});
 
+		try {
+			revalidatePath("/");
+			revalidatePath("/books");
+			revalidatePath(`/books/${book.id}`);
+		} catch (e) {
+			console.error("Revalidation error:", e);
+		}
+
 		return NextResponse.json({ book });
 	} catch (error) {
 		if (error instanceof z.ZodError) {
@@ -187,6 +196,14 @@ export async function DELETE(
 			where: { id },
 			data: { deletedAt: new Date() },
 		});
+
+		try {
+			revalidatePath("/");
+			revalidatePath("/books");
+			revalidatePath(`/books/${id}`);
+		} catch (e) {
+			console.error("Revalidation error:", e);
+		}
 
 		return NextResponse.json({ message: "Book deleted successfully", book });
 	} catch (error) {
