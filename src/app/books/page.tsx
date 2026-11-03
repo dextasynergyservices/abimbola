@@ -3,7 +3,8 @@ import { getBookCategories, getPublishedBooks } from "@/lib/books";
 import { getPublishedPageBySlug } from "@/lib/cms";
 import Books from "@/views/Books";
 
-export const revalidate = 60;
+// Cached for 24h; admin changes purge it instantly (see lib/cache.ts).
+export const revalidate = 86400;
 
 export async function generateMetadata(): Promise<Metadata> {
 	const page = await getPublishedPageBySlug("books");

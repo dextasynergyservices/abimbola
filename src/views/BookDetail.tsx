@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { books } from "@/data/books";
 import type { PublishedBook } from "@/lib/books";
 import { formatPublicationDate } from "@/lib/dates";
+import { getDisplayRating } from "@/lib/engagement/types";
 
 const PRICE_TYPE_LABELS: Record<string, string> = {
 	HARD_COPY: "Hard Copy",
@@ -22,9 +23,16 @@ interface BookDetailProps {
 	book?: PublishedBook;
 	bookId?: string;
 	dbRelatedBooks?: PublishedBook[];
+	/** Server-rendered reviews section, slotted in above related books. */
+	reviewsSection?: React.ReactNode;
 }
 
-const BookDetail = ({ book, bookId, dbRelatedBooks = [] }: BookDetailProps) => {
+const BookDetail = ({
+	book,
+	bookId,
+	dbRelatedBooks = [],
+	reviewsSection,
+}: BookDetailProps) => {
 	const router = useRouter();
 
 	const handleBack = () => {
@@ -100,21 +108,38 @@ const BookDetail = ({ book, bookId, dbRelatedBooks = [] }: BookDetailProps) => {
 								<p className="text-xl text-neutral-500">by {book.author}</p>
 							</div>
 
-							<div className="flex items-center gap-2">
-								{[...Array(5)].map((_, i) => (
-									<Star
-										key={`star-rating-${i}`}
-										className={`h-5 w-5 ${
-											i < Math.floor(book.rating || 5)
-												? "fill-amber-400 text-amber-400"
-												: "text-neutral-200"
-										}`}
-									/>
-								))}
-								<span className="text-neutral-500 text-sm">
-									({book.rating || 5.0} out of 5)
-								</span>
-							</div>
+							{(() => {
+								const display = getDisplayRating(book);
+								return (
+									<a
+										href="#reviews"
+										className="group inline-flex flex-wrap items-center gap-2"
+									>
+										<span
+											className="flex items-center gap-0.5"
+											role="img"
+											aria-label={`${display.value} out of 5 stars`}
+										>
+											{[...Array(5)].map((_, i) => (
+												<Star
+													key={`star-rating-${i}`}
+													className={`h-5 w-5 ${
+														i < Math.round(display.value)
+															? "fill-amber-400 text-amber-400"
+															: "text-neutral-200"
+													}`}
+												/>
+											))}
+										</span>
+										<span className="text-neutral-500 text-sm group-hover:text-neutral-800 transition-colors">
+											{display.value.toFixed(1)} out of 5
+											{display.count > 0
+												? ` · ${display.count} review${display.count === 1 ? "" : "s"}`
+												: " · Be the first to review"}
+										</span>
+									</a>
+								);
+							})()}
 
 							{hasPricing ? (
 								<div className="space-y-3">
@@ -149,6 +174,13 @@ const BookDetail = ({ book, bookId, dbRelatedBooks = [] }: BookDetailProps) => {
 															href={targetUrl}
 															target="_blank"
 															rel="noopener noreferrer"
+															data-track={
+																price.type === "FREE"
+																	? "book-download"
+																	: "buy-click"
+															}
+															data-track-book={book.title}
+															data-track-format={PRICE_TYPE_LABELS[price.type]}
 														>
 															{price.type === "FREE" ? (
 																<>
@@ -199,6 +231,8 @@ const BookDetail = ({ book, bookId, dbRelatedBooks = [] }: BookDetailProps) => {
 													href={preOrderUrl}
 													target="_blank"
 													rel="noopener noreferrer"
+													data-track="pre-order-click"
+													data-track-book={book.title}
 												>
 													<ShoppingCart className="mr-2 h-5 w-5 text-slate-950" />
 													Pre-Order Now
@@ -240,6 +274,8 @@ const BookDetail = ({ book, bookId, dbRelatedBooks = [] }: BookDetailProps) => {
 						</div>
 					</div>
 				</section>
+
+				{reviewsSection}
 
 				<section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-24">
 					<h2 className="text-3xl font-display font-bold mb-8 text-black">

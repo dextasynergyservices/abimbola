@@ -9,6 +9,7 @@ export async function GET() {
 	}
 
 	try {
+		const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 		const [
 			totalBooks,
 			publishedPosts,
@@ -16,6 +17,10 @@ export async function GET() {
 			totalSubscribers,
 			recentBooks,
 			recentPosts,
+			newReviews,
+			newComments,
+			flaggedReviews,
+			flaggedComments,
 		] = await Promise.all([
 			prisma.book.count({ where: { deletedAt: null } }),
 			prisma.post.count({ where: { status: "PUBLISHED", deletedAt: null } }),
@@ -39,6 +44,22 @@ export async function GET() {
 					updatedAt: true,
 				},
 			}),
+			prisma.bookReview.count({
+				where: { deletedAt: null, createdAt: { gte: weekAgo } },
+			}),
+			prisma.postComment.count({
+				where: {
+					deletedAt: null,
+					isAuthor: false,
+					createdAt: { gte: weekAgo },
+				},
+			}),
+			prisma.bookReview.count({
+				where: { deletedAt: null, status: "HIDDEN", flagged: true },
+			}),
+			prisma.postComment.count({
+				where: { deletedAt: null, status: "HIDDEN", flagged: true },
+			}),
 		]);
 
 		return NextResponse.json({
@@ -47,6 +68,8 @@ export async function GET() {
 				publishedPosts,
 				draftPosts,
 				totalSubscribers,
+				newEngagementThisWeek: newReviews + newComments,
+				flaggedEngagement: flaggedReviews + flaggedComments,
 			},
 			recentBooks,
 			recentPosts,

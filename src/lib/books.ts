@@ -23,6 +23,8 @@ export interface PublishedBook {
 	author: string;
 	description: string | null;
 	rating: number | null;
+	reviewCount?: number;
+	averageRating?: number | null;
 	publisher: string | null;
 	publicationDate: string | null;
 	comingSoonDate?: string | null;
@@ -42,6 +44,8 @@ const bookSelect = {
 	author: true,
 	description: true,
 	rating: true,
+	reviewCount: true,
+	averageRating: true,
 	publisher: true,
 	publicationDate: true,
 	comingSoonDate: true,

@@ -1,7 +1,7 @@
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
+import { revalidatePublicSite } from "@/lib/cache";
 import { prisma } from "@/lib/prisma";
 
 const priceSchema = z.object({
@@ -152,13 +152,7 @@ export async function POST(request: Request) {
 			include: { category: true, prices: true },
 		});
 
-		try {
-			revalidatePath("/");
-			revalidatePath("/books");
-			revalidatePath(`/books/${book.id}`);
-		} catch (e) {
-			console.error("Revalidation error:", e);
-		}
+		revalidatePublicSite();
 
 		return NextResponse.json({ book }, { status: 201 });
 	} catch (error) {

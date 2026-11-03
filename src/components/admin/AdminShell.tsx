@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
+import { autoExcludeAdminBrowser } from "@/lib/analytics/track";
 import { AdminHeader } from "./AdminHeader";
 import { AdminSidebarDesktop } from "./AdminSidebar";
 
@@ -16,6 +17,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 			router.replace("/admin/login");
 		}
 	}, [status, router]);
+
+	// Don't count the author's own visits to the public site from this browser.
+	useEffect(() => {
+		if (status === "authenticated") autoExcludeAdminBrowser();
+	}, [status]);
 
 	if (status === "loading") {
 		return (

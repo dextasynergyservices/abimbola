@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
+import { revalidatePublicSite } from "@/lib/cache";
 import { prisma } from "@/lib/prisma";
 
 const updateMediaSchema = z.object({
@@ -105,6 +106,7 @@ export async function PATCH(
 			},
 		});
 
+		revalidatePublicSite();
 		return NextResponse.json({ media });
 	} catch (error) {
 		if (error instanceof z.ZodError) {
@@ -158,6 +160,7 @@ export async function DELETE(
 			},
 		});
 
+		revalidatePublicSite();
 		return NextResponse.json({ message: "Media deleted successfully" });
 	} catch (error) {
 		console.error("Failed to delete media item:", error);

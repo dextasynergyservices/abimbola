@@ -22,6 +22,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { trackEvent } from "@/lib/analytics/track";
 import type { PublishedBook } from "@/lib/books";
 import type { PublishedPost } from "@/lib/cms";
 import { formatPublicationDate } from "@/lib/dates";
@@ -159,6 +160,7 @@ const Index = ({ featuredBooks = [], latestPosts = [] }: IndexProps) => {
 			const data = await res.json();
 			if (!res.ok) throw new Error(data.error || "Failed to subscribe");
 			setFormSubmitted(true);
+			trackEvent("newsletter-signup");
 		} catch (err: unknown) {
 			toast.error(
 				(err as Error).message || "Failed to subscribe. Please try again.",

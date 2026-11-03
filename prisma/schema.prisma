@@ -19,6 +19,11 @@ enum BookPriceType {
   COMING_SOON
 }
 
+enum ModerationStatus {
+  VISIBLE
+  HIDDEN
+}
+
 enum MessageStatus {
   UNREAD
   READ
@@ -33,9 +38,10 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  posts     Post[]     @relation("PostAuthor")
-  media     Media[]    @relation("MediaUploader")
-  auditLogs AuditLog[] @relation("UserAuditLogs")
+  posts        Post[]        @relation("PostAuthor")
+  media        Media[]       @relation("MediaUploader")
+  auditLogs    AuditLog[]    @relation("UserAuditLogs")
+  postComments PostComment[] @relation("CommentAdminAuthor")
 }
 
 model Page {
@@ -91,6 +97,7 @@ model Post {
 
   author   User          @relation("PostAuthor", fields: [authorId], references: [id])
   category BlogCategory? @relation(fields: [categoryId], references: [id])
+  comments PostComment[]
 }
 
 model BlogCategory {
@@ -121,7 +128,9 @@ model Book {
   slug            String        @unique
   author          String        @default("Abimbola Lawuyi")
   description     String?
-  rating          Float?        @default(5.0)
+  rating          Float?        @default(5.0) // Manual fallback, used until the book has visible reviews
+  reviewCount     Int           @default(0) // Denormalised: visible, non-deleted reviews
+  averageRating   Float? // Denormalised: average of visible, non-deleted reviews
   publisher       String?
   publicationDate String?
   comingSoonDate  String?
@@ -138,6 +147,67 @@ model Book {
 
   category BookCategory? @relation(fields: [categoryId], references: [id])
   prices   BookPrice[]
+  reviews  BookReview[]
+}
+
+model BookReview {
+  id            String           @id @default(cuid())
+  bookId        String
+  name          String
+  email         String? // Optional, never shown publicly
+  rating        Int // 1-5
+  title         String?
+  body          String
+  status        ModerationStatus @default(VISIBLE)
+  flagged       Boolean          @default(false) // Auto-held by the spam filter
+  flagReason    String?
+  authorReply   String? // Public reply from the author, written in the admin
+  authorReplyAt DateTime?
+  ipHash        String?
+  userAgent     String?
+  editTokenHash String? // SHA-256 of the private edit key held by the author's browser
+  editedAt      DateTime?
+  deletedAt     DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId, status, deletedAt, createdAt])
+  @@index([email, bookId])
+  @@index([ipHash, createdAt])
+  @@index([status, deletedAt, createdAt])
+}
+
+model PostComment {
+  id            String           @id @default(cuid())
+  postId        String
+  parentId      String? // One level of threading: replies point at a top-level comment
+  name          String
+  email         String? // Optional, never shown publicly
+  body          String
+  isAuthor      Boolean          @default(false) // Posted by the site author from the admin
+  adminUserId   String?
+  status        ModerationStatus @default(VISIBLE)
+  flagged       Boolean          @default(false)
+  flagReason    String?
+  ipHash        String?
+  userAgent     String?
+  editTokenHash String? // SHA-256 of the private edit key held by the author's browser
+  editedAt      DateTime?
+  deletedAt     DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent    PostComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   PostComment[] @relation("CommentReplies")
+  adminUser User?         @relation("CommentAdminAuthor", fields: [adminUserId], references: [id], onDelete: SetNull)
+
+  @@index([postId, status, deletedAt, createdAt])
+  @@index([parentId])
+  @@index([ipHash, createdAt])
+  @@index([status, deletedAt, createdAt])
 }
 
 model BookPrice {
@@ -216,4 +286,26 @@ model AuditLog {
   createdAt  DateTime @default(now())
 
   user User @relation("UserAuditLogs", fields: [userId], references: [id])
+}
+
+/// First-party, cookieless analytics. One row per pageview / custom event /
+/// engagement ping. Written in batches (one insert per visit) by /api/collect.
+model AnalyticsEvent {
+  id        BigInt   @id @default(autoincrement())
+  createdAt DateTime
+  visitorId String // Monthly-rotating salted hash of IP + user agent (no raw IP stored)
+  sessionId String // Random per-visit ID generated in the browser
+  type      String // "pageview" | "event" | "engagement"
+  name      String? // Custom event name (type = event)
+  path      String
+  referrer  String? // Referring domain or utm_source (first pageview of a visit)
+  country   String? // ISO code from Vercel's geo header
+  device    String? // desktop | mobile | tablet
+  browser   String?
+  os        String?
+  duration  Int? // Seconds of active time on the page
+  props     Json?
+
+  @@index([createdAt])
+  @@index([type, createdAt])
 }

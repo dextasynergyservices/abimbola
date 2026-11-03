@@ -7,6 +7,7 @@ import {
 	Clock,
 	FileEdit,
 	FileText,
+	MessageSquare,
 	Plus,
 	RefreshCw,
 	Users,
@@ -29,6 +30,8 @@ interface DashboardStats {
 		publishedPosts: number;
 		draftPosts: number;
 		totalSubscribers: number;
+		newEngagementThisWeek: number;
+		flaggedEngagement: number;
 	};
 	recentBooks: Array<{
 		id: string;
@@ -89,6 +92,20 @@ export default function AdminDashboardHome() {
 			color: "text-purple-700 bg-purple-50 ring-purple-200",
 			href: "/admin/newsletter",
 		},
+		{
+			title: "Reviews & Comments",
+			value: data?.stats.newEngagementThisWeek ?? 0,
+			description: data?.stats.flaggedEngagement
+				? `New this week · ${data.stats.flaggedEngagement} flagged`
+				: "New this week",
+			icon: MessageSquare,
+			color: data?.stats.flaggedEngagement
+				? "text-amber-700 bg-amber-50 ring-amber-300"
+				: "text-rose-700 bg-rose-50 ring-rose-200",
+			href: data?.stats.flaggedEngagement
+				? "/admin/engagement?status=flagged"
+				: "/admin/engagement",
+		},
 	];
 
 	return (
@@ -130,7 +147,7 @@ export default function AdminDashboardHome() {
 			</div>
 
 			{/* Summary Stat Cards */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-4 sm:gap-6">
 				{statCards.map((card) => {
 					const Icon = card.icon;
 					return (

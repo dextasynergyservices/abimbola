@@ -7,8 +7,10 @@ import {
 	getPublishedPostBySlug,
 	getPublishedPosts,
 } from "@/lib/cms";
+import { getPublicComments } from "@/lib/engagement/comments";
 
-export const revalidate = 60; // 1 minute revalidation
+// Cached for 24h; admin changes purge it instantly (see lib/cache.ts).
+export const revalidate = 86400;
 
 interface BlogPostPageProps {
 	params: Promise<{ slug: string }>;
@@ -97,10 +99,16 @@ export default async function BlogPostBySlugPage({
 		);
 	}
 
+	const commentPage = await getPublicComments(post.id);
+
 	return (
 		<div className="min-h-screen flex flex-col bg-white">
 			<Navigation />
-			<BlogPostClient post={post} authorProfile={authorProfile} />
+			<BlogPostClient
+				post={post}
+				authorProfile={authorProfile}
+				commentPage={commentPage}
+			/>
 			<Footer />
 		</div>
 	);

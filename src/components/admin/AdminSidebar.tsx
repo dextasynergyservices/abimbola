@@ -1,11 +1,13 @@
 "use client";
 
 import {
+	BarChart3,
 	BookOpen,
 	ChevronRight,
 	FileText,
 	LayoutDashboard,
 	Menu,
+	MessageSquare,
 	Settings,
 	Users,
 } from "lucide-react";
@@ -31,6 +33,11 @@ const navigationItems = [
 		icon: LayoutDashboard,
 	},
 	{
+		title: "Analytics",
+		href: "/admin/analytics",
+		icon: BarChart3,
+	},
+	{
 		title: "Books",
 		href: "/admin/books",
 		icon: BookOpen,
@@ -39,6 +46,11 @@ const navigationItems = [
 		title: "Blog",
 		href: "/admin/posts",
 		icon: FileText,
+	},
+	{
+		title: "Reviews & Comments",
+		href: "/admin/engagement",
+		icon: MessageSquare,
 	},
 	{
 		title: "Newsletter",

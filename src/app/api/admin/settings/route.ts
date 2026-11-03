@@ -1,7 +1,7 @@
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
+import { revalidatePublicSite } from "@/lib/cache";
 import { prisma } from "@/lib/prisma";
 
 const settingsSchema = z.object({
@@ -75,13 +75,7 @@ export async function PUT(request: Request) {
 			create: { id: "singleton", ...data },
 		});
 
-		try {
-			revalidatePath("/");
-			revalidatePath("/about");
-			revalidatePath("/contact");
-		} catch (_e) {
-			// Ignore cache revalidation errors
-		}
+		revalidatePublicSite();
 
 		return NextResponse.json({ settings });
 	} catch (error) {

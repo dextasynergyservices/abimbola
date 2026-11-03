@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
+import { AnalyticsScript } from "@/components/analytics/AnalyticsScript";
 import { Providers } from "./providers";
 
 const dmSans = DM_Sans({
@@ -29,6 +30,7 @@ export default function RootLayout({
 		<html lang="en">
 			<body className={`${dmSans.variable} ${cormorantGaramond.variable}`}>
 				<Providers>{children}</Providers>
+				<AnalyticsScript />
 			</body>
 		</html>
 	);

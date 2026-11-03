@@ -3,7 +3,8 @@ import { getFeaturedBooks } from "@/lib/books";
 import { getPublishedPosts } from "@/lib/cms";
 import Index from "@/views/Index";
 
-export const revalidate = 60;
+// Cached for 24h; admin changes purge it instantly (see lib/cache.ts).
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
 	title: "Abimbola Lawuyi | Author, Coach & Educational Leader",

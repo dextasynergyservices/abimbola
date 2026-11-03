@@ -2,11 +2,13 @@
 
 import { ArrowLeft, Calendar, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import PostComments from "@/components/engagement/PostComments";
 import {
 	type AuthorProfile,
 	DEFAULT_AUTHOR_PROFILE,
 	resolveAuthorProfile,
 } from "@/lib/author";
+import type { CommentPage } from "@/lib/engagement/types";
 
 interface BlogPostClientProps {
 	post: {
@@ -22,11 +24,14 @@ interface BlogPostClientProps {
 		featuredImage?: { secureUrl: string; altText?: string | null } | null;
 	};
 	authorProfile?: AuthorProfile;
+	/** Present only for real (database) posts; fallback posts have no comments. */
+	commentPage?: CommentPage;
 }
 
 export default function BlogPostClient({
 	post,
 	authorProfile = DEFAULT_AUTHOR_PROFILE,
+	commentPage,
 }: BlogPostClientProps) {
 	const _router = useRouter();
 
@@ -178,6 +183,10 @@ export default function BlogPostClient({
 					</div>
 				)}
 			</article>
+
+			{commentPage && (
+				<PostComments postId={post.id} initialPage={commentPage} />
+			)}
 		</main>
 	);
 }
