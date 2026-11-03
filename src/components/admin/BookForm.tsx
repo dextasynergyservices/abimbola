@@ -403,7 +403,7 @@ export function BookForm({ bookId }: BookFormProps) {
 										htmlFor="book-rating"
 										className="text-slate-700 font-medium"
 									>
-										Rating (0-5)
+										Fallback rating (0-5)
 									</Label>
 									<Input
 										id="book-rating"
@@ -415,6 +415,10 @@ export function BookForm({ bookId }: BookFormProps) {
 										onChange={(e) => setRating(e.target.value)}
 										className="mt-1.5 bg-slate-50 border-slate-200 text-slate-900 min-h-[44px]"
 									/>
+									<p className="text-xs text-slate-500 mt-1">
+										Shown only until the book has reader reviews; after that the
+										real average is used.
+									</p>
 								</div>
 							</div>
 

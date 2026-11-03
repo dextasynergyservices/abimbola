@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
+import { revalidatePublicSite } from "@/lib/cache";
 import { prisma } from "@/lib/prisma";
 
 const createCategorySchema = z.object({
@@ -62,6 +63,7 @@ export async function POST(request: Request) {
 			data: { name: validated.name, slug, sortOrder: count },
 		});
 
+		revalidatePublicSite();
 		return NextResponse.json({ category }, { status: 201 });
 	} catch (error) {
 		if (error instanceof z.ZodError) {

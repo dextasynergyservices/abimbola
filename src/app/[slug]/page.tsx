@@ -5,7 +5,8 @@ import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
 import { getPublishedPageBySlug } from "@/lib/cms";
 
-export const revalidate = 60;
+// Cached for 24h; admin changes purge it instantly (see lib/cache.ts).
+export const revalidate = 86400;
 
 interface DynamicPageProps {
 	params: Promise<{ slug: string }>;

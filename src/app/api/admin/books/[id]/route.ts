@@ -1,7 +1,7 @@
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
+import { revalidatePublicSite } from "@/lib/cache";
 import { prisma } from "@/lib/prisma";
 
 const priceSchema = z.object({
@@ -136,13 +136,7 @@ async function handleUpdate(request: Request, id: string) {
 			include: { category: true, prices: true },
 		});
 
-		try {
-			revalidatePath("/");
-			revalidatePath("/books");
-			revalidatePath(`/books/${book.id}`);
-		} catch (e) {
-			console.error("Revalidation error:", e);
-		}
+		revalidatePublicSite();
 
 		return NextResponse.json({ book });
 	} catch (error) {
@@ -197,13 +191,7 @@ export async function DELETE(
 			data: { deletedAt: new Date() },
 		});
 
-		try {
-			revalidatePath("/");
-			revalidatePath("/books");
-			revalidatePath(`/books/${id}`);
-		} catch (e) {
-			console.error("Revalidation error:", e);
-		}
+		revalidatePublicSite();
 
 		return NextResponse.json({ message: "Book deleted successfully", book });
 	} catch (error) {

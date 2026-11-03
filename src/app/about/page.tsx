@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { getPublishedPageBySlug } from "@/lib/cms";
 import About from "@/views/About";
 
-export const revalidate = 60;
+// Cached for 24h; admin changes purge it instantly (see lib/cache.ts).
+export const revalidate = 86400;
 
 export async function generateMetadata(): Promise<Metadata> {
 	const page = await getPublishedPageBySlug("about");

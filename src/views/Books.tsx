@@ -13,6 +13,7 @@ import { books as staticBooks } from "@/data/books";
 import type { PublishedBook, PublishedBookCategory } from "@/lib/books";
 import type { PublishedPage } from "@/lib/cms";
 import { formatPublicationDate } from "@/lib/dates";
+import { getDisplayRating } from "@/lib/engagement/types";
 
 interface BooksProps {
 	publishedPage?: PublishedPage | null;
@@ -242,21 +243,32 @@ export default function Books({
 												<p className="text-xs text-slate-500 font-medium">
 													by {book.author}
 												</p>
-												<div className="flex items-center space-x-1 text-amber-400">
-													{[...Array(5)].map((_, i) => (
-														<Star
-															key={`bstar-${book.id}-${i}`}
-															className={`h-3.5 w-3.5 ${
-																i < Math.floor(book.rating || 5)
-																	? "fill-amber-400 text-amber-400"
-																	: "text-slate-300"
-															}`}
-														/>
-													))}
-													<span className="text-xs font-semibold text-slate-700 ml-1">
-														({book.rating || 5.0})
-													</span>
-												</div>
+												{(() => {
+													const display = getDisplayRating(book);
+													return (
+														<div className="flex items-center space-x-1 text-amber-400">
+															{[...Array(5)].map((_, i) => (
+																<Star
+																	key={`bstar-${book.id}-${i}`}
+																	className={`h-3.5 w-3.5 ${
+																		i < Math.round(display.value)
+																			? "fill-amber-400 text-amber-400"
+																			: "text-slate-300"
+																	}`}
+																/>
+															))}
+															<span className="text-xs font-semibold text-slate-700 ml-1">
+																{display.value.toFixed(1)}
+																{display.count > 0 && (
+																	<span className="font-normal text-slate-500">
+																		{" "}
+																		({display.count})
+																	</span>
+																)}
+															</span>
+														</div>
+													);
+												})()}
 												<BookPriceDisplay book={book} />
 											</CardContent>
 

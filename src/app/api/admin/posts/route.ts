@@ -1,7 +1,7 @@
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
+import { revalidatePublicSite } from "@/lib/cache";
 import { prisma } from "@/lib/prisma";
 
 const createPostSchema = z.object({
@@ -139,13 +139,7 @@ export async function POST(request: Request) {
 			},
 		});
 
-		try {
-			revalidatePath("/");
-			revalidatePath("/blog");
-			revalidatePath(`/blog/${post.slug}`);
-		} catch (e) {
-			console.error("Revalidation error:", e);
-		}
+		revalidatePublicSite();
 
 		return NextResponse.json({ post }, { status: 201 });
 	} catch (error) {

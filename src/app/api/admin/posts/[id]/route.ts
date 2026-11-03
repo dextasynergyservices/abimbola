@@ -1,7 +1,7 @@
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
+import { revalidatePublicSite } from "@/lib/cache";
 import { prisma } from "@/lib/prisma";
 
 const updatePostSchema = z.object({
@@ -131,13 +131,7 @@ async function handleUpdate(request: Request, id: string) {
 			action = "UNPUBLISH_POST";
 		}
 
-		try {
-			revalidatePath("/");
-			revalidatePath("/blog");
-			revalidatePath(`/blog/${post.slug}`);
-		} catch (_e) {
-			// Ignore cache revalidation errors if outside request lifecycle
-		}
+		revalidatePublicSite();
 
 		await prisma.auditLog.create({
 			data: {
@@ -202,13 +196,7 @@ export async function DELETE(
 			data: { deletedAt: new Date() },
 		});
 
-		try {
-			revalidatePath("/");
-			revalidatePath("/blog");
-			revalidatePath(`/blog/${existing.slug}`);
-		} catch (_e) {
-			// Ignore cache revalidation errors
-		}
+		revalidatePublicSite();
 
 		const userId = session.user.id as string;
 		await prisma.auditLog.create({

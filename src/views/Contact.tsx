@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-
+import { trackEvent } from "@/lib/analytics/track";
 import type { PublishedPage } from "@/lib/cms";
 
 interface ContactProps {
@@ -61,6 +61,7 @@ const Contact = ({ publishedPage: _publishedPage }: ContactProps) => {
 			if (!res.ok) throw new Error(data.error || "Failed to send message");
 
 			toast.success("Message sent! We'll get back to you soon.");
+			trackEvent("contact-message");
 			setName("");
 			setEmail("");
 			setSubject("");

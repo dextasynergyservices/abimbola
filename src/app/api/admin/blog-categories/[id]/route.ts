@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
+import { revalidatePublicSite } from "@/lib/cache";
 import { prisma } from "@/lib/prisma";
 
 const updateCategorySchema = z.object({
@@ -45,6 +46,7 @@ export async function PATCH(
 			data: { name: validated.name, slug },
 		});
 
+		revalidatePublicSite();
 		return NextResponse.json({ category });
 	} catch (error) {
 		if (error instanceof z.ZodError) {
@@ -80,6 +82,7 @@ export async function DELETE(
 
 		await prisma.blogCategory.delete({ where: { id } });
 
+		revalidatePublicSite();
 		return NextResponse.json({ message: "Blog category deleted" });
 	} catch (error) {
 		console.error("Failed to delete blog category:", error);

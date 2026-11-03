@@ -1,1 +1,6 @@
 @import "../index.css";
+
+/* reCAPTCHA v3: badge hidden; the required attribution text is shown inline on each form (see RecaptchaNotice). */
+.grecaptcha-badge {
+	visibility: hidden;
+}
