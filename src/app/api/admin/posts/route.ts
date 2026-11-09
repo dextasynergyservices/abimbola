@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { revalidatePublicSite } from "@/lib/cache";
+import {
+	findPostSlugConflict,
+	releaseSlugFromOtherPostsHistory,
+	revalidatePostUrls,
+} from "@/lib/post-slugs";
 import { prisma } from "@/lib/prisma";
+import { validateSlug } from "@/lib/slug";
 
 const createPostSchema = z.object({
 	title: z.string().min(1, "Title is required"),
@@ -84,18 +90,15 @@ export async function POST(request: Request) {
 		const validated = createPostSchema.parse(body);
 
 		const formattedSlug = validated.slug.trim().toLowerCase();
-
-		// Check for duplicate slug
-		const existing = await prisma.post.findFirst({
-			where: { slug: formattedSlug, deletedAt: null },
-		});
-
-		if (existing) {
-			return NextResponse.json(
-				{ error: "A post with this slug already exists" },
-				{ status: 400 },
-			);
+		const slugError = validateSlug(formattedSlug);
+		if (slugError) {
+			return NextResponse.json({ error: slugError }, { status: 400 });
 		}
+		const conflict = await findPostSlugConflict(formattedSlug);
+		if (conflict) {
+			return NextResponse.json({ error: conflict }, { status: 400 });
+		}
+		await releaseSlugFromOtherPostsHistory(formattedSlug);
 
 		const userId = session.user.id as string;
 
@@ -140,6 +143,7 @@ export async function POST(request: Request) {
 		});
 
 		revalidatePublicSite();
+		revalidatePostUrls(post.id, [post.slug]);
 
 		return NextResponse.json({ post }, { status: 201 });
 	} catch (error) {

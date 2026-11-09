@@ -203,16 +203,62 @@ export const getBlogCategories = cache(async () => {
 	}
 });
 
+export type PublishedBookRoute =
+	| { kind: "found"; book: PublishedBook }
+	| { kind: "redirect"; slug: string }
+	| { kind: "not-found" };
+
 /**
- * Fetch single published book by ID or slug.
+ * Resolve a /books/[param] URL segment.
+ *
+ * Only the book's CURRENT slug renders the page. Anything else that still
+ * identifies the book — a previous slug (after an admin rename) or the raw
+ * database id — returns a redirect to the current slug, so every book has
+ * exactly one live URL and old links keep working.
+ *
+ * Wrapped with React cache() so generateMetadata and the page share one query.
+ */
+export const resolvePublishedBookRoute = cache(
+	async (param: string): Promise<PublishedBookRoute> => {
+		// Next.js already URL-decodes dynamic params.
+		const key = param.trim();
+		const slugKey = key.toLowerCase();
+
+		const current = await getPublishedBookBySlug(slugKey);
+		if (current) {
+			// Case-only mismatch (e.g. /books/Dear-Single) -> canonical lowercase.
+			if (key !== current.slug) return { kind: "redirect", slug: current.slug };
+			return { kind: "found", book: current };
+		}
+
+		try {
+			const legacy = await prisma.book.findFirst({
+				where: {
+					OR: [{ id: key }, { previousSlugs: { has: slugKey } }],
+					status: "PUBLISHED",
+					deletedAt: null,
+				},
+				select: { slug: true },
+			});
+			if (legacy) return { kind: "redirect", slug: legacy.slug };
+		} catch (error) {
+			console.error(`Error resolving book route "${key}":`, error);
+		}
+
+		return { kind: "not-found" };
+	},
+);
+
+/**
+ * Fetch a single published book by its CURRENT slug only.
  * Wrapped with React cache() to deduplicate requests during SSR.
  */
-export const getPublishedBookById = cache(
-	async (idOrSlug: string): Promise<PublishedBook | null> => {
+export const getPublishedBookBySlug = cache(
+	async (slug: string): Promise<PublishedBook | null> => {
 		try {
 			const book = await prisma.book.findFirst({
 				where: {
-					OR: [{ id: idOrSlug }, { slug: idOrSlug.toLowerCase() }],
+					slug,
 					status: "PUBLISHED",
 					deletedAt: null,
 				},
@@ -234,7 +280,7 @@ export const getPublishedBookById = cache(
 
 			return { ...book, coverImage };
 		} catch (error) {
-			console.error(`Error fetching published book "${idOrSlug}":`, error);
+			console.error(`Error fetching published book "${slug}":`, error);
 			return null;
 		}
 	},

@@ -518,8 +518,8 @@ export default function AdminBooksPage() {
 								Delete &ldquo;{deleteTarget.title}&rdquo;?
 							</AlertDialogTitle>
 							<AlertDialogDescription className="text-slate-500 text-sm">
-								This action performs a soft delete. The book record can be
-								recovered if needed.
+								This permanently deletes the book, its prices and all of its
+								reader reviews. This cannot be undone.
 							</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter className="mt-4">
@@ -531,7 +531,7 @@ export default function AdminBooksPage() {
 								disabled={actionLoading}
 								className="bg-rose-600 hover:bg-rose-700 text-white font-medium"
 							>
-								{actionLoading ? "Deleting..." : "Delete Book"}
+								{actionLoading ? "Deleting..." : "Delete Permanently"}
 							</AlertDialogAction>
 						</AlertDialogFooter>
 					</AlertDialogContent>

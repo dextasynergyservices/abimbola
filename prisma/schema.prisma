@@ -79,6 +79,7 @@ model Post {
   id              String        @id @default(cuid())
   title           String
   slug            String        @unique
+  previousSlugs   String[]      @default([]) // Old slugs; public requests for these 301 to the current slug
   excerpt         String?
   body            String
   featuredImageId String?
@@ -126,6 +127,7 @@ model Book {
   id              String        @id @default(cuid())
   title           String
   slug            String        @unique
+  previousSlugs   String[]      @default([]) // Old slugs; public requests for these 301 to the current slug
   author          String        @default("Abimbola Lawuyi")
   description     String?
   rating          Float?        @default(5.0) // Manual fallback, used until the book has visible reviews

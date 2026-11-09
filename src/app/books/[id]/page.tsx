@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import BookReviews from "@/components/engagement/BookReviews";
 import { books } from "@/data/books";
 import {
-	getPublishedBookById,
 	getPublishedBooks,
 	getRelatedBooksForBook,
+	type PublishedBook,
+	resolvePublishedBookRoute,
 } from "@/lib/books";
 import { getPublicReviews, getReviewSummary } from "@/lib/engagement/reviews";
 import type { PublicReview, ReviewSummary } from "@/lib/engagement/types";
@@ -21,7 +22,8 @@ interface BookDetailPageProps {
 export async function generateStaticParams() {
 	try {
 		const dbBooks = await getPublishedBooks();
-		const dbParams = dbBooks.map((b) => ({ id: b.id }));
+		// Pre-render only the canonical (slug) URL of each book.
+		const dbParams = dbBooks.map((b) => ({ id: b.slug }));
 		const staticParams = books.map((b) => ({ id: String(b.id) }));
 		return [...dbParams, ...staticParams];
 	} catch {
@@ -33,20 +35,24 @@ export async function generateMetadata({
 	params,
 }: BookDetailPageProps): Promise<Metadata> {
 	const { id } = await params;
-	const dbBook = await getPublishedBookById(id);
+	const route = await resolvePublishedBookRoute(id);
+	const dbBook = route.kind === "found" ? route.book : null;
 
 	if (dbBook) {
 		const seoTitle = `${dbBook.title} - Abimbola Lawuyi`;
 		const seoDescription =
 			dbBook.description || `Discover "${dbBook.title}" by Abimbola Lawuyi.`;
 		const imageUrl = dbBook.coverImage?.secureUrl;
+		const canonicalUrl = bookUrl(dbBook.slug);
 
 		return {
 			title: seoTitle,
 			description: seoDescription,
+			alternates: { canonical: canonicalUrl },
 			openGraph: {
 				title: seoTitle,
 				description: seoDescription,
+				url: canonicalUrl,
 				images: imageUrl
 					? [
 							{
@@ -75,7 +81,14 @@ export async function generateMetadata({
 export default async function BookDetailPage({ params }: BookDetailPageProps) {
 	const { id } = await params;
 
-	const dbBook = await getPublishedBookById(id);
+	const route = await resolvePublishedBookRoute(id);
+
+	// Old slug, raw id, or wrong casing -> 301 to the one canonical URL.
+	if (route.kind === "redirect") {
+		permanentRedirect(`/books/${encodeURIComponent(route.slug)}`);
+	}
+
+	const dbBook = route.kind === "found" ? route.book : null;
 
 	if (dbBook) {
 		const [relatedBooks, reviewPage, summary] = await Promise.all([
@@ -116,23 +129,28 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
 	return <BookDetail bookId={id} />;
 }
 
+/** Absolute canonical URL for a book (relative if NEXT_PUBLIC_APP_URL is unset). */
+function bookUrl(slug: string): string {
+	const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/+$/, "");
+	return `${appUrl}/books/${slug}`;
+}
+
 /**
  * schema.org Book + AggregateRating + Review structured data so search
  * engines can show star ratings. `<` is escaped so user text can never
  * close the script tag.
  */
 function buildBookJsonLd(
-	book: NonNullable<Awaited<ReturnType<typeof getPublishedBookById>>>,
+	book: PublishedBook,
 	summary: ReviewSummary,
 	reviews: PublicReview[],
 ): string {
-	const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
 	const data: Record<string, unknown> = {
 		"@context": "https://schema.org",
 		"@type": "Book",
 		name: book.title,
 		author: { "@type": "Person", name: book.author },
-		url: `${appUrl}/books/${book.slug}`,
+		url: bookUrl(book.slug),
 		...(book.description ? { description: book.description } : {}),
 		...(book.coverImage?.secureUrl ? { image: book.coverImage.secureUrl } : {}),
 		...(book.publisher

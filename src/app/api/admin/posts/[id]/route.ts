@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { revalidatePublicSite } from "@/lib/cache";
+import {
+	findPostSlugConflict,
+	releaseSlugFromOtherPostsHistory,
+	revalidatePostUrls,
+} from "@/lib/post-slugs";
 import { prisma } from "@/lib/prisma";
+import { nextPreviousSlugs, validateSlug } from "@/lib/slug";
 
 const updatePostSchema = z.object({
 	title: z.string().min(1, "Title is required"),
@@ -74,21 +80,23 @@ async function handleUpdate(request: Request, id: string) {
 		}
 
 		const formattedSlug = validated.slug.trim().toLowerCase();
+		const slugError = validateSlug(formattedSlug);
+		if (slugError) {
+			return NextResponse.json({ error: slugError }, { status: 400 });
+		}
+		const conflict = await findPostSlugConflict(formattedSlug, id);
+		if (conflict) {
+			return NextResponse.json({ error: conflict }, { status: 400 });
+		}
 
-		// Check for duplicate slug
-		const duplicate = await prisma.post.findFirst({
-			where: {
-				slug: formattedSlug,
-				id: { not: id },
-				deletedAt: null,
-			},
-		});
-
-		if (duplicate) {
-			return NextResponse.json(
-				{ error: "Another post with this slug already exists" },
-				{ status: 400 },
-			);
+		const slugChanged = existing.slug !== formattedSlug;
+		const previousSlugs = nextPreviousSlugs(
+			existing.previousSlugs,
+			existing.slug,
+			formattedSlug,
+		);
+		if (slugChanged) {
+			await releaseSlugFromOtherPostsHistory(formattedSlug, id);
 		}
 
 		const post = await prisma.post.update({
@@ -96,6 +104,7 @@ async function handleUpdate(request: Request, id: string) {
 			data: {
 				title: validated.title,
 				slug: formattedSlug,
+				previousSlugs,
 				excerpt: validated.excerpt ?? null,
 				body: validated.body,
 				featuredImageId: validated.featuredImageId ?? null,
@@ -132,6 +141,7 @@ async function handleUpdate(request: Request, id: string) {
 		}
 
 		revalidatePublicSite();
+		revalidatePostUrls(post.id, [post.slug, ...post.previousSlugs]);
 
 		await prisma.auditLog.create({
 			data: {
@@ -139,7 +149,15 @@ async function handleUpdate(request: Request, id: string) {
 				action,
 				entityType: "Post",
 				entityId: post.id,
-				metadata: { title: post.title, status: post.status },
+				metadata: {
+					title: post.title,
+					slug: post.slug,
+					status: post.status,
+					...(slugChanged ? { previousSlug: existing.slug } : {}),
+					...(existing.title !== post.title
+						? { previousTitle: existing.title }
+						: {}),
+				},
 			},
 		});
 
@@ -187,29 +205,37 @@ export async function DELETE(
 	try {
 		const { id } = await params;
 		const existing = await prisma.post.findUnique({ where: { id } });
-		if (!existing || existing.deletedAt) {
+		if (!existing) {
 			return NextResponse.json({ error: "Post not found" }, { status: 404 });
 		}
 
-		const post = await prisma.post.update({
+		const post = await prisma.post.delete({
 			where: { id },
-			data: { deletedAt: new Date() },
 		});
 
 		revalidatePublicSite();
+		revalidatePostUrls(post.id, [post.slug, ...post.previousSlugs]);
 
 		const userId = session.user.id as string;
 		await prisma.auditLog.create({
 			data: {
 				userId,
-				action: "SOFT_DELETE_POST",
+				action: "DELETE_POST",
 				entityType: "Post",
 				entityId: id,
-				metadata: { title: existing.title },
+				metadata: {
+					title: existing.title,
+					slug: existing.slug,
+					previousSlugs: existing.previousSlugs,
+					permanent: true,
+				},
 			},
 		});
 
-		return NextResponse.json({ message: "Post deleted successfully", post });
+		return NextResponse.json({
+			message: "Post permanently deleted",
+			post: { id: post.id, title: post.title },
+		});
 	} catch (error) {
 		console.error("Failed to delete post:", error);
 		return NextResponse.json(

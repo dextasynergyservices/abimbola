@@ -561,8 +561,8 @@ export default function AdminPostsPage() {
 								Delete post &ldquo;{deleteTarget.title}&rdquo;?
 							</AlertDialogTitle>
 							<AlertDialogDescription className="text-slate-500 text-sm">
-								This action performs a soft delete. The post record can be
-								recovered if needed.
+								This permanently deletes the article and all of its reader
+								comments. This cannot be undone.
 							</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter className="mt-4">
@@ -574,7 +574,7 @@ export default function AdminPostsPage() {
 								disabled={actionLoading}
 								className="bg-rose-600 hover:bg-rose-700 text-white font-medium"
 							>
-								{actionLoading ? "Deleting..." : "Delete Post"}
+								{actionLoading ? "Deleting..." : "Delete Permanently"}
 							</AlertDialogAction>
 						</AlertDialogFooter>
 					</AlertDialogContent>
