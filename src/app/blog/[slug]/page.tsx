@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { permanentRedirect } from "next/navigation";
 import BlogPostClient from "@/app/blog/[slug]/BlogPostClient";
 import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
 import {
 	getAuthorProfile,
-	getPublishedPostBySlug,
 	getPublishedPosts,
+	resolvePublishedPostRoute,
 } from "@/lib/cms";
 import { getPublicComments } from "@/lib/engagement/comments";
 
@@ -14,6 +15,11 @@ export const revalidate = 86400;
 
 interface BlogPostPageProps {
 	params: Promise<{ slug: string }>;
+}
+
+function postUrl(slug: string): string {
+	const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/+$/, "");
+	return `${appUrl}/blog/${slug}`;
 }
 
 export async function generateStaticParams() {
@@ -34,20 +40,24 @@ export async function generateMetadata({
 	params,
 }: BlogPostPageProps): Promise<Metadata> {
 	const { slug } = await params;
-	const post = await getPublishedPostBySlug(slug);
+	const route = await resolvePublishedPostRoute(slug);
+	const post = route.kind === "found" ? route.post : null;
 
 	if (post) {
 		const seoTitle = post.seoTitle || `${post.title} - Abimbola Lawuyi`;
 		const seoDescription =
 			post.seoDescription || post.excerpt || "Article by Abimbola Lawuyi";
 		const imageUrl = post.featuredImage?.secureUrl;
+		const canonicalUrl = postUrl(post.slug);
 
 		return {
 			title: seoTitle,
 			description: seoDescription,
+			alternates: { canonical: canonicalUrl },
 			openGraph: {
 				title: seoTitle,
 				description: seoDescription,
+				url: canonicalUrl,
 				images: imageUrl
 					? [
 							{
@@ -69,10 +79,16 @@ export default async function BlogPostBySlugPage({
 	params,
 }: BlogPostPageProps) {
 	const { slug } = await params;
-	const [post, authorProfile] = await Promise.all([
-		getPublishedPostBySlug(slug),
+	const [route, authorProfile] = await Promise.all([
+		resolvePublishedPostRoute(slug),
 		getAuthorProfile(),
 	]);
+
+	if (route.kind === "redirect") {
+		permanentRedirect(`/blog/${encodeURIComponent(route.slug)}`);
+	}
+
+	const post = route.kind === "found" ? route.post : null;
 
 	if (!post) {
 		// Fallback mock post if database record not found

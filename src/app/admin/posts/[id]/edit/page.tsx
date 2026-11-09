@@ -32,6 +32,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { UploadedMedia } from "@/hooks/useCloudinaryUpload";
 import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
 import { DEFAULT_AUTHOR_PROFILE } from "@/lib/author";
+import { SLUG_MAX_LENGTH, slugify, validateSlug } from "@/lib/slug";
 
 const RichTextEditor = dynamic(
 	() => import("@/components/admin/RichTextEditor"),
@@ -56,6 +57,7 @@ export default function EditPostScreen() {
 	// Post Fields
 	const [title, setTitle] = useState("");
 	const [slug, setSlug] = useState("");
+	const [originalSlug, setOriginalSlug] = useState("");
 	const [excerpt, setExcerpt] = useState("");
 	const [body, setBody] = useState("");
 	const [status, setStatus] = useState<"DRAFT" | "PUBLISHED" | "ARCHIVED">(
@@ -107,6 +109,7 @@ export default function EditPostScreen() {
 
 				setTitle(post.title || "");
 				setSlug(post.slug || "");
+				setOriginalSlug(post.slug || "");
 				setExcerpt(post.excerpt || "");
 				setBody(post.body || "");
 				setStatus(post.status || "DRAFT");
@@ -152,6 +155,19 @@ export default function EditPostScreen() {
 		setTitle(val);
 	};
 
+	const handleSlugChange = (val: string) => {
+		setSlug(
+			val
+				.toLowerCase()
+				.replace(/[^a-z0-9-]+/g, "-")
+				.replace(/-{2,}/g, "-")
+				.replace(/^-+/, ""),
+		);
+	};
+
+	const slugError = slug ? validateSlug(slug) : null;
+	const slugChanged = originalSlug !== "" && slug !== originalSlug;
+
 	const handleFileUpload = async (files: FileList | null) => {
 		const media = await upload(files);
 		if (media) setFeaturedImage(media);
@@ -163,10 +179,13 @@ export default function EditPostScreen() {
 			toast.error("Article title is required");
 			return;
 		}
-		if (!slug.trim()) {
-			toast.error("Article slug is required");
+		const finalSlug = slugify(slug);
+		const finalSlugError = validateSlug(finalSlug);
+		if (finalSlugError) {
+			toast.error(finalSlugError);
 			return;
 		}
+		setSlug(finalSlug);
 		if (!body.trim()) {
 			toast.error("Article content body is required");
 			return;
@@ -181,7 +200,7 @@ export default function EditPostScreen() {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					title: title.trim(),
-					slug: slug.trim().toLowerCase(),
+					slug: finalSlug,
 					excerpt: excerpt.trim() || null,
 					body: body.trim(),
 					status: targetStatus,
@@ -203,6 +222,7 @@ export default function EditPostScreen() {
 			}
 
 			setStatus(targetStatus);
+			setOriginalSlug(finalSlug);
 			toast.success(
 				targetStatus === "PUBLISHED"
 					? "Article published successfully!"
@@ -323,6 +343,57 @@ export default function EditPostScreen() {
 									placeholder="e.g. The Art of Mindful Reading"
 									className="mt-1.5 bg-slate-50 border-slate-200 text-slate-900 font-semibold min-h-[44px]"
 								/>
+							</div>
+
+							<div>
+								<div className="flex items-center justify-between gap-2">
+									<Label
+										htmlFor="post-slug"
+										className="text-slate-700 font-medium"
+									>
+										URL Slug <span className="text-rose-500">*</span>
+									</Label>
+									<button
+										type="button"
+										onClick={() => setSlug(slugify(title))}
+										disabled={!title.trim()}
+										className="text-xs font-semibold text-amber-700 hover:text-amber-900 disabled:text-slate-300 disabled:cursor-not-allowed"
+									>
+										Generate from title
+									</button>
+								</div>
+								<div className="mt-1.5 flex items-stretch rounded-md border border-slate-200 bg-slate-50 focus-within:ring-2 focus-within:ring-amber-400 overflow-hidden">
+									<span className="hidden sm:flex items-center px-3 text-xs text-slate-500 bg-slate-100 border-r border-slate-200 select-none">
+										/blog/
+									</span>
+									<Input
+										id="post-slug"
+										value={slug}
+										maxLength={SLUG_MAX_LENGTH}
+										onChange={(e) => handleSlugChange(e.target.value)}
+										onBlur={() => setSlug((s) => slugify(s))}
+										placeholder="the-art-of-mindful-reading"
+										aria-invalid={Boolean(slugError)}
+										aria-describedby="post-slug-help"
+										className="border-0 bg-transparent font-mono text-sm text-slate-900 min-h-[44px] focus-visible:ring-0 focus-visible:ring-offset-0"
+									/>
+								</div>
+								<p
+									id="post-slug-help"
+									className={`mt-1 text-xs ${slugError ? "text-rose-600" : "text-slate-500"}`}
+								>
+									{slugError ??
+										"Lowercase letters, numbers and hyphens. This is the article's public web address."}
+								</p>
+								{slugChanged && !slugError && (
+									<p className="mt-1.5 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-md px-2.5 py-1.5">
+										The old address{" "}
+										<span className="font-mono">/blog/{originalSlug}</span> will
+										permanently redirect to{" "}
+										<span className="font-mono">/blog/{slug}</span> after you
+										save.
+									</p>
+								)}
 							</div>
 
 							<div>

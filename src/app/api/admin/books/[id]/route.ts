@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
+import { recordBookAudit } from "@/lib/book-audit";
+import {
+	findBookSlugConflict,
+	releaseSlugFromOtherBooksHistory,
+	revalidateBookUrls,
+} from "@/lib/book-slugs";
 import { revalidatePublicSite } from "@/lib/cache";
 import { prisma } from "@/lib/prisma";
+import { nextPreviousSlugs, validateSlug } from "@/lib/slug";
 
 const priceSchema = z.object({
 	type: z.enum(["HARD_COPY", "SOFT_COPY", "FREE", "COMING_SOON"]),
@@ -77,14 +84,23 @@ async function handleUpdate(request: Request, id: string) {
 		}
 
 		const formattedSlug = validated.slug.trim().toLowerCase();
-		const duplicate = await prisma.book.findFirst({
-			where: { slug: formattedSlug, id: { not: id }, deletedAt: null },
-		});
-		if (duplicate) {
-			return NextResponse.json(
-				{ error: "Another book with this slug already exists" },
-				{ status: 400 },
-			);
+		const slugError = validateSlug(formattedSlug);
+		if (slugError) {
+			return NextResponse.json({ error: slugError }, { status: 400 });
+		}
+		const conflict = await findBookSlugConflict(formattedSlug, id);
+		if (conflict) {
+			return NextResponse.json({ error: conflict }, { status: 400 });
+		}
+
+		const slugChanged = existing.slug !== formattedSlug;
+		const previousSlugs = nextPreviousSlugs(
+			existing.previousSlugs,
+			existing.slug,
+			formattedSlug,
+		);
+		if (slugChanged) {
+			await releaseSlugFromOtherBooksHistory(formattedSlug, id);
 		}
 
 		if (validated.featuredOnHome) {
@@ -111,6 +127,7 @@ async function handleUpdate(request: Request, id: string) {
 			data: {
 				title: validated.title,
 				slug: formattedSlug,
+				previousSlugs,
 				author: validated.author || "Abimbola Lawuyi",
 				description: validated.description ?? null,
 				rating: validated.rating ?? 5.0,
@@ -136,7 +153,18 @@ async function handleUpdate(request: Request, id: string) {
 			include: { category: true, prices: true },
 		});
 
+		await recordBookAudit(session.user.id, "UPDATE_BOOK", book.id, {
+			title: book.title,
+			slug: book.slug,
+			status: book.status,
+			...(slugChanged ? { previousSlug: existing.slug } : {}),
+			...(existing.title !== book.title
+				? { previousTitle: existing.title }
+				: {}),
+		});
+
 		revalidatePublicSite();
+		revalidateBookUrls(book.id, [book.slug, ...book.previousSlugs]);
 
 		return NextResponse.json({ book });
 	} catch (error) {
@@ -182,18 +210,42 @@ export async function DELETE(
 	try {
 		const { id } = await params;
 		const existing = await prisma.book.findUnique({ where: { id } });
-		if (!existing || existing.deletedAt) {
+		if (!existing) {
 			return NextResponse.json({ error: "Book not found" }, { status: 404 });
 		}
 
-		const book = await prisma.book.update({
-			where: { id },
-			data: { deletedAt: new Date() },
+		// Permanent delete. Prices and reviews are removed by the DB cascade
+		// (onDelete: Cascade); other books' "related books" lists are cleaned
+		// in the same transaction so no dangling ids remain. The cover image
+		// stays in the media library because it may be used elsewhere.
+		const referencingBooks = await prisma.book.findMany({
+			where: { relatedBookIds: { has: id } },
+			select: { id: true, relatedBookIds: true },
+		});
+		const [book] = await prisma.$transaction([
+			prisma.book.delete({ where: { id } }),
+			...referencingBooks.map((b) =>
+				prisma.book.update({
+					where: { id: b.id },
+					data: { relatedBookIds: b.relatedBookIds.filter((r) => r !== id) },
+				}),
+			),
+		]);
+
+		await recordBookAudit(session.user.id, "DELETE_BOOK", book.id, {
+			title: book.title,
+			slug: book.slug,
+			previousSlugs: book.previousSlugs,
+			permanent: true,
 		});
 
 		revalidatePublicSite();
+		revalidateBookUrls(book.id, [book.slug, ...book.previousSlugs]);
 
-		return NextResponse.json({ message: "Book deleted successfully", book });
+		return NextResponse.json({
+			message: "Book permanently deleted",
+			book: { id: book.id, title: book.title },
+		});
 	} catch (error) {
 		console.error("Failed to delete book:", error);
 		return NextResponse.json(

@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
+import { recordBookAudit } from "@/lib/book-audit";
+import {
+	findBookSlugConflict,
+	releaseSlugFromOtherBooksHistory,
+	revalidateBookUrls,
+} from "@/lib/book-slugs";
 import { revalidatePublicSite } from "@/lib/cache";
 import { prisma } from "@/lib/prisma";
+import { validateSlug } from "@/lib/slug";
 
 const priceSchema = z.object({
 	type: z.enum(["HARD_COPY", "SOFT_COPY", "FREE", "COMING_SOON"]),
@@ -95,16 +102,15 @@ export async function POST(request: Request) {
 		const body = await request.json();
 		const validated = createBookSchema.parse(body);
 		const formattedSlug = validated.slug.trim().toLowerCase();
-
-		const existing = await prisma.book.findFirst({
-			where: { slug: formattedSlug, deletedAt: null },
-		});
-		if (existing) {
-			return NextResponse.json(
-				{ error: "A book with this slug already exists" },
-				{ status: 400 },
-			);
+		const slugError = validateSlug(formattedSlug);
+		if (slugError) {
+			return NextResponse.json({ error: slugError }, { status: 400 });
 		}
+		const conflict = await findBookSlugConflict(formattedSlug);
+		if (conflict) {
+			return NextResponse.json({ error: conflict }, { status: 400 });
+		}
+		await releaseSlugFromOtherBooksHistory(formattedSlug);
 
 		if (validated.featuredOnHome) {
 			const currentFeatured = await prisma.book.findMany({
@@ -152,7 +158,14 @@ export async function POST(request: Request) {
 			include: { category: true, prices: true },
 		});
 
+		await recordBookAudit(session.user.id, "CREATE_BOOK", book.id, {
+			title: book.title,
+			slug: book.slug,
+			status: book.status,
+		});
+
 		revalidatePublicSite();
+		revalidateBookUrls(book.id, [book.slug]);
 
 		return NextResponse.json({ book }, { status: 201 });
 	} catch (error) {

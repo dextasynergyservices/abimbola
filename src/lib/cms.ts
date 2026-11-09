@@ -268,17 +268,58 @@ export const getAuthorProfile = cache(async (): Promise<AuthorProfile> => {
 	}
 });
 
+export type PublishedPostRoute =
+	| { kind: "found"; post: PublishedPost }
+	| { kind: "redirect"; slug: string }
+	| { kind: "not-found" };
+
 /**
- * Fetch single published post by slug from Neon database, including full body.
+ * Resolve a /blog/[slug] URL segment.
+ *
+ * Only the post's CURRENT slug renders the page. Previous slugs (after an
+ * admin rename), the raw database id, or wrong casing return a redirect to the
+ * current slug so every article has exactly one live URL.
+ */
+export const resolvePublishedPostRoute = cache(
+	async (param: string): Promise<PublishedPostRoute> => {
+		const key = param.trim();
+		const slugKey = key.toLowerCase();
+
+		const current = await getPublishedPostBySlug(slugKey);
+		if (current) {
+			if (key !== current.slug) return { kind: "redirect", slug: current.slug };
+			return { kind: "found", post: current };
+		}
+
+		try {
+			const legacy = await prisma.post.findFirst({
+				where: {
+					OR: [{ id: key }, { previousSlugs: { has: slugKey } }],
+					status: "PUBLISHED",
+					deletedAt: null,
+				},
+				select: { slug: true },
+			});
+			if (legacy) return { kind: "redirect", slug: legacy.slug };
+		} catch (error) {
+			console.error(`Error resolving post route "${key}":`, error);
+		}
+
+		return { kind: "not-found" };
+	},
+);
+
+/**
+ * Fetch single published post by its CURRENT slug from Neon database, including full body.
  * Wrapped with React cache() to deduplicate requests during SSR.
  */
 export const getPublishedPostBySlug = cache(
-	async (slugOrId: string): Promise<PublishedPost | null> => {
+	async (slug: string): Promise<PublishedPost | null> => {
 		try {
-			const term = slugOrId.trim().toLowerCase();
+			const term = slug.trim().toLowerCase();
 			const post = await prisma.post.findFirst({
 				where: {
-					OR: [{ slug: term }, { id: slugOrId }],
+					slug: term,
 					status: "PUBLISHED",
 					deletedAt: null,
 				},
@@ -333,10 +374,7 @@ export const getPublishedPostBySlug = cache(
 				featuredImage,
 			};
 		} catch (error) {
-			console.error(
-				`Error fetching published post for slug "${slugOrId}":`,
-				error,
-			);
+			console.error(`Error fetching published post for slug "${slug}":`, error);
 			return null;
 		}
 	},
